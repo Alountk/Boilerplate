@@ -128,7 +128,7 @@ The API is secured using JWT (JSON Web Tokens).
 - [x] **Core Architecture Setup** (Hexagonal/DDD)
 - [x] **Videogames Module** (CRUD)
 - [x] **User Management** (Secure Registration/Updates)
-- [ ] **Authentication**: Implement JWT (JSON Web Tokens) for secure login.
+- [x] **Authentication**: Implement JWT (JSON Web Tokens) for secure login.
 - [ ] **Authorization**: Role-based access control (RBAC).
 - [ ] **Email Verification**: Send verification emails upon registration.
 - [ ] **Pagination & Filtering**: Advanced query capabilities for lists.
