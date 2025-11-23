@@ -2,6 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Videogames.Application.Services;
+using Videogames.Application.Settings;
 using Videogames.Domain.Ports;
 using Videogames.Infrastructure.Persistence;
 using Videogames.Infrastructure.Repositories;
@@ -30,6 +31,10 @@ public static class DependencyInjection
 
         services.AddScoped<IVideogameService, VideogameService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<ITokenService, TokenService>();
+        
+        services.Configure<JwtSettings>(options => configuration.GetSection("JwtSettings").Bind(options));
+        
         return services;
     }
 }
