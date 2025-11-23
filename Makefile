@@ -1,4 +1,8 @@
-.PHONY: docker-up run-api docker-down
+.PHONY: docker-up run-api docker-down migrate
+
+migrate:
+	dotnet ef database update --project Videogames.Infrastructure --startup-project Videogames.API
+
 
 docker-up:
 	docker-compose up -d
