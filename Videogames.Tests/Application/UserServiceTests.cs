@@ -12,12 +12,14 @@ namespace Videogames.Tests.Application;
 public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _mockRepository;
+    private readonly Mock<ITokenService> _mockTokenService;
     private readonly UserService _service;
 
     public UserServiceTests()
     {
         _mockRepository = new Mock<IUserRepository>();
-        _service = new UserService(_mockRepository.Object);
+        _mockTokenService = new Mock<ITokenService>();
+        _service = new UserService(_mockRepository.Object, _mockTokenService.Object);
     }
 
     [Fact]
