@@ -40,6 +40,16 @@
                 "reveal": "always",
                 "panel": "shared"
             }
+        },
+        {
+            "label": "Run Web",
+            "type": "shell",
+            "command": "make run-web",
+            "problemMatcher": [],
+            "presentation": {
+                "reveal": "always",
+                "panel": "shared"
+            }
         }
     ]
 }

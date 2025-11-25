@@ -7,12 +7,12 @@ export default function Navbar() {
   const { user, logout, isAuthenticated } = useAuth();
 
   return (
-    <nav className="bg-gray-800 p-4 text-white">
+    <nav className="bg-slate-700 flex items-center justify-between p-4 text-white">
       <div className="container mx-auto flex justify-between items-center">
-        <Link href="/" className="text-xl font-bold">
+        <Link href="/" className="text-xl">
           Videogames DB
         </Link>
-        <div className="flex gap-4">
+        <div className="flex items-center gap-4">
           {isAuthenticated ? (
             <>
               <span className="self-center">Welcome, {user?.firstName}</span>

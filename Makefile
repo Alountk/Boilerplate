@@ -12,3 +12,6 @@ run-api:
 
 docker-down:
 	docker-compose down
+
+run-web:
+	cd Videogames.Web && npm run dev
