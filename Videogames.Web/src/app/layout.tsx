@@ -1,8 +1,10 @@
+import { ThemeModeScript } from "flowbite-react";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import "./globals.css";
 import Navbar from "../components/Navbar";
 import { AuthProvider } from "../context/AuthContext";
+import "./globals.css";
+import Contact from "@/components/Contact";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
@@ -18,12 +20,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <ThemeModeScript />
+      </head>
       <body className={montserrat.className}>
         <AuthProvider>
-          <Navbar />
-          <main className="container mx-auto p-4">
-            {children}
-          </main>
+          <Contact />
+          {/* <Navbar /> */}
+          <main className="container mx-auto p-4">{children}</main>
         </AuthProvider>
       </body>
     </html>
