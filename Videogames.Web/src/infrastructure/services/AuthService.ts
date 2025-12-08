@@ -13,13 +13,13 @@ export class AuthService implements IAuthService {
   }
 
   async register(data: RegisterRequest): Promise<AuthResponse> {
-    const response = await axiosInstance.post<AuthResponse>('/Users/register', data);
-    // Usually register also logs in, or returns success. Assuming it returns AuthResponse as per port.
-    // If backend returns just user or 200 OK, we might need to adjust.
-    // Based on AuthController, Register returns UserDto usually.
-    // Let's assume for now it returns what we need or we handle it.
-    // If it doesn't return token, we might need to login after register.
-    // But for now implementing as per interface.
+    const { recaptchaToken, ...userData } = data;
+    const config = recaptchaToken 
+      ? { headers: { 'X-Recaptcha-Token': recaptchaToken } }
+      : {};
+      
+    // Fix: The endpoint is /Users (POST), not /Users/register based on UsersController
+    const response = await axiosInstance.post<AuthResponse>('/Users', userData, config);
     return response.data;
   }
 

@@ -14,6 +14,7 @@ export interface RegisterRequest {
   city: string;
   country: string;
   phone: string;
+  recaptchaToken?: string;
 }
 
 export interface AuthResponse {
