@@ -84,3 +84,7 @@ Desktop.ini
 
 # macOS
 .DS_Store
+
+# User-specific configuration
+**/appsettings*.json
+!**/appsettings.json
