@@ -12,11 +12,16 @@ public class UsersController : ControllerBase
 {
     private readonly IUserService _service;
     private readonly ILogger<UsersController> _logger;
+    private readonly IRecaptchaService _recaptchaService;
 
-    public UsersController(IUserService service, ILogger<UsersController> logger)
+    public UsersController(
+        IUserService service, 
+        ILogger<UsersController> logger,
+        IRecaptchaService recaptchaService)
     {
         _service = service;
         _logger = logger;
+        _recaptchaService = recaptchaService;
     }
 
     [HttpPost]
@@ -25,6 +30,24 @@ public class UsersController : ControllerBase
     {
         try
         {
+            if (Request.Headers.TryGetValue("X-Recaptcha-Token", out var token))
+            {
+                var isRecaptchaValid = await _recaptchaService.VerifyTokenAsync(token.ToString());
+                if (!isRecaptchaValid)
+                {
+                    _logger.LogWarning("Invalid recaptcha token provided during user creation.");
+                    return BadRequest(new { error = "Invalid reCAPTCHA." });
+                }
+            }
+            else
+            {
+                // In production, we might want to enforce this.
+                // For now, if no token is provided, we might fail or allow based on requirement.
+                // Requirement said "implement a recaptcha ... to avoid bots". So we should enforce it.
+                _logger.LogWarning("No recaptcha token provided.");
+                return BadRequest(new { error = "reCAPTCHA verification is required." });
+            }
+
             _logger.LogInformation("Creating new user");
             var created = await _service.CreateAsync(createDto);
             return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);

@@ -39,30 +39,30 @@ export default function CreateVideogamePage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-gray-100 py-10">
-      <div className="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <div className="flex justify-center items-center min-h-screen py-10">
+      <div className="bg-slate-700 p-8 rounded shadow-md w-full max-w-md">
         <h2 className="text-2xl font-bold mb-6 text-center">Add New Videogame</h2>
         <form onSubmit={handleSubmit}>
           <div className="mb-4">
-            <label className="block text-gray-700">English Name</label>
+            <label className="block text-white">English Name</label>
             <input name="englishName" onChange={handleChange} className="w-full border p-2 rounded" required />
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Console</label>
+            <label className="block text-white">Console</label>
             <input name="console" onChange={handleChange} className="w-full border p-2 rounded" required />
           </div>
           <div className="grid grid-cols-2 gap-4">
             <div className="mb-4">
-              <label className="block text-gray-700">QR Code</label>
+              <label className="block text-white">QR Code</label>
               <input name="qr" onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
             <div className="mb-4">
-              <label className="block text-gray-700">Barcode</label>
+              <label className="block text-white">Barcode</label>
               <input name="codebar" onChange={handleChange} className="w-full border p-2 rounded" />
             </div>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">State</label>
+            <label className="block text-white">State</label>
             <select name="state" onChange={handleChange} className="w-full border p-2 rounded">
               <option value={GameState.Sealed}>Sealed</option>
               <option value={GameState.Opened}>Opened</option>
@@ -70,11 +70,11 @@ export default function CreateVideogamePage() {
             </select>
           </div>
           <div className="mb-4">
-            <label className="block text-gray-700">Release Date</label>
+            <label className="block text-white">Release Date</label>
             <input name="releaseDate" type="date" onChange={handleChange} className="w-full border p-2 rounded" required />
           </div>
           <div className="mb-6">
-            <label className="block text-gray-700">Version</label>
+            <label className="block text-white">Version</label>
             <input name="versionGame" onChange={handleChange} className="w-full border p-2 rounded" />
           </div>
           <button type="submit" className="w-full bg-green-500 text-white p-2 rounded hover:bg-green-600">

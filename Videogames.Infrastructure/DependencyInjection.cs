@@ -6,6 +6,8 @@ using Videogames.Application.Settings;
 using Videogames.Domain.Ports;
 using Videogames.Infrastructure.Persistence;
 using Videogames.Infrastructure.Repositories;
+using Videogames.Infrastructure.Services;
+using Videogames.Infrastructure.Configuration;
 
 namespace Videogames.Infrastructure;
 
@@ -29,11 +31,15 @@ public static class DependencyInjection
             services.AddSingleton<IUserRepository, InMemoryUserRepository>();
         }
 
+        // Configuration
+        services.Configure<JwtSettings>(configuration.GetSection(JwtSettings.SectionName));
+        services.Configure<RecaptchaSettings>(configuration.GetSection(RecaptchaSettings.SectionName));
+
+        // Application Services
         services.AddScoped<IVideogameService, VideogameService>();
         services.AddScoped<IUserService, UserService>();
         services.AddScoped<ITokenService, TokenService>();
-        
-        services.Configure<JwtSettings>(options => configuration.GetSection("JwtSettings").Bind(options));
+        services.AddHttpClient<IRecaptchaService, GoogleRecaptchaService>();
         
         return services;
     }
