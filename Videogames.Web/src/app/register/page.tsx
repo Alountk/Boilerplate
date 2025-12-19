@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-import ReCAPTCHA from "react-google-recaptcha";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -16,7 +15,6 @@ export default function RegisterPage() {
     country: "",
     phone: "",
   });
-  const [recaptchaToken, setRecaptchaToken] = useState<string | null>(null);
   const { register } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
@@ -25,22 +23,13 @@ export default function RegisterPage() {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleRecaptchaChange = (token: string | null) => {
-    setRecaptchaToken(token);
-  };
-
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!recaptchaToken) {
-      setError("Please complete the reCAPTCHA verification.");
-      return;
-    }
 
     try {
       await register({
         ...formData,
         password: formData.password,
-        recaptchaToken,
       });
       router.push("/");
     } catch (err: any) {
@@ -127,16 +116,6 @@ export default function RegisterPage() {
               name="phone"
               onChange={handleChange}
               className="w-full border p-2 rounded"
-            />
-          </div>
-
-          <div className="mb-6 flex justify-center">
-            <ReCAPTCHA
-              sitekey={
-                process.env.NEXT_PUBLIC_RECAPTCHA_SITE_KEY ||
-                "6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"
-              } // Test key
-              onChange={handleRecaptchaChange}
             />
           </div>
 
