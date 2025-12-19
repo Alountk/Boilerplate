@@ -5,14 +5,14 @@
             "name": ".NET Core Launch (web)",
             "type": "coreclr",
             "request": "launch",
-            "preLaunchTask": "Docker Up",
-            "program": "${workspaceFolder}/Videogames.API/bin/Debug/net8.0/Videogames.API.dll",
+            // "preLaunchTask": "Docker Up",
+            "program": "${workspaceFolder}/Videogames.API/bin/Debug/net10.0/Videogames.API.dll",
             "args": [],
             "cwd": "${workspaceFolder}/Videogames.API",
             "stopAtEntry": false,
             "serverReadyAction": {
-                "action": "openExternally",
-                "pattern": "\\bNow listening on:\\s+(https?://\\S+)"
+                "pattern": "\\bNow listening on:\\s+(https?://\\S+)",
+                "uriFormat": "https://localhost:7079;http://localhost:5017"
             },
             "env": {
                 "ASPNETCORE_ENVIRONMENT": "Development"
