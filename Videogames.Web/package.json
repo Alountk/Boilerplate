@@ -11,19 +11,16 @@
   "dependencies": {
     "@heroicons/react": "^2.2.0",
     "axios": "^1.13.2",
-    "flowbite-react": "^0.12.10",
     "iconoir-react": "^7.11.0",
     "next": "16.0.3",
     "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "react-google-recaptcha": "^3.1.0"
+    "react-dom": "19.2.0"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
-    "@types/react-google-recaptcha": "^2.1.9",
     "eslint": "^9",
     "eslint-config-next": "16.0.3",
     "tailwindcss": "^4",
