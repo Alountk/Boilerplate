@@ -88,9 +88,20 @@ namespace Videogames.Infrastructure.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uuid");
 
+                    b.Property<decimal>("AcceptOffersRange")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.PrimitiveCollection<List<string>>("Assets")
                         .IsRequired()
                         .HasColumnType("text[]");
+
+                    b.Property<decimal>("AveragePrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
+                    b.Property<int>("Category")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Codebar")
                         .IsRequired()
@@ -100,13 +111,25 @@ namespace Videogames.Infrastructure.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("text");
+
                     b.Property<string>("EnglishName")
                         .IsRequired()
                         .HasColumnType("text");
 
+                    b.Property<decimal>("GeneralState")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.PrimitiveCollection<List<string>>("Images")
                         .IsRequired()
                         .HasColumnType("text[]");
+
+                    b.Property<decimal>("OwnPrice")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
 
                     b.Property<string>("Qr")
                         .IsRequired()
@@ -115,8 +138,16 @@ namespace Videogames.Infrastructure.Migrations
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<decimal>("Score")
+                        .HasPrecision(18, 2)
+                        .HasColumnType("numeric(18,2)");
+
                     b.Property<int>("State")
                         .HasColumnType("integer");
+
+                    b.Property<string>("UrlImg")
+                        .IsRequired()
+                        .HasColumnType("text");
 
                     b.Property<string>("VersionGame")
                         .IsRequired()
@@ -129,6 +160,49 @@ namespace Videogames.Infrastructure.Migrations
 
             modelBuilder.Entity("Videogames.Domain.Entities.Videogame", b =>
                 {
+                    b.OwnsMany("Videogames.Domain.ValueObjects.GameContent", "Contents", b1 =>
+                        {
+                            b1.Property<Guid>("VideogameId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("Id")
+                                .ValueGeneratedOnAdd()
+                                .HasColumnType("integer");
+
+                            NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b1.Property<int>("Id"));
+
+                            b1.Property<string>("BackUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("BottomSideUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("FrontalUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("LeftSideUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("RightSideUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.Property<string>("TopSideUrl")
+                                .IsRequired()
+                                .HasColumnType("text");
+
+                            b1.HasKey("VideogameId", "Id");
+
+                            b1.ToTable("GameContent");
+
+                            b1.WithOwner()
+                                .HasForeignKey("VideogameId");
+                        });
+
                     b.OwnsMany("Videogames.Domain.ValueObjects.LocalizedName", "Names", b1 =>
                         {
                             b1.Property<Guid>("VideogameId")
@@ -155,6 +229,8 @@ namespace Videogames.Infrastructure.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("VideogameId");
                         });
+
+                    b.Navigation("Contents");
 
                     b.Navigation("Names");
                 });

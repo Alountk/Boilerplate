@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState({
@@ -39,92 +40,144 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen py-10">
-      <div className="bg-slate-700 p-8 rounded shadow-md w-full max-w-md">
-        <h2 className="text-2xl font-bold mb-6 text-center">Register</h2>
-        {error && <p className="text-red-500 mb-4">{error}</p>}
-        <form onSubmit={handleSubmit}>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="mb-4">
-              <label className="block text-white">First Name</label>
+    <div className="flex justify-center items-center min-h-[calc(100vh-140px)] bg-gray-50 dark:bg-gray-900 py-10 transition-colors duration-300">
+      <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-xl w-full max-w-xl border border-gray-100 dark:border-gray-700">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Join vMarket
+          </h2>
+          <p className="text-gray-500 dark:text-gray-400 mt-2">
+            Create your marketplace account today
+          </p>
+        </div>
+        {error && (
+          <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 border border-red-100 dark:border-red-800">
+            {error}
+          </div>
+        )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                First Name
+              </label>
               <input
                 name="firstName"
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="John"
                 required
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-white">Last Name</label>
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                Last Name
+              </label>
               <input
                 name="lastName"
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="Doe"
                 required
               />
             </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-white">Email</label>
-            <input
-              name="email"
-              type="email"
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                Email Address
+              </label>
+              <input
+                name="email"
+                type="email"
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="name@example.com"
+                required
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                Password
+              </label>
+              <input
+                name="password"
+                type="password"
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="••••••••"
+                required
+              />
+            </div>
           </div>
-          <div className="mb-4">
-            <label className="block text-white">Password</label>
-            <input
-              name="password"
-              type="password"
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-              required
-            />
-          </div>
-          <div className="mb-4">
-            <label className="block text-white">Address</label>
+
+          <div>
+            <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+              Address
+            </label>
             <input
               name="address"
               onChange={handleChange}
-              className="w-full border p-2 rounded"
+              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              placeholder="123 Street Name"
             />
           </div>
-          <div className="grid grid-cols-2 gap-4">
-            <div className="mb-4">
-              <label className="block text-white">City</label>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                City
+              </label>
               <input
                 name="city"
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="City"
               />
             </div>
-            <div className="mb-4">
-              <label className="block text-white">Country</label>
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                Country
+              </label>
               <input
                 name="country"
                 onChange={handleChange}
-                className="w-full border p-2 rounded"
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="Country"
               />
             </div>
-          </div>
-          <div className="mb-6">
-            <label className="block text-white">Phone</label>
-            <input
-              name="phone"
-              onChange={handleChange}
-              className="w-full border p-2 rounded"
-            />
+            <div>
+              <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                Phone
+              </label>
+              <input
+                name="phone"
+                onChange={handleChange}
+                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+                placeholder="+1 234..."
+              />
+            </div>
           </div>
 
           <button
             type="submit"
-            className="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600"
+            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/25 active:scale-[0.98]"
           >
-            Register
+            Create Account
           </button>
+
+          <div className="text-center mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              Already have an account?{" "}
+              <Link
+                href="/login"
+                className="text-blue-600 dark:text-blue-400 font-bold hover:underline ml-1"
+              >
+                Sign in
+              </Link>
+            </p>
+          </div>
         </form>
       </div>
     </div>
