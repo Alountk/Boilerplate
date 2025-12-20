@@ -90,14 +90,34 @@ export default function CreateVideogamePage() {
     e.preventDefault();
     setLoading(true);
     try {
-      await videogameService.create({
+      // Ensure numeric fields are numbers and filter empty localized names
+      const payload = {
         ...formData,
-        names,
+        generalState: Number(formData.generalState),
+        averagePrice: Number(formData.averagePrice),
+        ownPrice: Number(formData.ownPrice),
+        acceptOffersRange: Number(formData.acceptOffersRange),
+        score: Number(formData.score),
+        category: Number(formData.category),
+        state: Number(formData.state),
+        names: names.filter(
+          (n) => n.name.trim() !== "" && n.language.trim() !== ""
+        ),
         assets: [],
         images: [],
-        state: Number(formData.state),
-        contents,
-      });
+        // Ensure date is in ISO format
+        releaseDate: new Date(formData.releaseDate).toISOString(),
+        contents: contents.map((c) => ({
+          frontalUrl: c.frontalUrl || "",
+          backUrl: c.backUrl || "",
+          rightSideUrl: c.rightSideUrl || "",
+          leftSideUrl: c.leftSideUrl || "",
+          topSideUrl: c.topSideUrl || "",
+          bottomSideUrl: c.bottomSideUrl || "",
+        })),
+      };
+
+      await videogameService.create(payload as any);
       router.push("/");
     } catch (error) {
       console.error("Failed to create videogame", error);
@@ -172,6 +192,51 @@ export default function CreateVideogamePage() {
                   className="form-input"
                   placeholder="e.g. PAL-ESP, NTSC"
                 />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  Category
+                </label>
+                <select
+                  name="category"
+                  value={formData.category}
+                  onChange={handleChange}
+                  className="form-input"
+                  required
+                >
+                  <option value={0}>PlayStation</option>
+                  <option value={1}>Xbox</option>
+                  <option value={2}>Nintendo</option>
+                  <option value={3}>Sega</option>
+                  <option value={4}>PC</option>
+                  <option value={5}>Other</option>
+                </select>
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                    QR Code
+                  </label>
+                  <input
+                    name="qr"
+                    value={formData.qr}
+                    onChange={handleChange}
+                    className="form-input"
+                    placeholder="QR Reference"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                    Barcode
+                  </label>
+                  <input
+                    name="codebar"
+                    value={formData.codebar}
+                    onChange={handleChange}
+                    className="form-input"
+                    placeholder="EAN/UPC"
+                  />
+                </div>
               </div>
             </div>
           </section>
