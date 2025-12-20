@@ -3,13 +3,13 @@ import { Montserrat } from "next/font/google";
 import Navbar from "../components/Navbar";
 import { AuthProvider } from "../context/AuthContext";
 import "./globals.css";
-import Contact from "@/components/Contact";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Videogames DB",
-  description: "A database of videogames",
+  title: "vMarket - The Ultimate Videogame Marketplace",
+  description:
+    "Buy, sell, and trade videogames, accessories, and merchandising.",
 };
 
 export default function RootLayout({
@@ -19,11 +19,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head></head>
-      <body className={montserrat.className}>
+      <body
+        className={`${montserrat.className} bg-white dark:bg-gray-900 transition-colors duration-300`}
+      >
         <AuthProvider>
-          <Contact />
-          <main className="container mx-auto p-4">{children}</main>
+          <Navbar />
+          <main className="min-h-[calc(100vh-140px)]">{children}</main>
         </AuthProvider>
       </body>
     </html>
