@@ -16,4 +16,15 @@ public class Videogame
     public GameState State { get; set; }
     public DateTime ReleaseDate { get; set; }
     public string VersionGame { get; set; } = string.Empty;
+
+    // Marketplace fields
+    public string Description { get; set; } = string.Empty;
+    public string UrlImg { get; set; } = string.Empty;
+    public decimal GeneralState { get; set; }
+    public decimal AveragePrice { get; set; }
+    public decimal OwnPrice { get; set; }
+    public decimal AcceptOffersRange { get; set; }
+    public decimal Score { get; set; }
+    public int Category { get; set; }
+    public List<GameContent> Contents { get; set; } = new();
 }
