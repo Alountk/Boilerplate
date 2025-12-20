@@ -11,6 +11,22 @@ export interface CreateVideogameRequest {
   state: number;
   releaseDate: string;
   versionGame: string;
+  description: string;
+  urlImg: string;
+  generalState: number;
+  averagePrice: number;
+  ownPrice: number;
+  acceptOffersRange: number;
+  score: number;
+  category: number;
+  contents: {
+    frontalUrl: string;
+    backUrl: string;
+    rightSideUrl: string;
+    leftSideUrl: string;
+    topSideUrl: string;
+    bottomSideUrl: string;
+  }[];
 }
 
 export interface UpdateVideogameRequest extends Partial<CreateVideogameRequest> {
