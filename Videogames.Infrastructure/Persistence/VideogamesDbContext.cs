@@ -33,8 +33,24 @@ public class VideogamesDbContext : DbContext
                 a.Property(n => n.Language);
             });
 
+            entity.OwnsMany(e => e.Contents, a =>
+            {
+                a.WithOwner().HasForeignKey("VideogameId");
+                a.Property(c => c.FrontalUrl);
+                a.Property(c => c.BackUrl);
+                a.Property(c => c.RightSideUrl);
+                a.Property(c => c.LeftSideUrl);
+                a.Property(c => c.TopSideUrl);
+                a.Property(c => c.BottomSideUrl);
+            });
+
             entity.Property(e => e.Assets).HasColumnType("text[]"); // Postgres array
             entity.Property(e => e.Images).HasColumnType("text[]"); // Postgres array
+            entity.Property(e => e.GeneralState).HasPrecision(18, 2);
+            entity.Property(e => e.AveragePrice).HasPrecision(18, 2);
+            entity.Property(e => e.OwnPrice).HasPrecision(18, 2);
+            entity.Property(e => e.AcceptOffersRange).HasPrecision(18, 2);
+            entity.Property(e => e.Score).HasPrecision(18, 2);
         });
 
         modelBuilder.Entity<User>(entity =>
