@@ -1,9 +1,19 @@
-'use client';
+"use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { User } from '../domain/models/User';
-import { AuthService } from '../infrastructure/services/AuthService';
-import { LoginRequest, RegisterRequest, UpdateUserRequest } from '../domain/ports/IAuthService';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  ReactNode,
+} from "react";
+import { User } from "../domain/models/User";
+import { AuthService } from "../infrastructure/services/AuthService";
+import {
+  LoginRequest,
+  RegisterRequest,
+  UpdateUserRequest,
+} from "../domain/ports/IAuthService";
 
 interface AuthContextType {
   user: User | null;
@@ -12,17 +22,20 @@ interface AuthContextType {
   logout: () => void;
   updateUser: (id: string, data: UpdateUserRequest) => Promise<void>;
   isAuthenticated: boolean;
+  loading: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
   const authService = new AuthService();
 
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     setUser(currentUser);
+    setLoading(false);
   }, []);
 
   const login = async (credentials: LoginRequest) => {
@@ -33,7 +46,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   const register = async (data: RegisterRequest) => {
     const response = await authService.register(data);
     if (response.user) {
-        setUser(response.user);
+      setUser(response.user);
     }
   };
 
@@ -48,7 +61,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   };
 
   return (
-    <AuthContext.Provider value={{ user, login, register, logout, updateUser, isAuthenticated: !!user }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        login,
+        register,
+        logout,
+        updateUser,
+        isAuthenticated: !!user,
+        loading,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );
@@ -57,7 +80,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
