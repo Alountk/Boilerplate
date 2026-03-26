@@ -28,6 +28,7 @@ public class VideogamesController : ControllerBase
     }
 
     [HttpGet("{id}")]
+    [AllowAnonymous]
     public async Task<ActionResult<VideogameDto>> GetById(Guid id)
     {
         var videogame = await _service.GetByIdAsync(id);
@@ -39,6 +40,7 @@ public class VideogamesController : ControllerBase
     }
 
     [HttpGet]
+    [AllowAnonymous]
     public async Task<ActionResult<IEnumerable<VideogameDto>>> GetAll()
     {
         var videogames = await _service.GetAllAsync();
