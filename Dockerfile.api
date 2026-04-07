@@ -1,0 +1,27 @@
+# syntax=docker/dockerfile:1
+FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
+WORKDIR /src
+
+COPY Videogames.sln ./
+COPY Videogames.Domain/Videogames.Domain.csproj Videogames.Domain/
+COPY Videogames.Application/Videogames.Application.csproj Videogames.Application/
+COPY Videogames.Infrastructure/Videogames.Infrastructure.csproj Videogames.Infrastructure/
+COPY Videogames.API/Videogames.API.csproj Videogames.API/
+
+RUN dotnet restore Videogames.API/Videogames.API.csproj
+
+COPY Videogames.Domain/ Videogames.Domain/
+COPY Videogames.Application/ Videogames.Application/
+COPY Videogames.Infrastructure/ Videogames.Infrastructure/
+COPY Videogames.API/ Videogames.API/
+
+RUN dotnet publish Videogames.API/Videogames.API.csproj -c Release -o /app/publish --no-restore
+
+FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
+WORKDIR /app
+COPY --from=build /app/publish .
+
+ENV ASPNETCORE_URLS=http://+:8080
+EXPOSE 8080
+
+ENTRYPOINT ["dotnet", "Videogames.API.dll"]

@@ -88,6 +88,14 @@ builder.Services.AddSwaggerGen(c =>
 
 var app = builder.Build();
 
+// Configure to read the headers from Nginx
+app.UseForwardedHeaders(new ForwardedHeadersOptions
+{
+    ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto
+});
+
+
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

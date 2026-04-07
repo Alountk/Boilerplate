@@ -1,0 +1,13 @@
+.git
+.gitignore
+**/.vs
+**/bin
+**/obj
+**/node_modules
+**/.next
+**/playwright-report
+**/test-results
+Videogames.Web/node_modules
+Videogames.Web/.next
+*.log
+test-results
