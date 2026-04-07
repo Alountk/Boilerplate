@@ -1,31 +1,49 @@
-version: "3.8"
+# Version of the stack for Portainer
+# Services: API (.NET) + Web (Next.js)
+# Note: MinIO and PostgreSQL are assumed to be external/already running.
 
 services:
-  postgres:
-    image: postgres:17
-    container_name: videogames_postgres
-    environment:
-      - POSTGRES_USER=admin
-      - POSTGRES_PASSWORD=adminpassword
-      - POSTGRES_DB=videogamesdb
+  api:
+    image: ${API_IMAGE_TAG:-videogames-api:latest}
+    restart: unless-stopped
+    build:
+      context: .
+      dockerfile: Dockerfile.api
     ports:
-      - "5432:5432"
-    volumes:
-      - postgres_data_development:/var/lib/postgresql
-
-  minio:
-    image: minio/minio
-    container_name: videogames_minio
-    ports:
-      - "9000:9000"
-      - "9001:9001"
+      - "${API_PORT:-5017}:8080"
     environment:
-      - MINIO_ROOT_USER=minioadmin
-      - MINIO_ROOT_PASSWORD=minioadmin
-    command: server /data --console-address ":9001"
-    volumes:
-      - minio_data:/data
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER:-VideogamesAPI}
+      - JwtSettings__Audience=${JWT_AUDIENCE:-VideogamesClient}
+      - JwtSettings__ExpiryMinutes=${JWT_EXPIRY_MINUTES:-60}
+      - Minio__Endpoint=${MINIO_ENDPOINT}
+      - Minio__User=${MINIO_USER}
+      - Minio__Secret=${MINIO_SECRET}
+      - Minio__BucketName=${MINIO_BUCKET:-videogames}
+      - Minio__UseSSL=${MINIO_USE_SSL:-false}
+    networks:
+      - app-network
 
-volumes:
-  postgres_data_development:
-  minio_data:
+  web:
+    image: ${WEB_IMAGE_TAG:-videogames-web:latest}
+    restart: unless-stopped
+    build:
+      context: ./Videogames.Web
+      dockerfile: Dockerfile
+      args:
+        NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+networks:
+  app-network:
+    driver: bridge

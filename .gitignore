@@ -95,3 +95,5 @@ Desktop.ini
 **/playwright/.cache/
 *.log
 *.txt
+
+.env
