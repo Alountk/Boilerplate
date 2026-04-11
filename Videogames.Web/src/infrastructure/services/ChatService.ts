@@ -1,40 +1,20 @@
-import { axiosInstance } from "../api/axiosInstance";
+import { IChatService } from '../../domain/ports/IChatService';
+import { Conversation, Message } from '../../domain/models/Chat';
+import { axiosInstance } from '../api/axiosInstance';
 
-export interface MessageDto {
-  id: string;
-  conversationId: string;
-  senderId: string;
-  text: string;
-  createdAt: string;
-  isRead: boolean;
-}
-
-export interface ConversationDto {
-  id: string;
-  buyerId: string;
-  buyerName: string;
-  sellerId: string;
-  sellerName: string;
-  videogameId: string;
-  videogameName: string;
-  videogameUrlImg?: string;
-  createdAt: string;
-  lastMessage?: MessageDto;
-}
-
-export class ChatService {
-  async getConversations(): Promise<ConversationDto[]> {
-    const response = await axiosInstance.get<ConversationDto[]>("/Chat/conversations");
+export class ChatService implements IChatService {
+  async getConversations(): Promise<Conversation[]> {
+    const response = await axiosInstance.get<Conversation[]>("/Chat/conversations");
     return response.data;
   }
 
-  async getMessages(conversationId: string): Promise<MessageDto[]> {
-    const response = await axiosInstance.get<MessageDto[]>(`/Chat/conversations/${conversationId}/messages`);
+  async getMessages(conversationId: string): Promise<Message[]> {
+    const response = await axiosInstance.get<Message[]>(`/Chat/conversations/${conversationId}/messages`);
     return response.data;
   }
 
-  async startConversation(videogameId: string): Promise<ConversationDto> {
-    const response = await axiosInstance.post<ConversationDto>(`/Chat/conversations/${videogameId}`);
+  async startConversation(videogameId: string): Promise<Conversation> {
+    const response = await axiosInstance.post<Conversation>(`/Chat/conversations/${videogameId}`);
     return response.data;
   }
 

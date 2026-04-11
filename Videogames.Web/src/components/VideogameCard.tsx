@@ -1,6 +1,7 @@
 import { TrashIcon, HeartIcon, ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/solid";
+import { Videogame } from "../domain/models/Videogame";
 
 interface VideogameCardProps {
   videogame: Videogame;
