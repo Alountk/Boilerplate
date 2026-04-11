@@ -1,5 +1,6 @@
 using Serilog;
 using Videogames.Infrastructure;
+using Videogames.Infrastructure.RealTime;
 using Microsoft.OpenApi.Models;
 using Microsoft.AspNetCore.HttpOverrides;
 
@@ -15,6 +16,7 @@ builder.Host.UseSerilog();
 
 // Add services to the container.
 builder.Services.AddControllers();
+builder.Services.AddSignalR();
 // Add CORS
 builder.Services.AddCors(options =>
 {
@@ -114,5 +116,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapHub<ChatHub>("/hubs/chat");
 
 app.Run();
