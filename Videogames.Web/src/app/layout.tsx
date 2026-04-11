@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import Navbar from "../components/Navbar";
 import { AuthProvider } from "../context/AuthContext";
+import { ChatProvider } from "../context/ChatContext";
 import "./globals.css";
 
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -23,8 +24,10 @@ export default function RootLayout({
         className={`${montserrat.className} bg-white dark:bg-gray-900 transition-colors duration-300`}
       >
         <AuthProvider>
-          <Navbar />
-          <main className="min-h-[calc(100vh-140px)]">{children}</main>
+          <ChatProvider>
+            <Navbar />
+            <main className="min-h-[calc(100vh-140px)]">{children}</main>
+          </ChatProvider>
         </AuthProvider>
       </body>
     </html>
