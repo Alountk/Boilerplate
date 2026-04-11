@@ -15,6 +15,10 @@ export class AuthService implements IAuthService {
   async register(data: RegisterRequest): Promise<AuthResponse> {
     // Fix: The endpoint is /Users (POST), not /Users/register based on UsersController
     const response = await axiosInstance.post<AuthResponse>('/Users', data);
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
     return response.data;
   }
 
