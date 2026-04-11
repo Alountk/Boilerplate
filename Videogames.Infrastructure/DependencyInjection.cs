@@ -8,6 +8,7 @@ using Videogames.Infrastructure.Adapters;
 using Videogames.Infrastructure.Configuration;
 using Videogames.Infrastructure.Persistence;
 using Videogames.Infrastructure.Repositories;
+using Videogames.Infrastructure.Services;
 
 
 namespace Videogames.Infrastructure;
@@ -25,11 +26,18 @@ public static class DependencyInjection
 
             services.AddScoped<IVideogameRepository, PostgresVideogameRepository>();
             services.AddScoped<IUserRepository, PostgresUserRepository>();
+            services.AddScoped<IChatService, ChatService>();
         }
         else
         {
+            Console.ForegroundColor = ConsoleColor.Yellow;
+            Console.WriteLine("WARNING: 'DefaultConnection' connection string is missing or empty.");
+            Console.WriteLine("Falling back to IN-MEMORY repositories. Data will be lost on restart.");
+            Console.ResetColor();
+
             services.AddSingleton<IVideogameRepository, InMemoryVideogameRepository>();
             services.AddSingleton<IUserRepository, InMemoryUserRepository>();
+            // Note: InMemoryChatService would go here if implemented
         }
 
         // Configuration
