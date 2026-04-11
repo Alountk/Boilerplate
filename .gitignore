@@ -97,3 +97,8 @@ Desktop.ini
 *.txt
 
 .env
+.env.local
+
+# Agents
+.agents/
+skills-lock.json
