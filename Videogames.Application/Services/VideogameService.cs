@@ -13,7 +13,7 @@ public class VideogameService : IVideogameService
         _repository = repository;
     }
 
-    public async Task<VideogameDto> CreateAsync(CreateVideogameDto createDto)
+    public async Task<VideogameDto> CreateAsync(CreateVideogameDto createDto, Guid sellerId)
     {
         var videogame = new Videogame
         {
@@ -36,7 +36,8 @@ public class VideogameService : IVideogameService
             AcceptOffersRange = createDto.AcceptOffersRange,
             Score = createDto.Score,
             Category = createDto.Category,
-            Contents = createDto.Contents
+            Contents = createDto.Contents,
+            SellerId = sellerId
         };
 
         var created = await _repository.CreateAsync(videogame);

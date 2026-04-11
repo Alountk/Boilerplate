@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Videogames.Application.DTOs;
 using Videogames.Application.Services;
+using System.Security.Claims;
 
 namespace Videogames.API.Controllers;
 
@@ -22,8 +23,14 @@ public class VideogamesController : ControllerBase
     [HttpPost]
     public async Task<ActionResult<VideogameDto>> Create(CreateVideogameDto createDto)
     {
-        _logger.LogInformation("Creating new videogame: {Name}", createDto.EnglishName);
-        var created = await _service.CreateAsync(createDto);
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        _logger.LogInformation("Creating new videogame: {Name} for User: {UserId}", createDto.EnglishName, userId);
+        var created = await _service.CreateAsync(createDto, userId);
         return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
     }
 

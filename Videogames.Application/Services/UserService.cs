@@ -17,7 +17,7 @@ public class UserService : IUserService
         _tokenService = tokenService;
     }
 
-    public async Task<UserDto> CreateAsync(CreateUserDto createDto)
+    public async Task<AuthResponseDto> CreateAsync(CreateUserDto createDto)
     {
         // Check if email already exists
         if (await _repository.EmailExistsAsync(createDto.Email))
@@ -41,7 +41,9 @@ public class UserService : IUserService
         };
 
         var created = await _repository.CreateAsync(user);
-        return MapToDto(created);
+        var token = _tokenService.GenerateToken(created);
+        
+        return new AuthResponseDto(token, MapToDto(created));
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
@@ -79,7 +81,7 @@ public class UserService : IUserService
         return users.Select(MapToDto);
     }
 
-    public async Task UpdateAsync(Guid id, UpdateUserDto updateDto)
+    public async Task<UserDto> UpdateAsync(Guid id, UpdateUserDto updateDto)
     {
         var existing = await _repository.GetByIdAsync(id);
         if (existing == null)
@@ -123,6 +125,7 @@ public class UserService : IUserService
         existing.UpdatedAt = DateTime.UtcNow;
 
         await _repository.UpdateAsync(existing);
+        return MapToDto(existing);
     }
 
     public async Task DeleteAsync(Guid id)

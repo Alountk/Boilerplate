@@ -23,15 +23,13 @@ public class UsersController : ControllerBase
 
     [HttpPost]
     [AllowAnonymous]
-    public async Task<ActionResult<UserDto>> Create(CreateUserDto createDto)
+    public async Task<ActionResult<AuthResponseDto>> Create(CreateUserDto createDto)
     {
         try
         {
-
-
             _logger.LogInformation("Creating new user");
-            var created = await _service.CreateAsync(createDto);
-            return CreatedAtAction(nameof(GetById), new { id = created.Id }, created);
+            var response = await _service.CreateAsync(createDto);
+            return CreatedAtAction(nameof(GetById), new { id = response.User.Id }, response);
         }
         catch (InvalidOperationException ex)
         {
@@ -75,13 +73,13 @@ public class UsersController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task<IActionResult> Update(Guid id, UpdateUserDto updateDto)
+    public async Task<ActionResult<UserDto>> Update(Guid id, UpdateUserDto updateDto)
     {
         try
         {
             _logger.LogInformation("Updating user: {Id}", id);
-            await _service.UpdateAsync(id, updateDto);
-            return NoContent();
+            var updatedUser = await _service.UpdateAsync(id, updateDto);
+            return Ok(updatedUser);
         }
         catch (InvalidOperationException ex)
         {
