@@ -12,6 +12,8 @@ public class VideogamesDbContext : DbContext
 
     public DbSet<Videogame> Videogames { get; set; }
     public DbSet<User> Users { get; set; }
+    public DbSet<Conversation> Conversations { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -51,6 +53,49 @@ public class VideogamesDbContext : DbContext
             entity.Property(e => e.OwnPrice).HasPrecision(18, 2);
             entity.Property(e => e.AcceptOffersRange).HasPrecision(18, 2);
             entity.Property(e => e.Score).HasPrecision(18, 2);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<Conversation>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(e => e.Buyer)
+                .WithMany()
+                .HasForeignKey(e => e.BuyerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Seller)
+                .WithMany()
+                .HasForeignKey(e => e.SellerId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.HasOne(e => e.Videogame)
+                .WithMany()
+                .HasForeignKey(e => e.VideogameId)
+                .OnDelete(DeleteBehavior.Cascade);
+        });
+
+        modelBuilder.Entity<Message>(entity =>
+        {
+            entity.HasKey(e => e.Id);
+            
+            entity.HasOne(e => e.Conversation)
+                .WithMany(c => c.Messages)
+                .HasForeignKey(e => e.ConversationId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            entity.HasOne(e => e.Sender)
+                .WithMany()
+                .HasForeignKey(e => e.SenderId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            entity.Property(e => e.Text).IsRequired();
+            entity.Property(e => e.CreatedAt).IsRequired();
         });
 
         modelBuilder.Entity<User>(entity =>

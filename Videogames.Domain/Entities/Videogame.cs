@@ -27,4 +27,8 @@ public class Videogame
     public decimal Score { get; set; }
     public int Category { get; set; }
     public List<GameContent> Contents { get; set; } = new();
+
+    // Relationships
+    public Guid SellerId { get; set; }
+    public User Seller { get; set; } = null!;
 }
