@@ -39,4 +39,5 @@ export interface Videogame {
   score: number;
   category: number;
   contents: GameContent[];
+  sellerId: string;
 }

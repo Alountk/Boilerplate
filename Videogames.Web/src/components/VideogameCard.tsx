@@ -1,5 +1,5 @@
-import { Videogame } from "../domain/models/Videogame";
-import { TrashIcon, HeartIcon } from "@heroicons/react/24/outline";
+import { TrashIcon, HeartIcon, ChatBubbleOvalLeftEllipsisIcon } from "@heroicons/react/24/outline";
+import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/solid";
 
 interface VideogameCardProps {
@@ -16,7 +16,10 @@ export default function VideogameCard({
   const isGoodCondition = videogame.generalState >= 8;
 
   return (
-    <div className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 group flex flex-col h-full">
+    <Link 
+      href={`/product/${videogame.id}`}
+      className="bg-white dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 hover:shadow-lg transition-all duration-300 group flex flex-col h-full"
+    >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-gray-100 dark:bg-gray-900">
         {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -89,6 +92,6 @@ export default function VideogameCard({
           </div>
         </div>
       </div>
-    </div>
+    </Link>
   );
 }

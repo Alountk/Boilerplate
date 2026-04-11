@@ -3,10 +3,10 @@
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
-import { ShoppingCartIcon, BellIcon } from "@heroicons/react/24/outline";
+import { ShoppingCartIcon, BellIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
 
 export default function Navbar() {
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, loading } = useAuth();
 
   return (
     <header className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
@@ -14,7 +14,9 @@ export default function Navbar() {
       <div className="border-b border-gray-100 dark:border-gray-800">
         <div className="container mx-auto px-4 h-10 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
           <div className="flex items-center gap-4">
-            {isAuthenticated ? (
+            {loading ? (
+              <div className="h-4 w-24 bg-gray-100 dark:bg-gray-800 animate-pulse rounded" />
+            ) : isAuthenticated ? (
               <>
                 <span>
                   Hi <span className="font-bold">{user?.firstName}</span>!
@@ -56,6 +58,9 @@ export default function Navbar() {
             </Link>
             <Link href="/create" className="hover:underline">
               Sell
+            </Link>
+            <Link href="/messages" className="hover:underline flex items-center gap-1">
+              Messages
             </Link>
             <Link href="#" className="hover:underline hidden md:block">
               Watchlist
