@@ -61,7 +61,7 @@ test.describe('RAWG API Search Integration', () => {
     await page.goto('/create');
 
     // 1. Type in English Name
-    const nameInput = page.getByLabel('English Name');
+    const nameInput = page.locator('#englishName');
     await nameInput.fill('Zelda');
 
     // 2. Verify search results dropdown appears
@@ -72,19 +72,19 @@ test.describe('RAWG API Search Integration', () => {
     await resultItem.click();
 
     // 4. Verify fields are auto-populated
-    await expect(page.getByLabel('Release Date')).toHaveValue('2017-03-03');
-    await expect(page.getByLabel('Console')).toHaveValue('Nintendo'); // Mapped from Nintendo Switch
-    await expect(page.getByLabel('Detailed Description')).toHaveValue(/Hyrule/);
+    await expect(page.locator('input[name="releaseDate"]')).toHaveValue('2017-03-03');
+    await expect(page.locator('input[name="console"]')).toHaveValue('Nintendo'); // Mapped from Nintendo Switch
+    await expect(page.locator('[name="description"]')).toHaveValue(/Hyrule/);
     
     // Category should be selected (Nintendo usually has id 2)
-    const categorySelect = page.getByLabel('Category');
+    const categorySelect = page.locator('select[name="category"]');
     await expect(categorySelect).toHaveValue('2');
   });
 
   test('should handle empty search results gracefully', async ({ page }) => {
     await page.goto('/create');
 
-    await page.getByLabel('English Name').fill('NonExistentGame12345');
+    await page.locator('#englishName').fill('NonExistentGame12345');
 
     // Wait a bit for debounce and verify no dropdown appears (or shows "No results")
     // In our implementation, we just don't show the dropdown if results are 0
@@ -97,10 +97,10 @@ test.describe('RAWG API Search Integration', () => {
     await page.route('**/api.rawg.io/api/games?*search=fail*', route => route.fulfill({ status: 500 }));
 
     await page.goto('/create');
-    await page.getByLabel('English Name').fill('fail');
+    await page.locator('#englishName').fill('fail');
 
     // Verify app doesn't crash and name field is still usable
     await page.waitForTimeout(1000);
-    await expect(page.getByLabel('English Name')).toHaveValue('fail');
+    await expect(page.locator('#englishName')).toHaveValue('fail');
   });
 });

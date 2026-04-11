@@ -29,8 +29,8 @@ test.describe('Authentication Flow', () => {
     await page.click('text=Sign in');
     
     // Fill login form
-    await page.getByLabel('Email Address').fill('e2e-test@example.com');
-    await page.getByLabel('Password').fill('StrongPassword123!');
+    await page.locator('input[name="email"]').fill('e2e-test@example.com');
+    await page.locator('input[name="password"]').fill('StrongPassword123!');
     
     // Click sign in button
     await page.getByRole('button', { name: 'Sign In' }).click();
@@ -45,8 +45,8 @@ test.describe('Authentication Flow', () => {
   test('should logout successfully', async ({ page }) => {
     // Login first
     await page.goto('/login');
-    await page.getByLabel('Email Address').fill('e2e-test@example.com');
-    await page.getByLabel('Password').fill('StrongPassword123!');
+    await page.locator('input[name="email"]').fill('e2e-test@example.com');
+    await page.locator('input[name="password"]').fill('StrongPassword123!');
     await page.getByRole('button', { name: 'Sign In' }).click();
     
     // Verify logged in
@@ -62,11 +62,11 @@ test.describe('Authentication Flow', () => {
 
   test('should show error with invalid credentials', async ({ page }) => {
     await page.goto('/login');
-    await page.getByLabel('Email Address').fill('wrong@example.com');
-    await page.getByLabel('Password').fill('WrongPassword123!');
+    await page.locator('input[name="email"]').fill('wrong@example.com');
+    await page.locator('input[name="password"]').fill('WrongPassword123!');
     await page.getByRole('button', { name: 'Sign In' }).click();
     
     // Verify error message
-    await expect(page.locator('text=Invalid credentials')).toBeVisible();
+    await expect(page.locator('text=Invalid email or password')).toBeVisible();
   });
 });

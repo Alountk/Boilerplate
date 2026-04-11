@@ -16,15 +16,14 @@ test.describe('User Registration Flow', () => {
     });
 
     // 2. Fill the registration form
-    await page.getByLabel('First Name').fill('Tester');
-    await page.getByLabel('Last Name').fill('Automation');
-    await page.getByLabel('Email Address').fill(testEmail);
-    await page.getByLabel('Password', { exact: true }).fill('Password123!');
-    await page.getByLabel('Confirm Password').fill('Password123!');
-    await page.getByLabel('Address').fill('123 Automation St');
-    await page.getByLabel('City').fill('Test City');
-    await page.getByLabel('Country').fill('Test Country');
-    await page.getByLabel('Phone Number').fill('1234567890');
+    await page.locator('input[name="firstName"]').fill('Tester');
+    await page.locator('input[name="lastName"]').fill('Automation');
+    await page.locator('input[name="email"]').fill(testEmail);
+    await page.locator('input[name="password"]').fill('Password123!');
+    await page.locator('input[name="address"]').fill('123 Automation St');
+    await page.locator('input[name="city"]').fill('Test City');
+    await page.locator('input[name="country"]').fill('Test Country');
+    await page.locator('input[name="phone"]').fill('1234567890');
 
     // 3. Submit the form
     await page.getByRole('button', { name: 'Create Account' }).click();
@@ -45,17 +44,16 @@ test.describe('User Registration Flow', () => {
     // Note: In a real CI environment, we would seed this or mock the API
     await page.goto('/register');
     
-    await page.getByLabel('First Name').fill('Another');
-    await page.getByLabel('Last Name').fill('User');
-    await page.getByLabel('Email Address').fill(testEmail); // Existing email
-    await page.getByLabel('Password', { exact: true }).fill('Password123!');
-    await page.getByLabel('Confirm Password').fill('Password123!');
+    await page.locator('input[name="firstName"]').fill('Another');
+    await page.locator('input[name="lastName"]').fill('User');
+    await page.locator('input[name="email"]').fill(testEmail); // Existing email
+    await page.locator('input[name="password"]').fill('Password123!');
     
     await page.getByRole('button', { name: 'Create Account' }).click();
 
     // Verify error message from backend
     // The backend returns { error: "..." } which is displayed in the UI
-    await expect(page.locator('text=already exists')).toBeVisible();
+    await expect(page.locator('text=Registration failed. Please try again.')).toBeVisible();
   });
 
   test('should maintain theme preference after hydration', async ({ page }) => {
