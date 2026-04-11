@@ -23,7 +23,7 @@ public class UserServiceTests
     }
 
     [Fact]
-    public async Task CreateAsync_ValidUser_ReturnsUserDto()
+    public async Task CreateAsync_ValidUser_ReturnsAuthResponseDto()
     {
         // Arrange
         var createDto = new CreateUserDto(
@@ -40,21 +40,23 @@ public class UserServiceTests
         _mockRepository.Setup(r => r.EmailExistsAsync(It.IsAny<string>()))
             .ReturnsAsync(false);
 
-        _mockRepository.Setup(r => r.CreateAsync(It.IsAny<User>()))
-            .ReturnsAsync((User u) => u);
+        _mockTokenService.Setup(s => s.GenerateToken(It.IsAny<User>()))
+            .Returns("fake-token");
 
         // Act
         var result = await _service.CreateAsync(createDto);
 
         // Assert
         Assert.NotNull(result);
-        Assert.Equal("John", result.FirstName);
-        Assert.Equal("Doe", result.LastName);
-        Assert.Equal("john.doe@example.com", result.Email);
-        Assert.Equal("123 Main St", result.Address);
-        Assert.Equal("New York", result.City);
-        Assert.Equal("USA", result.Country);
-        Assert.Equal("+1234567890", result.Phone);
+        Assert.Equal("fake-token", result.Token);
+        Assert.NotNull(result.User);
+        Assert.Equal("John", result.User.FirstName);
+        Assert.Equal("Doe", result.User.LastName);
+        Assert.Equal("john.doe@example.com", result.User.Email);
+        Assert.Equal("123 Main St", result.User.Address);
+        Assert.Equal("New York", result.User.City);
+        Assert.Equal("USA", result.User.Country);
+        Assert.Equal("+1234567890", result.User.Phone);
 
         _mockRepository.Verify(r => r.CreateAsync(It.Is<User>(u =>
             u.FirstName == "John" &&
@@ -113,6 +115,9 @@ public class UserServiceTests
         _mockRepository.Setup(r => r.CreateAsync(It.IsAny<User>()))
             .Callback<User>(u => capturedUser = u)
             .ReturnsAsync((User u) => u);
+
+        _mockTokenService.Setup(s => s.GenerateToken(It.IsAny<User>()))
+            .Returns("token");
 
         // Act
         await _service.CreateAsync(createDto);

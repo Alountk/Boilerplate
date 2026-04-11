@@ -154,3 +154,24 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 ## 📄 License
 
 This project is licensed under the MIT License.
+
+## 📝 Postmortem & Improvements
+
+### 2026-04-11: RAWG API Integration & Hydration Fixes
+- **Feature**: Integrated **RAWG API** to automatically fetch game metadata (name, release date, description, score, platform) during the "Sell Item" flow. Implemented a debounced search UI to improve UX and reduce API calls.
+- **Bug Fix**: Resolved **hydration mismatch** errors in `AuthContext` and `ThemeToggle`. Moved client-side state initialization (from `localStorage` and `window`) into `useEffect` hooks to ensure consistency between server-rendered HTML and client-side hydration.
+- **UX**: Added a loading skeleton to the `Navbar` to handle asynchronous auth state determination, preventing content flickering during page load.
+
+### 2026-04-11: Registration API Alignment & DB Diagnostics
+- **Bug Fix**: Fixed a mismatch between the Frontend and Backend registration flow. The `UsersController.Create` now returns an `AuthResponseDto` (Token + User), allowing immediate auto-login after a successful registration.
+- **Diagnostics**: Added a high-visibility Console Warning when the application fails to find a valid connection string, preventing silent fallbacks to In-Memory mode that could confuse developers.
+- **Configuration**: Added `appsettings.Development.json` to the API to provide clear guidance on where to configure local database connections.
+
+### 2026-04-11: Comprehensive Test Suite & QA
+- **E2E Testing**: Created `registration.spec.ts` to verify the full registration UI flow, ensuring immediate auto-login and handling edge cases like duplicate emails.
+- **API Testing**: Created `rawg_search.spec.ts` with comprehensive API mocking to test the RAWG integration (search, auto-fill, and error handling) without external dependencies.
+- **Backend Stability**: Updated `UserServiceTests.cs` to align with the new authentication response format and verified token generation logic.
+- **QA**: Integrated hydration checks within the E2E suite to monitor for React hydration mismatches during navigation.
+
+
+

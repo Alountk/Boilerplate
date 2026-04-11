@@ -13,18 +13,73 @@ import {
   PlusIcon,
   TrashIcon,
   TagIcon,
+  MagnifyingGlassIcon,
+  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
+import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
+import { RAWGService } from "../../infrastructure/services/RAWGService";
+import { RAWGGame } from "../../domain/ports/IRAWGService";
 
 import { useAuth } from "../../context/AuthContext";
+
+function FieldFeedback({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="mt-1 flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 font-medium">
+      <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+      <span>{message}</span>
+    </p>
+  );
+}
 
 export default function CreateVideogamePage() {
   const { user, loading: authLoading } = useAuth();
 
+  const [formData, setFormData] = useState({
+    englishName: "",
+    qr: "",
+    codebar: "",
+    console: "",
+    state: GameState.Sealed,
+    releaseDate: "",
+    versionGame: "",
+    description: "",
+    urlImg: "",
+    generalState: 0,
+    averagePrice: 0,
+    ownPrice: 0,
+    acceptOffersRange: 0,
+    score: 0,
+    category: 0,
+  });
+
+  const [errors, setErrors] = useState<Record<string, string>>({});
+  const [touched, setTouched] = useState<Record<string, boolean>>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const validate = (data: typeof formData) => {
+    const nextErrors: Record<string, string> = {};
+    if (!data.englishName.trim()) nextErrors.englishName = "English name is required.";
+    if (!data.console.trim()) nextErrors.console = "Console is required.";
+    if (!data.releaseDate) nextErrors.releaseDate = "Release date is required.";
+    if (data.ownPrice <= 0) nextErrors.ownPrice = "Asking price must be greater than 0.";
+    return nextErrors;
+  };
+
+  const showFieldError = (name: string) => {
+    if (errors[name] && (touched[name] || submitAttempted)) return errors[name];
+    return undefined;
+  };
+
   const router = useRouter();
   const videogameService = new VideogameService();
   const imageService = new ImageService();
+  const rawgService = new RAWGService();
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [searching, setSearching] = useState(false);
+  const [searchResults, setSearchResults] = useState<RAWGGame[]>([]);
+  const [showSearch, setShowSearch] = useState(false);
 
   const getImageUrl = (filename: string) => {
     // We must use the full filename (with extension) because that's how it's stored in S3.
@@ -39,23 +94,6 @@ export default function CreateVideogamePage() {
   const [images, setImages] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
-  const [formData, setFormData] = useState({
-    englishName: "",
-    qr: "",
-    codebar: "",
-    console: "",
-    state: GameState.Sealed,
-    releaseDate: "",
-    versionGame: "",
-    description: "",
-    urlImg: "", // Keep for backward compatibility, will use first image from images array
-    generalState: 0,
-    averagePrice: 0,
-    ownPrice: 0,
-    acceptOffersRange: 0,
-    score: 0,
-    category: 0,
-  });
 
   const [names, setNames] = useState([{ language: "", name: "" }]);
   const [contents, setContents] = useState([
@@ -75,6 +113,73 @@ export default function CreateVideogamePage() {
     }
   }, [user, authLoading, router]);
 
+  // RAWG Search Effect
+  useEffect(() => {
+    const searchTerm = formData.englishName.trim();
+    if (searchTerm.length < 3) {
+      setSearchResults([]);
+      setShowSearch(false);
+      return;
+    }
+
+    const timer = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const results = await rawgService.searchGames(searchTerm);
+        setSearchResults(results);
+        setShowSearch(results.length > 0);
+      } catch (error) {
+        console.error("RAWG Search failed", error);
+      } finally {
+        setSearching(false);
+      }
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [formData.englishName]);
+
+  const handleSelectGame = async (game: RAWGGame) => {
+    setShowSearch(false);
+    setLoading(true);
+    try {
+      const details = await rawgService.getGameDetails(game.id);
+      
+      // Map platform to category
+      const platformNames = details.platforms.map(p => p.platform.slug.toLowerCase());
+      let category = 5; // Other
+      if (platformNames.some(p => p.includes('playstation'))) category = 0;
+      else if (platformNames.some(p => p.includes('xbox'))) category = 1;
+      else if (platformNames.some(p => p.includes('nintendo') || p.includes('switch') || p.includes('wii') || p.includes('gamecube') || p.includes('n64') || p.includes('snes') || p.includes('nes'))) category = 2;
+      else if (platformNames.some(p => p.includes('sega') || p.includes('genesis') || p.includes('saturn') || p.includes('dreamcast'))) category = 3;
+      else if (platformNames.some(p => p.includes('pc'))) category = 4;
+
+      // Extract console name
+      const consoleName = details.platforms.length > 0 ? details.platforms[0].platform.name : "";
+
+      setFormData(prev => ({
+        ...prev,
+        englishName: details.name,
+        releaseDate: details.released || "",
+        console: consoleName,
+        description: details.description_raw || prev.description,
+        score: details.metacritic || 0,
+        category: category,
+        urlImg: details.background_image || prev.urlImg
+      }));
+
+      // If there is an image, we could add it to the images array too
+      if (details.background_image) {
+        // Note: This image is external, won't be in our S3, but we can store the URL for now
+        // if the system supports external URLs in urlImg
+      }
+
+    } catch (error) {
+      console.error("Failed to fetch game details", error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   if (authLoading || !user) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
@@ -89,10 +194,19 @@ export default function CreateVideogamePage() {
     >
   ) => {
     const { name, value, type } = e.target;
-    setFormData((prev) => ({
-      ...prev,
-      [name]: type === "number" ? parseFloat(value) : value,
-    }));
+    const val = type === "number" ? parseFloat(value) : value;
+    setFormData((prev) => {
+      const next = { ...prev, [name]: val };
+      const fieldErrors = validate(next);
+      setErrors(fieldErrors);
+      return next;
+    });
+    setTouched((prev) => ({ ...prev, [name]: true }));
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    const { name } = e.target;
+    setTouched((prev) => ({ ...prev, [name]: true }));
   };
 
   const handleMultipleFilesChange = async (
@@ -190,6 +304,15 @@ export default function CreateVideogamePage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitAttempted(true);
+    const fieldErrors = validate(formData);
+    setErrors(fieldErrors);
+
+    if (Object.keys(fieldErrors).length > 0) {
+      scrollToFirstError();
+      return;
+    }
+
     setLoading(true);
     try {
       // Ensure numeric fields are numbers and filter empty localized names
@@ -252,15 +375,54 @@ export default function CreateVideogamePage() {
                 >
                   English Name
                 </label>
-                <input
-                  id="englishName"
-                  name="englishName"
-                  value={formData.englishName}
-                  onChange={handleChange}
-                  className="form-input"
-                  required
-                  placeholder="e.g. The Legend of Zelda"
-                />
+                <div className="relative">
+                  <input
+                    id="englishName"
+                    name="englishName"
+                    value={formData.englishName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={getInputClassNames(!!showFieldError('englishName'))}
+                    aria-invalid={!!showFieldError('englishName')}
+                    placeholder="e.g. The Legend of Zelda"
+                  />
+                  <FieldFeedback message={showFieldError('englishName')} />
+                  {searching && (
+                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
+                      <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                    </div>
+                  )}
+                  {showSearch && searchResults.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 max-h-60 overflow-y-auto">
+                      {searchResults.map((game) => (
+                        <button
+                          key={game.id}
+                          type="button"
+                          onClick={() => handleSelectGame(game)}
+                          className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-left transition-colors border-b last:border-0 border-gray-50 dark:border-gray-700"
+                        >
+                          {game.background_image ? (
+                            <img 
+                              src={game.background_image} 
+                              alt={game.name} 
+                              className="w-12 h-12 object-cover rounded shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded">
+                              <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">{game.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {game.released ? new Date(game.released).getFullYear() : 'TBA'} • {game.platforms?.[0]?.platform.name || 'Unknown platform'}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
               <div>
                 <label
@@ -274,10 +436,12 @@ export default function CreateVideogamePage() {
                   name="console"
                   value={formData.console}
                   onChange={handleChange}
-                  className="form-input"
-                  required
+                  onBlur={handleBlur}
+                  className={getInputClassNames(!!showFieldError('console'))}
+                  aria-invalid={!!showFieldError('console')}
                   placeholder="e.g. Nintendo Switch"
                 />
+                <FieldFeedback message={showFieldError('console')} />
               </div>
               <div>
                 <label
@@ -292,9 +456,11 @@ export default function CreateVideogamePage() {
                   type="date"
                   value={formData.releaseDate}
                   onChange={handleChange}
-                  className="form-input"
-                  required
+                  onBlur={handleBlur}
+                  className={getInputClassNames(!!showFieldError('releaseDate'))}
+                  aria-invalid={!!showFieldError('releaseDate')}
                 />
+                <FieldFeedback message={showFieldError('releaseDate')} />
               </div>
               <div>
                 <label
@@ -459,8 +625,11 @@ export default function CreateVideogamePage() {
                       step="0.01"
                       value={formData.ownPrice}
                       onChange={handleChange}
-                      className="form-input"
+                      onBlur={handleBlur}
+                      className={getInputClassNames(!!showFieldError('ownPrice'))}
+                      aria-invalid={!!showFieldError('ownPrice')}
                     />
+                    <FieldFeedback message={showFieldError('ownPrice')} />
                   </div>
                 </div>
                 <div>

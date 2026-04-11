@@ -4,6 +4,18 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
+
+function FieldFeedback({ message }: { message?: string }) {
+  if (!message) return null;
+  return (
+    <p className="mt-1.5 flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 font-medium" role="alert">
+      <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
+      <span>{message}</span>
+    </p>
+  );
+}
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,14 +23,33 @@ export default function LoginPage() {
   const { login } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
+  const [fieldErrors, setFieldErrors] = useState<{email?: string; password?: string}>({});
+  const [submitAttempted, setSubmitAttempted] = useState(false);
+
+  const validate = () => {
+    const next: {email?: string; password?: string} = {};
+    if (!email.trim()) next.email = "Email is required";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Invalid email format";
+    if (!password) next.password = "Password is required";
+    return next;
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setSubmitAttempted(true);
+    const errors = validate();
+    setFieldErrors(errors);
+
+    if (Object.keys(errors).length > 0) {
+      scrollToFirstError();
+      return;
+    }
+
     try {
-      await login({ email, password }); // Assuming passwordHash field for now
+      await login({ email, password });
       router.push("/");
     } catch (err) {
-      setError("Invalid credentials");
+      setError("Invalid email or password");
       console.error(err);
     }
   };
@@ -52,11 +83,15 @@ export default function LoginPage() {
               name="email"
               type="email"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              onChange={(e) => {
+                setEmail(e.target.value);
+                if (submitAttempted) setFieldErrors(validate());
+              }}
+              className={getInputClassNames(!!fieldErrors.email)}
+              aria-invalid={!!fieldErrors.email}
               placeholder="name@example.com"
-              required
             />
+            <FieldFeedback message={fieldErrors.email} />
           </div>
           <div>
             <label
@@ -70,11 +105,15 @@ export default function LoginPage() {
               name="password"
               type="password"
               value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
+              onChange={(e) => {
+                setPassword(e.target.value);
+                if (submitAttempted) setFieldErrors(validate());
+              }}
+              className={getInputClassNames(!!fieldErrors.password)}
+              aria-invalid={!!fieldErrors.password}
               placeholder="••••••••"
-              required
             />
+            <FieldFeedback message={fieldErrors.password} />
           </div>
           <button
             type="submit"

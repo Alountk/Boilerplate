@@ -49,14 +49,16 @@ public class VideogameServiceTests
         _repositoryMock.Setup(r => r.CreateAsync(It.IsAny<Videogame>()))
             .ReturnsAsync((Videogame v) => v);
 
+        var sellerId = Guid.NewGuid();
+
         // Act
-        var result = await _service.CreateAsync(createDto);
+        var result = await _service.CreateAsync(createDto, sellerId);
 
         // Assert
         Assert.NotNull(result);
         Assert.Equal(createDto.EnglishName, result.EnglishName);
         Assert.Equal(createDto.Console, result.Console);
-        _repositoryMock.Verify(r => r.CreateAsync(It.IsAny<Videogame>()), Times.Once);
+        _repositoryMock.Verify(r => r.CreateAsync(It.Is<Videogame>(v => v.SellerId == sellerId)), Times.Once);
     }
 
     [Fact]

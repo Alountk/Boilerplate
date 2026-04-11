@@ -5,6 +5,7 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { UserPlusIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
+import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
 
 type RegisterForm = {
   firstName: string;
@@ -80,14 +81,6 @@ function FieldFeedback({
   );
 }
 
-function inputClassNames(invalid: boolean) {
-  return [
-    "w-full px-4 py-3 rounded-xl border bg-transparent dark:text-white outline-none transition-all",
-    invalid
-      ? "border-red-500 dark:border-red-500/80 focus:ring-2 focus:ring-red-500/40 focus:border-red-500"
-      : "border-gray-200 dark:border-gray-700 focus:ring-2 focus:ring-blue-500 focus:border-transparent",
-  ].join(" ");
-}
 
 export default function RegisterPage() {
   const [formData, setFormData] = useState<RegisterForm>(initialForm);
@@ -150,10 +143,12 @@ export default function RegisterPage() {
     const blocking = ["firstName", "lastName", "email", "password"] as const;
     if (blocking.some((k) => fieldErrors[k])) {
       setError("");
+      scrollToFirstError();
       return;
     }
     if (Object.keys(fieldErrors).length > 0) {
       setError("");
+      scrollToFirstError();
       return;
     }
 
@@ -244,7 +239,7 @@ export default function RegisterPage() {
                       autoComplete="given-name"
                       aria-invalid={!!showFieldError("firstName")}
                       aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined}
-                      className={inputClassNames(!!showFieldError("firstName"))}
+                      className={getInputClassNames(!!showFieldError("firstName"))}
                       placeholder="John"
                     />
                     <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
@@ -265,7 +260,7 @@ export default function RegisterPage() {
                       autoComplete="family-name"
                       aria-invalid={!!showFieldError("lastName")}
                       aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined}
-                      className={inputClassNames(!!showFieldError("lastName"))}
+                      className={getInputClassNames(!!showFieldError("lastName"))}
                       placeholder="Doe"
                     />
                     <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
@@ -291,7 +286,7 @@ export default function RegisterPage() {
                       autoComplete="email"
                       aria-invalid={!!showFieldError("email")}
                       aria-describedby={showFieldError("email") ? "err-email" : undefined}
-                      className={inputClassNames(!!showFieldError("email"))}
+                      className={getInputClassNames(!!showFieldError("email"))}
                       placeholder="you@example.com"
                     />
                     <FieldFeedback id="err-email" message={showFieldError("email")} />
@@ -315,7 +310,7 @@ export default function RegisterPage() {
                       aria-describedby={
                         showFieldError("password") ? "err-password" : "password-hint"
                       }
-                      className={inputClassNames(!!showFieldError("password"))}
+                      className={getInputClassNames(!!showFieldError("password"))}
                       placeholder="At least 8 characters"
                     />
                     <p
@@ -353,7 +348,7 @@ export default function RegisterPage() {
                       autoComplete="street-address"
                       aria-invalid={!!showFieldError("address")}
                       aria-describedby={showFieldError("address") ? "err-address" : undefined}
-                      className={inputClassNames(!!showFieldError("address"))}
+                      className={getInputClassNames(!!showFieldError("address"))}
                       placeholder="Street, number"
                     />
                     <FieldFeedback id="err-address" message={showFieldError("address")} />
@@ -375,7 +370,7 @@ export default function RegisterPage() {
                         autoComplete="address-level2"
                         aria-invalid={!!showFieldError("city")}
                         aria-describedby={showFieldError("city") ? "err-city" : undefined}
-                        className={inputClassNames(!!showFieldError("city"))}
+                        className={getInputClassNames(!!showFieldError("city"))}
                         placeholder="City"
                       />
                       <FieldFeedback id="err-city" message={showFieldError("city")} />
@@ -396,7 +391,7 @@ export default function RegisterPage() {
                         autoComplete="country-name"
                         aria-invalid={!!showFieldError("country")}
                         aria-describedby={showFieldError("country") ? "err-country" : undefined}
-                        className={inputClassNames(!!showFieldError("country"))}
+                        className={getInputClassNames(!!showFieldError("country"))}
                         placeholder="Country"
                       />
                       <FieldFeedback id="err-country" message={showFieldError("country")} />
@@ -419,7 +414,7 @@ export default function RegisterPage() {
                         autoComplete="tel"
                         aria-invalid={!!showFieldError("phone")}
                         aria-describedby={showFieldError("phone") ? "err-phone" : undefined}
-                        className={inputClassNames(!!showFieldError("phone"))}
+                        className={getInputClassNames(!!showFieldError("phone"))}
                         placeholder="+34 …"
                       />
                       <FieldFeedback id="err-phone" message={showFieldError("phone")} />

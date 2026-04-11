@@ -28,21 +28,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window !== "undefined") {
-      const authService = new AuthService();
-      return authService.getCurrentUser();
-    }
-    return null;
-  });
-  const [loading, setLoading] = useState(() => {
-    return typeof window === "undefined";
-  });
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // If we're on client, we're done loading after the initial render sync
+    // Load user only on client side after mount
     if (typeof window !== "undefined") {
-      // eslint-disable-next-line react-hooks/set-state-in-effect
+      const authService = new AuthService();
+      const currentUser = authService.getCurrentUser();
+      if (currentUser) {
+        setUser(currentUser);
+      }
       setLoading(false);
     }
   }, []);
