@@ -1,21 +1,12 @@
 import { test, expect } from '@playwright/test';
 import path from 'path';
+import { DEFAULT_E2E_USER, ensureE2EUser, loginAsUser } from './support/auth';
+import { fillRequiredItemFields, mockImageUpload, uploadCoverImage } from './support/item-creation';
 
 const TEST_IMAGE_PATH = path.resolve(__dirname, 'assets/test-image.png');
 
 test.beforeAll(async ({ request }) => {
-  await request.post('http://localhost:5017/api/Users', {
-    data: {
-      firstName: 'John',
-      lastName: 'Doe',
-      email: 'e2e-test@example.com',
-      password: 'StrongPassword123!',
-      address: '123 Test St',
-      city: 'Test City',
-      country: 'Test Country',
-      phone: '+1234567890'
-    }
-  });
+  await ensureE2EUser(request, DEFAULT_E2E_USER);
 });
 
 test.describe('Marketplace Flow', () => {
@@ -56,14 +47,7 @@ test.describe('Marketplace Flow', () => {
 
   test('should allow listing an item after login', async ({ page }) => {
     // 1. Login
-    await page.goto('/login');
-    await page.getByLabel('Email Address').fill('e2e-test@example.com');
-    await page.getByLabel('Password').fill('StrongPassword123!');
-    await page.getByRole('button', { name: 'Sign In' }).click();
-    
-    // Wait for redirection and session visibility in Navbar
-    await expect(page).toHaveURL(/.*\//, { timeout: 15000 });
-    await expect(page.locator('text=Hi John!')).toBeVisible({ timeout: 15000 });
+    await loginAsUser(page, DEFAULT_E2E_USER);
     
     // Extra safety: ensure the API/Backend session is also ready if possible
     // (In this case, waiting for the UI greeting is usually sufficient)
@@ -79,56 +63,35 @@ test.describe('Marketplace Flow', () => {
     await expect(page).toHaveURL(/.*create/);
     
     // 3. Fill the form
-    await page.getByLabel('English Name').fill('E2E Test Game');
-    await page.getByLabel('Console').fill('Test Console');
-    await page.getByLabel('Release Date').fill('2023-01-01');
-    await page.getByLabel('Version').fill('v1.0-Test');
-    
-    // Select category (Nintendo is value 2)
-    await page.getByLabel('Category').selectOption('2');
-    
-    // Fill prices
-    await page.getByLabel('Average Market Price').fill('50');
-    await page.getByLabel('Your Asking Price').fill('45');
-    
-    // Fill description
-    await page.getByLabel('Detailed Description').fill('This is a test game created by Playwright E2E.');
+    await fillRequiredItemFields(page, 'E2E Test Game');
     
     // Mock image upload response for CI environment
-    await page.route('**/api/Images/upload', async route => {
-      await route.fulfill({
-        status: 200,
-        contentType: 'application/json',
-        body: JSON.stringify({ fileName: 'e2e-mock-image-guid.png' }),
-      });
-    });
-
-    // Mock image retrieval response (since we use a fake filename)
-    await page.route('**/api/Images/e2e-mock-image-guid.png', async route => {
-      // Return a 302 redirect to a placeholder, or just 200 with dummy content
-      // Since frontend follows redirect, mocking 200 with image content is easier for test
-      await route.fulfill({
-        status: 200,
-        contentType: 'image/png',
-        body: Buffer.from('fake-image-content'), // Minimal content
-      });
-    });
+    await mockImageUpload(page, 'e2e-mock-image-guid.png');
 
     // Upload multiple cover images
-    await page.locator('#imageUpload').setInputFiles([
-      TEST_IMAGE_PATH,
-      TEST_IMAGE_PATH, // Using same image twice for testing
-    ]);
-    
-    // Wait for uploads to complete - should see 2 image previews in grid
-    // Use specific alt text selector since .grid > div is too generic
-    await expect(page.locator('img[alt^="Preview "]').first()).toBeVisible({ timeout: 10000 });
-    await expect(page.locator('img[alt^="Preview "]')).toHaveCount(2);
+    await uploadCoverImage(page, TEST_IMAGE_PATH, 2);
     
     // Submit
     await page.getByRole('button', { name: 'List Item Now' }).click();
     
     // 4. Verify redirection to home
     await expect(page).toHaveURL('http://localhost:3000/');
+  });
+
+  test('should let a registered user create an item and see it listed', async ({ page }) => {
+    const uniqueItemName = `E2E Created Item ${Date.now()}`;
+
+    await loginAsUser(page, DEFAULT_E2E_USER);
+    await page.getByRole('link', { name: 'Sell', exact: true }).click();
+    await expect(page).toHaveURL(/.*create/, { timeout: 15000 });
+
+    await fillRequiredItemFields(page, uniqueItemName);
+    await mockImageUpload(page, 'e2e-created-item-image.png');
+    await uploadCoverImage(page, TEST_IMAGE_PATH, 1);
+
+    await page.getByRole('button', { name: 'List Item Now' }).click();
+    await expect(page).toHaveURL('http://localhost:3000/', { timeout: 15000 });
+
+    await expect(page.getByRole('heading', { level: 3, name: uniqueItemName }).first()).toBeVisible({ timeout: 15000 });
   });
 });
