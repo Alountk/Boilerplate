@@ -21,6 +21,12 @@ FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS runtime
 WORKDIR /app
 COPY --from=build /app/publish .
 
+ARG APP_VERSION=dev
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.title="vMarket API"
+LABEL org.opencontainers.image.version=$APP_VERSION
+LABEL org.opencontainers.image.revision=$GIT_SHA
+
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 

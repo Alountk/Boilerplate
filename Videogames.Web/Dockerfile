@@ -17,6 +17,12 @@ RUN npm run build
 FROM node:20-alpine AS runner
 WORKDIR /app
 
+ARG APP_VERSION=dev
+ARG GIT_SHA=unknown
+LABEL org.opencontainers.image.title="vMarket Web"
+LABEL org.opencontainers.image.version=$APP_VERSION
+LABEL org.opencontainers.image.revision=$GIT_SHA
+
 ENV NODE_ENV=production
 ENV PORT=3000
 ENV HOSTNAME=0.0.0.0

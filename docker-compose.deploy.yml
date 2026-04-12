@@ -1,0 +1,41 @@
+# Deploy stack (version-pinned images)
+# Usage:
+#   APP_VERSION=main-123-abcdef0 docker compose -f docker-compose.deploy.yml up -d
+
+services:
+  api:
+    image: ${API_IMAGE_REPO:-ghcr.io/alountk/vmarket-api}:${APP_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${API_PORT:-5017}:8080"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://+:8080
+      - ConnectionStrings__DefaultConnection=${CONNECTION_STRING}
+      - JwtSettings__Secret=${JWT_SECRET}
+      - JwtSettings__Issuer=${JWT_ISSUER:-VideogamesAPI}
+      - JwtSettings__Audience=${JWT_AUDIENCE:-VideogamesClient}
+      - JwtSettings__ExpiryMinutes=${JWT_EXPIRY_MINUTES:-60}
+      - Minio__Endpoint=${MINIO_ENDPOINT}
+      - Minio__User=${MINIO_USER}
+      - Minio__Secret=${MINIO_SECRET}
+      - Minio__BucketName=${MINIO_BUCKET:-videogames}
+      - Minio__UseSSL=${MINIO_USE_SSL:-false}
+    networks:
+      - app-network
+
+  web:
+    image: ${WEB_IMAGE_REPO:-ghcr.io/alountk/vmarket-web}:${APP_VERSION:-latest}
+    restart: unless-stopped
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - api
+
+networks:
+  app-network:
+    driver: bridge

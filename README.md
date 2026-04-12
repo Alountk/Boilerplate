@@ -118,6 +118,30 @@ npx playwright install
 npm run test:e2e
 ```
 
+## 🚀 Versioned Docker Deploy
+
+Deployments can be pinned to an immutable image version generated in CI on every push to `main`.
+
+1. Set deployment variables (based on `.env.portainer.example`):
+```bash
+APP_VERSION=main-<runNumber>-<shortSha>
+API_IMAGE_REPO=ghcr.io/<owner>/vmarket-api
+WEB_IMAGE_REPO=ghcr.io/<owner>/vmarket-web
+```
+
+2. Deploy exact versions:
+```bash
+docker compose -f docker-compose.deploy.yml up -d
+```
+
+3. Rollback to a previous release by changing only `APP_VERSION` and re-running deploy.
+
+Helper make targets:
+```bash
+make docker-deploy-up
+make docker-deploy-down
+```
+
 ## 📂 Project Structure
 
 ```
