@@ -10,8 +10,6 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  API_IMAGE_NAME: ${{ github.repository_owner }}/vmarket-api
-  WEB_IMAGE_NAME: ${{ github.repository_owner }}/vmarket-web
 
 jobs:
   publish-images:
@@ -29,6 +27,16 @@ jobs:
           APP_VERSION="main-${GITHUB_RUN_NUMBER}-${SHORT_SHA}"
           echo "app_version=${APP_VERSION}" >> "$GITHUB_OUTPUT"
           echo "Computed APP_VERSION=${APP_VERSION}"
+
+      - name: Compute lowercase image names
+        id: image
+        shell: bash
+        run: |
+          OWNER_LC="${GITHUB_REPOSITORY_OWNER,,}"
+          echo "api_image=${OWNER_LC}/vmarket-api" >> "$GITHUB_OUTPUT"
+          echo "web_image=${OWNER_LC}/vmarket-web" >> "$GITHUB_OUTPUT"
+          echo "API image: ${OWNER_LC}/vmarket-api"
+          echo "WEB image: ${OWNER_LC}/vmarket-web"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -50,8 +58,8 @@ jobs:
             APP_VERSION=${{ steps.version.outputs.app_version }}
             GIT_SHA=${{ github.sha }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.version.outputs.app_version }}
-            ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:main-latest
+            ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:${{ steps.version.outputs.app_version }}
+            ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:main-latest
 
       - name: Build and push Web image
         uses: docker/build-push-action@v6
@@ -64,11 +72,11 @@ jobs:
             APP_VERSION=${{ steps.version.outputs.app_version }}
             GIT_SHA=${{ github.sha }}
           tags: |
-            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ steps.version.outputs.app_version }}
-            ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:main-latest
+            ${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:${{ steps.version.outputs.app_version }}
+            ${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:main-latest
 
       - name: Release summary
         run: |
           echo "Published version: ${{ steps.version.outputs.app_version }}"
-          echo "API: ${{ env.REGISTRY }}/${{ env.API_IMAGE_NAME }}:${{ steps.version.outputs.app_version }}"
-          echo "WEB: ${{ env.REGISTRY }}/${{ env.WEB_IMAGE_NAME }}:${{ steps.version.outputs.app_version }}"
+          echo "API: ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:${{ steps.version.outputs.app_version }}"
+          echo "WEB: ${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:${{ steps.version.outputs.app_version }}"
