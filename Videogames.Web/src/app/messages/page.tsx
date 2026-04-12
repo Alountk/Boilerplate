@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useChat } from "../../hooks/useChat";
 import { ChatService } from "../../infrastructure/services/ChatService";
@@ -9,9 +9,11 @@ import {
   ChatBubbleLeftRightIcon
 } from "@heroicons/react/24/outline";
 import { ChatList } from "../../components/chat/ChatList";
+import { useSearchParams } from "next/navigation";
 import { ChatRoom } from "../../components/chat/ChatRoom";
 
 export default function MessagesPage() {
+  const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { 
     messages, 
@@ -26,18 +28,10 @@ export default function MessagesPage() {
   } = useChat();
 
   const [loading, setLoading] = useState(true);
-  const chatService = new ChatService();
+  // Use stable service instance
+  const [chatService] = useState(() => new ChatService());
 
-  useEffect(() => {
-    if (user) {
-      chatService.getConversations().then((data) => {
-        setConversations(data);
-        setLoading(false);
-      });
-    }
-  }, [user]);
-
-  const handleSelectConversation = async (conv: Conversation) => {
+  const handleSelectConversation = useCallback(async (conv: Conversation) => {
     if (activeConversationId) {
       await leaveConversation(activeConversationId);
     }
@@ -53,7 +47,28 @@ export default function MessagesPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [activeConversationId, chatService, joinConversation, leaveConversation, setActiveConversationId, setMessages]);
+
+  // Effect 1: Load conversations when user is ready
+  useEffect(() => {
+    if (user) {
+      chatService.getConversations().then((data) => {
+        setConversations(data);
+        setLoading(false);
+      });
+    }
+  }, [user, chatService, setConversations]);
+
+  // Effect 2: Auto-select conversation from ?conv= URL param once conversations are loaded
+  useEffect(() => {
+    const convId = searchParams.get("conv");
+    if (!convId || activeConversationId || conversations.length === 0) return;
+
+    const targetConv = conversations.find(c => c.id === convId);
+    if (targetConv) {
+      handleSelectConversation(targetConv);
+    }
+  }, [conversations, searchParams, activeConversationId, handleSelectConversation]);
 
   const onSendMessage = async (text: string) => {
     if (!activeConversationId) return;

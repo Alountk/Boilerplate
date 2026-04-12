@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback, ReactNode, useRef } from "react";
 import * as signalR from "@microsoft/signalr";
 import { Message, Conversation } from "../domain/models/Chat";
 import { useAuth } from "./AuthContext";
@@ -30,7 +30,13 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
+  const activeConvIdRef = useRef<string | null>(null);
   const [loading, setLoading] = useState(false);
+
+  // Keep ref in sync so SignalR handlers always see the latest value
+  useEffect(() => {
+    activeConvIdRef.current = activeConversationId;
+  }, [activeConversationId]);
 
   const refreshConversations = useCallback(async () => {
     if (!user) return;
@@ -68,41 +74,38 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       .catch((err) => console.error("SignalR Connection Error: ", err));
 
     newConnection.on("ReceiveMessage", (message: Message) => {
-      // Update messages if it's for the active conversation
+      // Use ref to avoid stale closure — always reads current activeConversationId
       setMessages((prev) => {
         if (prev.some(m => m.id === message.id)) return prev;
-        // Only append if it's the current active conversation
-        // (Wait, logic here: we might want to update conversations list even if not active)
-        return message.conversationId === activeConversationId ? [...prev, message] : prev;
+        return message.conversationId === activeConvIdRef.current ? [...prev, message] : prev;
       });
       
       // Update conversations list with the latest message and sort
       setConversations(prev => {
-        const updated = prev.map(c => {
-          if (c.id === message.conversationId) {
-            return { ...c, lastMessage: message };
-          }
-          return c;
-        });
+        const inList = prev.some(c => c.id === message.conversationId);
         
-        // If it's a new conversation not in list, we might need to refresh
-        if (!updated.some(c => c.id === message.conversationId)) {
-            refreshConversations();
-            return prev;
+        // If it's a brand-new conversation not in the list, refresh
+        if (!inList) {
+          refreshConversations();
+          return prev;
         }
 
-        return updated.sort((a, b) => {
+        return prev
+          .map(c => c.id === message.conversationId ? { ...c, lastMessage: message } : c)
+          .sort((a, b) => {
             const dateA = a.lastMessage?.createdAt || a.createdAt;
             const dateB = b.lastMessage?.createdAt || b.createdAt;
             return new Date(dateB).getTime() - new Date(dateA).getTime();
-        });
+          });
       });
     });
 
     return () => {
       newConnection.stop();
     };
-  }, [user, activeConversationId, refreshConversations]);
+  // Only re-create the connection when the user changes (not on every conversation switch)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   const joinConversation = useCallback(async (conversationId: string) => {
     if (connection && connection.state === signalR.HubConnectionState.Connected) {
@@ -117,9 +120,21 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   }, [connection]);
 
   const sendMessage = useCallback(async (conversationId: string, text: string) => {
-    if (connection && connection.state === signalR.HubConnectionState.Connected) {
-      await connection.invoke("SendMessage", conversationId, text);
-    }
+    if (!connection || connection.state !== signalR.HubConnectionState.Connected) return;
+
+    // Optimistic update: show message immediately in sender's UI
+    // The server will broadcast it back via ReceiveMessage which will deduplicate by id
+    const optimisticMsg: Message = {
+      id: `optimistic-${Date.now()}`,
+      conversationId,
+      senderId: "", // filled by server, but we render regardless
+      text,
+      createdAt: new Date().toISOString(),
+      isRead: false,
+    };
+    setMessages(prev => [...prev, optimisticMsg]);
+
+    await connection.invoke("SendMessage", conversationId, text);
   }, [connection]);
 
   return (
