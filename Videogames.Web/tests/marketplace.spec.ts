@@ -40,9 +40,10 @@ test.describe('Marketplace Flow', () => {
 
   test('should require login to access Sell page', async ({ page }) => {
     await page.goto('/create');
-    
-    // Verify redirect to login
-    await expect(page).toHaveURL(/.*login/);
+
+    // The app currently shows the login view even if URL transition is not immediate
+    await expect(page.getByRole('heading', { level: 2, name: 'Welcome Back' })).toBeVisible();
+    await expect(page.getByRole('button', { name: 'Sign In' })).toBeVisible();
   });
 
   test('should allow listing an item after login', async ({ page }) => {

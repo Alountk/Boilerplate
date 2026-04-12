@@ -1,26 +1,32 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
-  --card-bg: #f8f9fa;
-  --card-border: #e5e7eb;
+  --background: #f7f8fa;
+  --foreground: #101828;
+  --card-bg: #ffffff;
+  --card-border: #e4e7ec;
+  --muted-bg: #eef2f6;
+  --focus: #2563eb;
 }
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --card-bg: #1a1a1a;
-    --card-border: #333333;
+    --background: #0b111a;
+    --foreground: #e6e8ec;
+    --card-bg: #121a26;
+    --card-border: #243041;
+    --muted-bg: #1a2433;
+    --focus: #60a5fa;
   }
 }
 
 .dark {
-  --background: #0a0a0a;
-  --foreground: #ededed;
-  --card-bg: #1a1a1a;
-  --card-border: #333333;
+  --background: #0b111a;
+  --foreground: #e6e8ec;
+  --card-bg: #121a26;
+  --card-border: #243041;
+  --muted-bg: #1a2433;
+  --focus: #60a5fa;
 }
 
 @theme inline {
@@ -28,12 +34,23 @@
   --color-foreground: var(--foreground);
   --color-card: var(--card-bg);
   --color-card-border: var(--card-border);
+  --color-muted-bg: var(--muted-bg);
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
 }
 
 body {
-  /* background: var(--background); */
+  background: radial-gradient(circle at top left, #ffffff 0%, var(--background) 38%);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  text-rendering: optimizeLegibility;
+}
+
+.dark body {
+  background: radial-gradient(circle at top left, #101827 0%, var(--background) 42%);
+}
+
+:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
 }

@@ -3,25 +3,23 @@
 import Link from "next/link";
 import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "./ThemeToggle";
-import { ShoppingCartIcon, BellIcon, ChatBubbleLeftRightIcon } from "@heroicons/react/24/outline";
+import { ShoppingCartIcon, BellIcon } from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const { user, logout, isAuthenticated, loading } = useAuth();
 
   return (
-    <header className="w-full bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-800 transition-colors duration-300">
+    <header className="w-full bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md transition-colors duration-300 sticky top-0 z-40">
       {/* Top Bar */}
-      <div className="border-b border-gray-100 dark:border-gray-800">
-        <div className="container mx-auto px-4 h-10 flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
-          <div className="flex items-center gap-4">
+      <div className="border-b border-slate-100 dark:border-slate-800">
+        <div className="container mx-auto px-4 h-10 flex items-center justify-between text-xs text-slate-600 dark:text-slate-300">
+          <div className="flex items-center gap-4 min-w-0">
             {loading ? (
-              <div className="h-4 w-24 bg-gray-100 dark:bg-gray-800 animate-pulse rounded" />
+              <div className="h-4 w-24 bg-slate-100 dark:bg-slate-800 animate-pulse rounded" />
             ) : isAuthenticated ? (
               <>
-                <span>
-                  Hi <span className="font-bold">{user?.firstName}</span>!
-                </span>
-                <button onClick={logout} className="hover:underline">
+                <span className="truncate">Hi {user?.firstName}!</span>
+                <button onClick={logout} className="hover:underline underline-offset-2">
                   Sign out
                 </button>
               </>
@@ -31,43 +29,55 @@ export default function Navbar() {
                   Hi!{" "}
                   <Link
                     href="/login"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-blue-700 dark:text-blue-300 hover:underline underline-offset-2"
                   >
                     Sign in
                   </Link>{" "}
                   or{" "}
                   <Link
                     href="/register"
-                    className="text-blue-600 dark:text-blue-400 hover:underline"
+                    className="text-blue-700 dark:text-blue-300 hover:underline underline-offset-2"
                   >
                     register
                   </Link>
                 </span>
               </>
             )}
-            <Link href="#" className="hover:underline hidden sm:block">
+            <Link href="#" className="hover:underline underline-offset-2 hidden sm:block">
               Daily Deals
             </Link>
-            <Link href="#" className="hover:underline hidden sm:block">
+            <Link href="#" className="hover:underline underline-offset-2 hidden sm:block">
               Help & Contact
             </Link>
           </div>
           <div className="flex items-center gap-4">
-            <Link href="#" className="hover:underline hidden md:block">
+            <Link href="#" className="hover:underline underline-offset-2 hidden md:block">
               Ship to
             </Link>
-            <Link href="/create" className="hover:underline">
+            <Link href="/create" className="hover:underline underline-offset-2 font-medium">
               Sell
             </Link>
-            <Link href="/messages" className="hover:underline flex items-center gap-1">
+            <Link href="/messages" className="hover:underline underline-offset-2 flex items-center gap-1">
               Messages
             </Link>
-            <Link href="#" className="hover:underline hidden md:block">
+            <Link href="#" className="hover:underline underline-offset-2 hidden md:block">
               Watchlist
             </Link>
-            <div className="flex items-center gap-3 ml-2">
-              <BellIcon className="h-5 w-5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200" />
-              <ShoppingCartIcon className="h-5 w-5 cursor-pointer hover:text-gray-800 dark:hover:text-gray-200" />
+            <div className="flex items-center gap-2 ml-2">
+              <button
+                type="button"
+                aria-label="Notifications"
+                className="p-1.5 rounded-md text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <BellIcon className="h-5 w-5" />
+              </button>
+              <button
+                type="button"
+                aria-label="Cart"
+                className="p-1.5 rounded-md text-slate-600 hover:text-slate-900 dark:text-slate-300 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-slate-800"
+              >
+                <ShoppingCartIcon className="h-5 w-5" />
+              </button>
               <ThemeToggle />
             </div>
           </div>
@@ -75,10 +85,10 @@ export default function Navbar() {
       </div>
 
       {/* Main Header */}
-      <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-4 md:gap-8">
+      <div className="container mx-auto px-4 py-4 flex flex-col md:flex-row items-center gap-4 md:gap-6">
         <Link
           href="/"
-          className="text-3xl font-bold bg-linear-to-r from-blue-600 via-red-500 to-yellow-500 bg-clip-text text-transparent italic shrink-0"
+          className="text-2xl md:text-3xl font-semibold tracking-tight text-slate-900 dark:text-slate-100 shrink-0"
         >
           vMarket
         </Link>
@@ -88,23 +98,27 @@ export default function Navbar() {
             <input
               type="text"
               placeholder="Search for anything"
-              className="w-full h-10 px-4 py-2 border border-blue-600/30 dark:border-gray-700 rounded-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:outline-none focus:ring-1 focus:ring-blue-500"
+              aria-label="Search for anything"
+              className="w-full h-10 px-4 py-2 border border-slate-300 dark:border-slate-700 rounded-lg bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <select className="h-10 px-4 border border-gray-300 dark:border-gray-700 rounded-sm bg-gray-50 dark:bg-gray-800 text-sm text-gray-700 dark:text-gray-300 focus:outline-none hidden lg:block">
+          <select
+            aria-label="Filter by category"
+            className="h-10 px-4 border border-slate-300 dark:border-slate-700 rounded-lg bg-slate-50 dark:bg-slate-900 text-sm text-slate-700 dark:text-slate-300 focus:outline-none focus:ring-2 focus:ring-blue-500 hidden lg:block"
+          >
             <option>All Categories</option>
             <option>Videogames</option>
             <option>Consoles</option>
             <option>Accessories</option>
           </select>
-          <button className="h-10 px-8 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-sm transition-colors whitespace-nowrap">
+          <button className="h-10 px-6 bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-semibold rounded-lg transition-colors whitespace-nowrap">
             Search
           </button>
         </div>
 
         <Link
           href="#"
-          className="text-sm text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 transition-colors shrink-0 hidden md:block"
+          className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-slate-100 transition-colors shrink-0 hidden md:block"
         >
           Advanced
         </Link>
