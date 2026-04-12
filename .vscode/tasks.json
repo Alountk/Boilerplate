@@ -100,6 +100,16 @@
 			"label": "Commit Task Runner Entries",
 			"type": "shell",
 			"command": "git add .vscode/tasks.json && git commit -m \"chore(vscode): persist helper task entries used during validation\""
+		},
+		{
+			"label": "Final Status Check",
+			"type": "shell",
+			"command": "git status --short && git --no-pager log --oneline -n 5"
+		},
+		{
+			"label": "Commit Last Task Update",
+			"type": "shell",
+			"command": "git add .vscode/tasks.json && git commit -m \"chore(vscode): add status/log helper task entry\""
 		}
 	]
 }
