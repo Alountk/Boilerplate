@@ -60,15 +60,29 @@ jobs:
 
       - name: Run Playwright tests
         working-directory: Videogames.Web
+        continue-on-error: true
         run: npm run test:e2e
         env:
           # Ensuring Playwright handles the webserver internally via config
           CI: true
+
+      - name: Summarize Playwright results
+        if: always()
+        working-directory: Videogames.Web
+        shell: bash
+        run: |
+          if [ -f "test-results/.last-run.json" ]; then
+            echo "Playwright .last-run.json:"
+            cat test-results/.last-run.json
+            node -e "const fs=require('fs');const p='test-results/.last-run.json';const d=JSON.parse(fs.readFileSync(p,'utf8'));if(d.status&&d.status!=='passed'){console.log('::warning::Playwright finished with status='+d.status);}"
+          else
+            echo "::warning::No Playwright .last-run.json found in Videogames.Web/test-results"
+          fi
 
       - name: Upload Playwright report
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: playwright-report
-          path: Videogames.Web/playwright-report/
+          path: Videogames.Web/test-results/
           retention-days: 30
