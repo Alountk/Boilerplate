@@ -41,9 +41,10 @@ public class UserService : IUserService
         };
 
         var created = await _repository.CreateAsync(user);
-        var token = _tokenService.GenerateToken(created);
-        
-        return new AuthResponseDto(token, MapToDto(created));
+        var persistedUser = created ?? user;
+        var token = _tokenService.GenerateToken(persistedUser);
+
+        return new AuthResponseDto(token, MapToDto(persistedUser));
     }
 
     public async Task<AuthResponseDto> LoginAsync(LoginDto loginDto)
