@@ -169,7 +169,7 @@ This project is licensed under the MIT License.
 
 ### 2026-04-11: Comprehensive Test Suite & QA
 - **E2E Testing**: Created `registration.spec.ts` to verify the full registration UI flow, ensuring immediate auto-login and handling edge cases like duplicate emails.
-- **API Testing**: Created `rawg_search.spec.ts` with comprehensive API mocking to test the RAWG integration (search, auto-fill, and error handling) without external dependencies.
+- **API Testing**: Created `rawg-search.spec.ts` with comprehensive API mocking to test the RAWG integration (search, auto-fill, and error handling) without external dependencies.
 - **Backend Stability**: Updated `UserServiceTests.cs` to align with the new authentication response format and verified token generation logic.
 - **QA**: Integrated hydration checks within the E2E suite to monitor for React hydration mismatches during navigation.
 
