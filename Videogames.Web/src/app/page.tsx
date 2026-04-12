@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { TagIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 import { Videogame } from "../domain/models/Videogame";
 import { VideogameService } from "../infrastructure/services/VideogameService";
 import { useAuth } from "../context/AuthContext";
@@ -46,115 +45,93 @@ export default function Home() {
   );
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 md:py-10 transition-colors duration-300">
-      {/* Hero Section */}
-      <section className="mb-12 bg-white dark:bg-slate-900 rounded-2xl p-6 md:p-10 border border-slate-200 dark:border-slate-800 flex flex-col md:flex-row items-center gap-8">
-        <div className="flex-1 text-center md:text-left">
-          <h1 className="text-4xl md:text-5xl font-bold text-slate-900 dark:text-slate-100 mb-4 leading-tight text-balance">
-            Marketplace for gamers, built for real collectors
+    <div className="min-h-screen bg-surface text-on-surface">
+      {/* ─── Hero ─────────────────────────────────────── */}
+      <section className="relative w-full min-h-[520px] flex items-center overflow-hidden">
+        {/* Ambient glows */}
+        <div className="absolute inset-0 z-0 pointer-events-none">
+          <div className="absolute -top-20 left-1/4 w-[50%] h-[50%] rounded-full bg-primary-container/10 blur-[140px]" />
+          <div className="absolute bottom-0 right-0 w-[40%] h-[60%] rounded-full bg-primary/5 blur-[100px]" />
+        </div>
+        <div className="relative z-10 px-8 md:px-24 max-w-[1440px] mx-auto w-full py-24">
+          <span className="text-primary-fixed uppercase tracking-[0.3em] font-bold text-xs mb-4 block">
+            Curated Excellence
+          </span>
+          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface leading-none mb-6">
+            Discovery in the{" "}
+            <br />
+            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary">
+              Vault.
+            </span>
           </h1>
-          <p className="text-lg text-slate-600 dark:text-slate-300 mb-8 max-w-xl">
-            Buy, sell, and trade your favorite videogames, accessories, and
-            merchandising. Build your perfect collection today.
+          <p className="text-on-surface-variant text-lg max-w-xl mb-10 leading-relaxed">
+            A curated marketplace of rare videogames, accessories, and collectibles for the discerning collector.
           </p>
-          <div className="flex flex-wrap gap-4 justify-center md:justify-start">
+          <div className="flex flex-wrap gap-4">
             <Link
-              href="#"
-              className="px-6 py-3 bg-slate-900 hover:bg-slate-800 dark:bg-blue-600 dark:hover:bg-blue-500 text-white font-semibold rounded-lg transition-colors flex items-center gap-2"
+              href="#recently-added"
+              className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all"
             >
-              Start Shopping <ArrowRightIcon className="h-5 w-5" />
+              Explore Collection
+              <span className="material-symbols-outlined">arrow_forward</span>
             </Link>
             <Link
               href="/create"
-              className="px-6 py-3 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-slate-900 dark:text-slate-100 font-semibold rounded-lg border border-slate-300 dark:border-slate-700 transition-colors flex items-center gap-2"
+              className="bg-surface-container-high text-on-surface px-8 py-4 rounded-xl font-bold hover:bg-surface-bright transition-colors"
             >
-              <TagIcon className="h-5 w-5" /> Sell an Item
+              Sell an Item
             </Link>
-          </div>
-        </div>
-        <div className="flex-1 w-full max-w-md">
-          <div className="relative">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=2070&auto=format&fit=crop"
-              alt="Gaming setup 1"
-              className="w-full h-full object-cover rounded-xl"
-            />
           </div>
         </div>
       </section>
 
-      {/* Category Grid */}
-      <section className="mb-16">
-        <div className="flex items-center justify-between mb-8 gap-3">
-          <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100">
-            Shop by Category
-          </h2>
-          <Link
-            href="#"
-            className="text-slate-600 dark:text-slate-300 font-medium hover:text-slate-900 dark:hover:text-slate-100 hover:underline underline-offset-4 flex items-center gap-1"
-          >
-            Browse all categories <ArrowRightIcon className="h-4 w-4" />
-          </Link>
+      {/* ─── Categories ───────────────────────────────── */}
+      <section className="px-8 md:px-12 py-20 max-w-[1440px] mx-auto">
+        <div className="flex justify-between items-end mb-12">
+          <div>
+            <h2 className="text-3xl font-bold tracking-tight text-on-surface">Categories</h2>
+            <p className="text-on-surface-variant mt-2">Filter by archive department</p>
+          </div>
         </div>
-
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
           {CATEGORIES.map((cat) => (
-            <div
+            <Link
               key={cat.id}
-              className="group bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors"
+              href={`/category/${cat.id}`}
+              className="group cursor-pointer"
             >
-              <Link
-                href={`/category/${cat.id}`}
-                className="block h-40 overflow-hidden relative group/img"
-              >
+              <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-container-low transition-all duration-300 group-hover:bg-surface-container-high group-hover:-translate-y-2">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={cat.img}
                   alt={cat.name}
-                  className="w-full h-full object-cover transform group-hover/img:scale-110 transition-transform duration-500"
+                  className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-300"
                 />
-                <div className="absolute inset-0 bg-linear-to-t from-black/55 to-transparent"></div>
-                <h3 className="absolute bottom-4 left-4 text-xl font-bold text-white uppercase tracking-wider">
-                  {cat.name}
-                </h3>
-              </Link>
-              <div className="p-4">
-                <ul className="space-y-2">
-                  {cat.subcategories.map((sub) => (
-                    <li key={sub}>
-                      <Link
-                        href={`/category/${cat.id}`}
-                        className="text-sm text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-slate-100 flex items-center justify-between group/link"
-                      >
-                        {sub}
-                        <ArrowRightIcon className="h-3 w-3 opacity-0 group-hover/link:opacity-100 transform -translate-x-2 group-hover/link:translate-x-0 transition-all" />
-                      </Link>
-                    </li>
-                  ))}
-                </ul>
+                <div className="absolute inset-0 bg-linear-to-t from-surface-container-lowest/80 to-transparent" />
+                <div className="absolute bottom-4 left-0 right-0 text-center">
+                  <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface">{cat.name}</h3>
+                </div>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </section>
 
-      {/* Featured Items */}
-      <section className="mb-12">
-        <h2 className="text-2xl font-bold text-slate-900 dark:text-slate-100 mb-8">
-          Recently Added Items
-        </h2>
+      {/* ─── Recently Added ───────────────────────────── */}
+      <section id="recently-added" className="px-8 md:px-12 py-12 max-w-[1440px] mx-auto">
+        <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">Recently Added</h2>
+        <p className="text-on-surface-variant mb-12">New acquisitions entered into the archive today.</p>
         {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
               <div
                 key={i}
-                className="aspect-3/4 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse border border-slate-200 dark:border-slate-700"
-              ></div>
+                className="aspect-3/4 bg-surface-container rounded-xl animate-pulse"
+              />
             ))}
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-6">
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12">
             {videogames.map((game) => (
               <VideogameCard
                 key={game.id}
@@ -164,13 +141,12 @@ export default function Home() {
               />
             ))}
             {videogames.length === 0 && (
-              <div className="col-span-full py-12 text-center bg-slate-50 dark:bg-slate-900 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700" role="status">
-                <p className="text-slate-600 dark:text-slate-300">
-                  No items found in the marketplace. Be the first to sell!
-                </p>
+              <div className="col-span-full py-20 text-center bg-surface-container-low rounded-2xl" role="status">
+                <span className="material-symbols-outlined text-5xl text-outline mb-4 block">inventory_2</span>
+                <p className="text-on-surface-variant mb-4">No items found in the archive. Be the first to contribute.</p>
                 <Link
                   href="/create"
-                  className="text-slate-900 dark:text-slate-100 font-semibold hover:underline mt-2 inline-block"
+                  className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-bold text-sm inline-block hover:opacity-90 transition-all"
                 >
                   List an item now
                 </Link>
@@ -179,6 +155,47 @@ export default function Home() {
           </div>
         )}
       </section>
+
+      {/* ─── Newsletter CTA ───────────────────────────── */}
+      <section className="my-16 mx-8 md:mx-12 p-12 md:p-16 rounded-3xl bg-linear-to-br from-surface-container-low to-surface relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
+        <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary-container/10 rounded-full blur-[100px]" />
+        <div className="relative z-10 flex-1">
+          <h2 className="text-4xl font-black tracking-tighter mb-4">Stay in the Loop.</h2>
+          <p className="text-on-surface-variant max-w-md">
+            Receive weekly manifests of newly archived collectibles before they hit the public vault.
+          </p>
+        </div>
+        <div className="relative z-10 w-full md:w-auto flex gap-4">
+          {/* FEATURE-PENDING: newsletter subscription */}
+          <input
+            className="bg-surface-container-highest border-none rounded-xl px-6 py-4 w-full md:w-72 focus:ring-1 focus:ring-primary outline-none text-on-surface placeholder:text-outline/50"
+            placeholder="Email address"
+            type="email"
+            disabled
+          />
+          <button disabled className="bg-on-surface text-surface font-bold px-6 py-4 rounded-xl opacity-60 cursor-not-allowed">
+            Join
+          </button>
+        </div>
+      </section>
+
+      {/* ─── Footer ───────────────────────────────────── */}
+      <footer className="w-full mt-8 tonal-architecture-shift">
+        <div className="w-full px-8 md:px-12 py-12 flex flex-col md:flex-row justify-between items-center max-w-[1440px] mx-auto">
+          <div className="mb-8 md:mb-0">
+            <span className="text-on-surface font-black italic text-xl">vMarket</span>
+            <p className="text-on-surface-variant mt-2 text-xs opacity-80">
+              © {new Date().getFullYear()} vMarket. Curated for collectors.
+            </p>
+          </div>
+          <div className="flex flex-wrap justify-center gap-8">
+            {/* FEATURE-PENDING: footer pages */}
+            <span className="text-on-surface-variant opacity-60 text-sm">Privacy Policy</span>
+            <span className="text-on-surface-variant opacity-60 text-sm">Terms</span>
+            <span className="text-on-surface-variant opacity-60 text-sm">Support</span>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }

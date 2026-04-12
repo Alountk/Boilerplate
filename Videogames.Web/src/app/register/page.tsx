@@ -4,8 +4,7 @@ import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { UserPlusIcon, ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
+import { scrollToFirstError } from "../../utils/formUtils";
 
 type RegisterForm = {
   firstName: string;
@@ -70,12 +69,8 @@ function FieldFeedback({
 }) {
   if (!message) return null;
   return (
-    <p
-      id={id}
-      role="alert"
-      className="mt-1.5 flex items-start gap-1.5 text-sm text-red-600 dark:text-red-400"
-    >
-      <ExclamationCircleIcon className="h-4 w-4 shrink-0 mt-0.5" aria-hidden />
+    <p id={id} role="alert" className="mt-1 text-xs text-error px-1 flex items-center gap-1">
+      <span className="material-symbols-outlined text-[14px]">error</span>
       <span>{message}</span>
     </p>
   );
@@ -172,283 +167,182 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-linear-to-b from-gray-50 via-white to-blue-50/40 dark:from-gray-950 dark:via-gray-900 dark:to-gray-900 py-10 px-4 transition-colors duration-300">
-      <div className="mx-auto w-full max-w-2xl">
-        <div className="overflow-hidden rounded-2xl border border-gray-200/80 bg-white shadow-xl shadow-gray-200/50 dark:border-gray-700 dark:bg-gray-800 dark:shadow-none">
-          <div className="border-b border-gray-100 bg-linear-to-r from-blue-600 to-indigo-600 px-8 py-8 text-white dark:border-gray-700">
-            <div className="flex items-start gap-4">
-              <div className="rounded-xl bg-white/15 p-3 backdrop-blur-sm">
-                <UserPlusIcon className="h-8 w-8" aria-hidden />
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col md:flex-row">
+      {/* Left panel — immersive visual */}
+      <section className="hidden md:flex md:w-5/12 lg:w-1/2 bg-surface-container-lowest relative overflow-hidden flex-col justify-between p-12">
+        <div className="absolute inset-0 z-0">
+          <div className="absolute inset-0 bg-linear-to-br from-primary-container/20 via-surface-container-lowest to-surface-container" />
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary-container/15 blur-[120px]" />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/10 blur-[80px]" />
+        </div>
+        <div className="relative z-10">
+          <h1 className="text-2xl font-extrabold tracking-tighter text-on-surface italic">vMarket</h1>
+        </div>
+        <div className="relative z-10 max-w-md">
+          <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4 block">
+            Exclusive Membership
+          </span>
+          <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-on-surface mb-6">
+            Curating the{" "}
+            <span className="text-primary-container">extraordinary</span> since the midnight hour.
+          </h2>
+          <p className="text-on-surface-variant text-lg leading-relaxed font-light">
+            Join an elite circle of collectors and scholars dedicated to preserving the world&apos;s most elusive digital artifacts.
+          </p>
+        </div>
+        <div className="relative z-10">
+          <p className="text-sm text-outline font-medium tracking-wide">
+            © {new Date().getFullYear()} vMarket.
+          </p>
+        </div>
+      </section>
+
+      {/* Right panel — form */}
+      <section className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 bg-surface overflow-y-auto">
+        {/* Mobile brand */}
+        <div className="md:hidden w-full mb-10 flex justify-center">
+          <h1 className="text-xl font-black italic tracking-tighter text-on-surface">vMarket</h1>
+        </div>
+
+        <div className="w-full max-w-lg">
+          <header className="mb-10">
+            <h3 className="text-3xl font-bold tracking-tight text-on-surface mb-2">
+              Create your account
+            </h3>
+            <p className="text-on-surface-variant text-sm">
+              Welcome to the inner circle. Please provide your credentials.
+            </p>
+          </header>
+
+          {error && (
+            <div className="mb-6 rounded-md bg-error-container/30 border border-error/30 px-4 py-3 text-sm text-error" role="alert">
+              {error}
+            </div>
+          )}
+          {submitAttempted && missingRequiredCount > 0 && (
+            <div className="mb-6 rounded-md bg-surface-container-low border border-outline-variant/30 px-4 py-3 text-sm text-on-surface-variant" role="status">
+              {missingRequiredCount} required field{missingRequiredCount !== 1 ? "s" : ""} need{missingRequiredCount === 1 ? "s" : ""} attention.
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit} className="space-y-5" noValidate>
+            {/* — Account fields — */}
+            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">
+              Account
+            </p>
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="firstName">
+                  First Name <span className="text-error">*</span>
+                </label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">person</span>
+                  <input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="John" />
+                </div>
+                <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
               </div>
-              <div>
-                <h1 className="text-2xl font-bold tracking-tight sm:text-3xl">
-                  Join vMarket
-                </h1>
-                <p className="mt-1 text-sm text-blue-100">
-                  Create your account and start buying and selling games.
-                </p>
+              <div className="space-y-1">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="lastName">
+                  Last Name <span className="text-error">*</span>
+                </label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">badge</span>
+                  <input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Doe" />
+                </div>
+                <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
               </div>
             </div>
-          </div>
-
-          <div className="p-8 sm:p-10">
-            {error && (
-              <div
-                className="mb-6 rounded-xl border border-red-200 bg-red-50 p-4 text-sm text-red-700 dark:border-red-800 dark:bg-red-950/40 dark:text-red-300"
-                role="alert"
-              >
-                {error}
+            <div className="space-y-1">
+              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="email">
+                Email Address <span className="text-error">*</span>
+              </label>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">mail</span>
+                <input id="email" name="email" type="email" inputMode="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="curator@nocturnalarchive.com" />
               </div>
-            )}
-
-            {submitAttempted && missingRequiredCount > 0 && (
-              <div
-                className="mb-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 dark:border-amber-900/60 dark:bg-amber-950/40 dark:text-amber-200"
-                role="status"
-              >
-                <p className="font-semibold">Please complete the required fields</p>
-                <p className="mt-1 text-amber-800/90 dark:text-amber-300/90">
-                  {missingRequiredCount} field{missingRequiredCount !== 1 ? "s" : ""}{" "}
-                  need your attention below.
-                </p>
+              <FieldFeedback id="err-email" message={showFieldError("email")} />
+            </div>
+            <div className="space-y-1">
+              <div className="flex justify-between items-end">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant" htmlFor="password">
+                  Password <span className="text-error">*</span>
+                </label>
+                <span className="text-[0.625rem] text-outline italic">Min. 8 characters</span>
               </div>
-            )}
-
-            <form onSubmit={handleSubmit} className="space-y-8" noValidate>
-              <section aria-labelledby="account-heading">
-                <h2
-                  id="account-heading"
-                  className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400"
-                >
-                  Account
-                </h2>
-                <div className="grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="firstName"
-                      className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      First name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="firstName"
-                      name="firstName"
-                      value={formData.firstName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="given-name"
-                      aria-invalid={!!showFieldError("firstName")}
-                      aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined}
-                      className={getInputClassNames(!!showFieldError("firstName"))}
-                      placeholder="John"
-                    />
-                    <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="lastName"
-                      className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      Last name <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="lastName"
-                      name="lastName"
-                      value={formData.lastName}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="family-name"
-                      aria-invalid={!!showFieldError("lastName")}
-                      aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined}
-                      className={getInputClassNames(!!showFieldError("lastName"))}
-                      placeholder="Doe"
-                    />
-                    <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
-                  </div>
-                </div>
-
-                <div className="mt-5 grid grid-cols-1 gap-5 md:grid-cols-2">
-                  <div>
-                    <label
-                      htmlFor="email"
-                      className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      Email <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="email"
-                      name="email"
-                      type="email"
-                      inputMode="email"
-                      value={formData.email}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="email"
-                      aria-invalid={!!showFieldError("email")}
-                      aria-describedby={showFieldError("email") ? "err-email" : undefined}
-                      className={getInputClassNames(!!showFieldError("email"))}
-                      placeholder="you@example.com"
-                    />
-                    <FieldFeedback id="err-email" message={showFieldError("email")} />
-                  </div>
-                  <div>
-                    <label
-                      htmlFor="password"
-                      className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      Password <span className="text-red-500">*</span>
-                    </label>
-                    <input
-                      id="password"
-                      name="password"
-                      type="password"
-                      value={formData.password}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="new-password"
-                      aria-invalid={!!showFieldError("password")}
-                      aria-describedby={
-                        showFieldError("password") ? "err-password" : "password-hint"
-                      }
-                      className={getInputClassNames(!!showFieldError("password"))}
-                      placeholder="At least 8 characters"
-                    />
-                    <p
-                      id="password-hint"
-                      className="mt-1.5 text-xs text-gray-500 dark:text-gray-400"
-                    >
-                      Use 8–100 characters to match server rules.
-                    </p>
-                    <FieldFeedback id="err-password" message={showFieldError("password")} />
-                  </div>
-                </div>
-              </section>
-
-              <section aria-labelledby="contact-heading">
-                <h2
-                  id="contact-heading"
-                  className="mb-4 text-xs font-bold uppercase tracking-widest text-gray-500 dark:text-gray-400"
-                >
-                  Contact details <span className="font-normal normal-case text-gray-400">(optional)</span>
-                </h2>
-                <div className="space-y-5">
-                  <div>
-                    <label
-                      htmlFor="address"
-                      className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                    >
-                      Address
-                    </label>
-                    <input
-                      id="address"
-                      name="address"
-                      value={formData.address}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      autoComplete="street-address"
-                      aria-invalid={!!showFieldError("address")}
-                      aria-describedby={showFieldError("address") ? "err-address" : undefined}
-                      className={getInputClassNames(!!showFieldError("address"))}
-                      placeholder="Street, number"
-                    />
-                    <FieldFeedback id="err-address" message={showFieldError("address")} />
-                  </div>
-                  <div className="grid grid-cols-1 gap-5 md:grid-cols-3">
-                    <div>
-                      <label
-                        htmlFor="city"
-                        className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                      >
-                        City
-                      </label>
-                      <input
-                        id="city"
-                        name="city"
-                        value={formData.city}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        autoComplete="address-level2"
-                        aria-invalid={!!showFieldError("city")}
-                        aria-describedby={showFieldError("city") ? "err-city" : undefined}
-                        className={getInputClassNames(!!showFieldError("city"))}
-                        placeholder="City"
-                      />
-                      <FieldFeedback id="err-city" message={showFieldError("city")} />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="country"
-                        className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                      >
-                        Country
-                      </label>
-                      <input
-                        id="country"
-                        name="country"
-                        value={formData.country}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        autoComplete="country-name"
-                        aria-invalid={!!showFieldError("country")}
-                        aria-describedby={showFieldError("country") ? "err-country" : undefined}
-                        className={getInputClassNames(!!showFieldError("country"))}
-                        placeholder="Country"
-                      />
-                      <FieldFeedback id="err-country" message={showFieldError("country")} />
-                    </div>
-                    <div>
-                      <label
-                        htmlFor="phone"
-                        className="mb-2 block text-sm font-semibold text-gray-800 dark:text-gray-200"
-                      >
-                        Phone
-                      </label>
-                      <input
-                        id="phone"
-                        name="phone"
-                        type="tel"
-                        inputMode="tel"
-                        value={formData.phone}
-                        onChange={handleChange}
-                        onBlur={handleBlur}
-                        autoComplete="tel"
-                        aria-invalid={!!showFieldError("phone")}
-                        aria-describedby={showFieldError("phone") ? "err-phone" : undefined}
-                        className={getInputClassNames(!!showFieldError("phone"))}
-                        placeholder="+34 …"
-                      />
-                      <FieldFeedback id="err-phone" message={showFieldError("phone")} />
-                    </div>
-                  </div>
-                </div>
-              </section>
-
-              <button
-                type="submit"
-                className="w-full rounded-xl bg-blue-600 py-4 font-bold text-white shadow-lg shadow-blue-500/25 transition-all hover:bg-blue-700 active:scale-[0.98] focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800"
-              >
-                Create account
-              </button>
-
-              <p className="text-center text-xs text-gray-500 dark:text-gray-400">
-                <span className="text-red-500">*</span> Required fields
-              </p>
-
-              <div className="border-t border-gray-100 pt-8 text-center dark:border-gray-700">
-                <p className="text-sm text-gray-500 dark:text-gray-400">
-                  Already have an account?{" "}
-                  <Link
-                    href="/login"
-                    className="font-bold text-blue-600 hover:underline dark:text-blue-400"
-                  >
-                    Sign in
-                  </Link>
-                </p>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">lock</span>
+                <input id="password" name="password" type="password" value={formData.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
               </div>
-            </form>
+              <FieldFeedback id="err-password" message={showFieldError("password")} />
+            </div>
+
+            {/* — Contact details (optional) — */}
+            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant pt-2">
+              Contact Details <span className="font-normal normal-case text-outline">(optional)</span>
+            </p>
+            <div className="space-y-1">
+              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="address">Address</label>
+              <div className="relative group">
+                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">home</span>
+                <input id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Street, number" />
+              </div>
+              <FieldFeedback id="err-address" message={showFieldError("address")} />
+            </div>
+            <div className="grid grid-cols-3 gap-4">
+              <div className="space-y-1">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="city">City</label>
+                <input id="city" name="city" value={formData.city} onChange={handleChange} onBlur={handleBlur} autoComplete="address-level2" aria-invalid={!!showFieldError("city")} aria-describedby={showFieldError("city") ? "err-city" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="City" />
+                <FieldFeedback id="err-city" message={showFieldError("city")} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="country">Country</label>
+                <input id="country" name="country" value={formData.country} onChange={handleChange} onBlur={handleBlur} autoComplete="country-name" aria-invalid={!!showFieldError("country")} aria-describedby={showFieldError("country") ? "err-country" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Country" />
+                <FieldFeedback id="err-country" message={showFieldError("country")} />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" inputMode="tel" value={formData.phone} onChange={handleChange} onBlur={handleBlur} autoComplete="tel" aria-invalid={!!showFieldError("phone")} aria-describedby={showFieldError("phone") ? "err-phone" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="+1 …" />
+                <FieldFeedback id="err-phone" message={showFieldError("phone")} />
+              </div>
+            </div>
+
+            {/* CTA */}
+            <button
+              type="submit"
+              className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:opacity-90 active:scale-[0.98] transition-all mt-2"
+            >
+              Create Account
+            </button>
+
+            {/* Social / alternative — FEATURE-PENDING */}
+            <div className="mt-8">
+              <div className="flex items-center gap-4 mb-6">
+                <div className="h-px flex-1 bg-surface-container-highest" />
+                <span className="text-[10px] uppercase tracking-widest font-bold text-outline">Alternative Entry</span>
+                <div className="h-px flex-1 bg-surface-container-highest" />
+              </div>
+              <div className="grid grid-cols-2 gap-4">
+                <button disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">Google</button>
+                <button disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">GitHub</button>
+              </div>
+            </div>
+          </form>
+
+          <div className="mt-10 text-center">
+            <p className="text-sm text-on-surface-variant">
+              Already a member?{" "}
+              <Link href="/login" className="text-primary font-bold ml-1 hover:text-primary-fixed transition-colors">
+                Sign in here
+              </Link>
+            </p>
           </div>
         </div>
-      </div>
+      </section>
+
+      {/* Mobile footer */}
+      <footer className="md:hidden w-full px-6 py-6 text-center bg-surface-container-lowest">
+        <p className="text-xs text-outline font-medium">© {new Date().getFullYear()} vMarket.</p>
+      </footer>
     </div>
   );
 }

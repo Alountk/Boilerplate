@@ -59,9 +59,9 @@ export default function CategoryPage({
 
   if (!category) {
     return (
-      <div className="max-w-7xl mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">Category not found</h1>
-        <Link href="/" className="text-blue-600 hover:underline">
+      <div className="max-w-7xl mx-auto px-4 py-20 text-center">
+        <h1 className="text-2xl font-bold mb-4 text-slate-900 dark:text-slate-100">Category not found</h1>
+        <Link href="/" className="text-[#285A48] dark:text-[#B0E4CC] hover:underline">
           Return Home
         </Link>
       </div>
@@ -69,78 +69,81 @@ export default function CategoryPage({
   }
 
   return (
-    <div className="max-w-7xl mx-auto px-4 py-8 bg-white dark:bg-gray-900 transition-colors duration-300">
+    <div className="max-w-7xl mx-auto px-4 py-8 transition-colors duration-300">
       {/* Breadcrumbs */}
-      <nav className="flex items-center gap-2 text-sm text-gray-500 dark:text-gray-400 mb-8">
-        <Link href="/" className="hover:text-blue-600">
+      <nav className="mb-8 flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400">
+        <Link href="/" className="hover:text-[#285A48] dark:hover:text-[#B0E4CC] transition-colors">
           Home
         </Link>
         <span>/</span>
-        <span className="font-bold text-gray-900 dark:text-white uppercase tracking-wider">
+        <span className="font-semibold text-slate-900 dark:text-slate-100 uppercase tracking-wide">
           {category.name}
         </span>
       </nav>
 
       <div className="flex flex-col md:flex-row gap-8">
-        {/* Sidebar - eBay Style Filters */}
+        {/* Sidebar Filters */}
         <aside className="w-full md:w-64 shrink-0">
           <div className="sticky top-24">
-            <h2 className="text-lg font-bold text-gray-900 dark:text-white mb-4 border-b pb-2">
-              {category.name}
-            </h2>
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-tight">
-                Categories
-              </h3>
-              <ul className="space-y-2">
-                {category.subcategories.map((sub) => (
-                  <li key={sub}>
-                    <button className="text-sm text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400 block w-full text-left">
-                      {sub}
-                    </button>
-                  </li>
-                ))}
-              </ul>
-            </div>
+            <div className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white/85 dark:bg-slate-900/80 backdrop-blur-sm p-4">
+              <h2 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-5 border-b border-slate-200 dark:border-slate-800 pb-3">
+                {category.name}
+              </h2>
 
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-tight">
-                Condition
-              </h3>
-              <div className="space-y-2">
-                {["New", "Like New", "Very Good", "Good", "Acceptable"].map(
-                  (cond) => (
-                    <label
-                      key={cond}
-                      className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-400 cursor-pointer hover:text-blue-600"
-                    >
-                      <input
-                        type="checkbox"
-                        className="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                      />
-                      {cond}
-                    </label>
-                  )
-                )}
+              <div className="mb-7">
+                <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
+                  Categories
+                </h3>
+                <ul className="space-y-1.5">
+                  {category.subcategories.map((sub) => (
+                    <li key={sub}>
+                      <button className="w-full rounded-md px-2.5 py-1.5 text-left text-sm text-slate-700 dark:text-slate-300 hover:bg-[#B0E4CC]/35 dark:hover:bg-[#285A48]/40 hover:text-[#285A48] dark:hover:text-[#B0E4CC] transition-colors">
+                        {sub}
+                      </button>
+                    </li>
+                  ))}
+                </ul>
               </div>
-            </div>
 
-            <div className="mb-8">
-              <h3 className="text-sm font-bold text-gray-700 dark:text-gray-300 mb-3 uppercase tracking-tight">
-                Price Range
-              </h3>
-              <div className="flex items-center gap-2">
-                <input
-                  type="text"
-                  placeholder="Min"
-                  className="w-full px-2 py-1 text-sm border rounded dark:bg-gray-800 dark:border-gray-700"
-                />
-                <span className="text-gray-400">-</span>
-                <input
-                  type="text"
-                  placeholder="Max"
-                  className="w-full px-2 py-1 text-sm border rounded dark:bg-gray-800 dark:border-gray-700"
-                />
+              <div className="mb-7">
+                <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
+                  Condition
+                </h3>
+                <div className="space-y-2">
+                  {["New", "Like New", "Very Good", "Good", "Acceptable"].map(
+                    (cond) => (
+                      <label
+                        key={cond}
+                        className="flex items-center gap-2 text-sm text-slate-700 dark:text-slate-300 cursor-pointer hover:text-[#285A48] dark:hover:text-[#B0E4CC] transition-colors"
+                      >
+                        <input
+                          type="checkbox"
+                          className="rounded border-slate-300 dark:border-slate-600 text-[#285A48] focus:ring-[#408A71]"
+                        />
+                        {cond}
+                      </label>
+                    )
+                  )}
+                </div>
+              </div>
+
+              <div>
+                <h3 className="text-xs font-semibold text-slate-500 dark:text-slate-400 mb-3 uppercase tracking-wider">
+                  Price Range
+                </h3>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    placeholder="Min"
+                    className="w-full px-2.5 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
+                  />
+                  <span className="text-slate-400">-</span>
+                  <input
+                    type="text"
+                    placeholder="Max"
+                    className="w-full px-2.5 py-1.5 text-sm border border-slate-300 dark:border-slate-700 rounded-md bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200"
+                  />
+                </div>
               </div>
             </div>
           </div>
@@ -149,25 +152,25 @@ export default function CategoryPage({
         {/* Main Content */}
         <main className="flex-1">
           {/* Header & Controls */}
-          <div className="bg-white dark:bg-gray-800 p-4 rounded-xl border border-gray-200 dark:border-gray-700 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="bg-white/88 dark:bg-slate-900/82 p-4 rounded-2xl border border-slate-200 dark:border-slate-800 mb-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4 backdrop-blur-sm">
             <div>
-              <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h1 className="text-2xl font-semibold text-slate-900 dark:text-slate-100">
                 {category.name}
               </h1>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
+              <p className="text-sm text-slate-500 dark:text-slate-400">
                 {videogames.length} listings found
               </p>
             </div>
             <div className="flex items-center gap-4">
-              <div className="flex items-center bg-gray-100 dark:bg-gray-700 rounded-lg p-1">
-                <button className="p-1.5 rounded-md bg-white dark:bg-gray-600 shadow-sm text-blue-600">
+              <div className="flex items-center bg-slate-100 dark:bg-slate-800 rounded-lg p-1 border border-slate-200 dark:border-slate-700">
+                <button className="p-1.5 rounded-md bg-white dark:bg-slate-700 shadow-sm text-[#285A48] dark:text-[#B0E4CC]">
                   <Squares2X2Icon className="h-5 w-5" />
                 </button>
-                <button className="p-1.5 rounded-md text-gray-500 dark:text-gray-400">
+                <button className="p-1.5 rounded-md text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-100 transition-colors">
                   <ListBulletIcon className="h-5 w-5" />
                 </button>
               </div>
-              <select className="bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg px-3 py-1.5 text-sm font-medium focus:ring-2 focus:ring-blue-500 outline-none">
+              <select className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg px-3 py-1.5 text-sm font-medium text-slate-700 dark:text-slate-200 focus:ring-2 focus:ring-[#408A71] outline-none">
                 <option>Best Match</option>
                 <option>Price: Low to High</option>
                 <option>Price: High to Low</option>
@@ -182,7 +185,7 @@ export default function CategoryPage({
               {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
                 <div
                   key={i}
-                  className="aspect-3/4 bg-gray-100 dark:bg-gray-800 rounded-xl animate-pulse border border-gray-100 dark:border-gray-700"
+                  className="aspect-3/4 bg-slate-100 dark:bg-slate-800 rounded-xl animate-pulse border border-slate-200 dark:border-slate-700"
                 ></div>
               ))}
             </div>
@@ -198,20 +201,20 @@ export default function CategoryPage({
               ))}
             </div>
           ) : (
-            <div className="py-24 text-center bg-gray-50 dark:bg-gray-800/50 rounded-2xl border border-dashed border-gray-300 dark:border-gray-700">
+            <div className="py-24 text-center bg-white/65 dark:bg-slate-900/45 rounded-2xl border border-dashed border-slate-300 dark:border-slate-700">
               <div className="max-w-sm mx-auto">
-                <div className="bg-blue-50 dark:bg-blue-900/20 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <Squares2X2Icon className="h-8 w-8 text-blue-600" />
+                <div className="bg-[#B0E4CC]/55 dark:bg-[#285A48]/45 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <Squares2X2Icon className="h-8 w-8 text-[#285A48] dark:text-[#B0E4CC]" />
                 </div>
-                <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                <h3 className="text-lg font-semibold text-slate-900 dark:text-slate-100 mb-2">
                   No items found
                 </h3>
-                <p className="text-gray-500 dark:text-gray-400 mb-6">
+                <p className="text-slate-500 dark:text-slate-400 mb-6">
                   There are currently no items listed in this category.
                 </p>
                 <Link
                   href="/create"
-                  className="inline-flex items-center gap-2 px-6 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all"
+                  className="inline-flex items-center gap-2 px-6 py-2 bg-[#285A48] hover:bg-[#1f4739] dark:bg-[#408A71] dark:hover:bg-[#53a689] text-white font-semibold rounded-full transition-colors"
                 >
                   Post your listing
                 </Link>

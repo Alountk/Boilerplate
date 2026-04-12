@@ -1,56 +1,88 @@
 @import "tailwindcss";
 
-:root {
-  --background: #f7f8fa;
-  --foreground: #101828;
-  --card-bg: #ffffff;
-  --card-border: #e4e7ec;
-  --muted-bg: #eef2f6;
-  --focus: #2563eb;
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b111a;
-    --foreground: #e6e8ec;
-    --card-bg: #121a26;
-    --card-border: #243041;
-    --muted-bg: #1a2433;
-    --focus: #60a5fa;
-  }
-}
-
-.dark {
-  --background: #0b111a;
-  --foreground: #e6e8ec;
-  --card-bg: #121a26;
-  --card-border: #243041;
-  --muted-bg: #1a2433;
-  --focus: #60a5fa;
-}
-
+/* ─── Indigo Archive Design System ─────────────────────────────────────── */
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --color-card: var(--card-bg);
-  --color-card-border: var(--card-border);
-  --color-muted-bg: var(--muted-bg);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* Surface hierarchy */
+  --color-surface:                    #0b1326;
+  --color-surface-dim:                #0b1326;
+  --color-surface-container-lowest:   #060e20;
+  --color-surface-container-low:      #131b2e;
+  --color-surface-container:          #171f33;
+  --color-surface-container-high:     #222a3d;
+  --color-surface-container-highest:  #2d3449;
+  --color-surface-bright:             #31394d;
+  --color-surface-variant:            #2d3449;
+
+  /* Text / Icon */
+  --color-on-surface:                 #dae2fd;
+  --color-on-surface-variant:         #c7c4d8;
+  --color-on-background:              #dae2fd;
+  --color-inverse-on-surface:         #283044;
+  --color-inverse-surface:            #dae2fd;
+
+  /* Primary palette */
+  --color-primary:                    #c3c0ff;
+  --color-primary-container:          #4f46e5;
+  --color-on-primary:                 #1d00a5;
+  --color-on-primary-container:       #dad7ff;
+  --color-primary-fixed:              #e2dfff;
+  --color-primary-fixed-dim:          #c3c0ff;
+  --color-inverse-primary:            #4d44e3;
+  --color-on-primary-fixed:           #0f0069;
+  --color-on-primary-fixed-variant:   #3323cc;
+
+  /* Secondary palette */
+  --color-secondary:                  #bcc7de;
+  --color-secondary-container:        #3e495d;
+  --color-on-secondary:               #263143;
+  --color-on-secondary-container:     #aeb9d0;
+  --color-secondary-fixed:            #d8e3fb;
+  --color-secondary-fixed-dim:        #bcc7de;
+  --color-on-secondary-fixed:         #111c2d;
+  --color-on-secondary-fixed-variant: #3c475a;
+
+  /* Tertiary (accent warm) */
+  --color-tertiary:                   #ffb695;
+  --color-tertiary-container:         #a44100;
+  --color-on-tertiary:                #571f00;
+  --color-on-tertiary-container:      #ffd2be;
+  --color-tertiary-fixed:             #ffdbcc;
+  --color-tertiary-fixed-dim:         #ffb695;
+  --color-on-tertiary-fixed:          #351000;
+  --color-on-tertiary-fixed-variant:  #7b2f00;
+
+  /* Outline / Divider */
+  --color-outline:                    #918fa1;
+  --color-outline-variant:            #464555;
+
+  /* Error */
+  --color-error:                      #ffb4ab;
+  --color-error-container:            #93000a;
+  --color-on-error:                   #690005;
+  --color-on-error-container:         #ffdad6;
+
+  /* Surface tint */
+  --color-surface-tint:               #c3c0ff;
 }
 
 body {
-  background: radial-gradient(circle at top left, #ffffff 0%, var(--background) 38%);
-  color: var(--foreground);
-  font-family: var(--font-geist-sans), "Segoe UI", sans-serif;
+  background-color: #0b1326;
+  color: #dae2fd;
+  font-family: 'Manrope', 'Segoe UI', sans-serif;
   text-rendering: optimizeLegibility;
 }
 
-.dark body {
-  background: radial-gradient(circle at top left, #101827 0%, var(--background) 42%);
+:focus-visible {
+  outline: 2px solid #c3c0ff;
+  outline-offset: 2px;
 }
 
-:focus-visible {
-  outline: 2px solid var(--focus);
-  outline-offset: 2px;
+/* Indigo gradient helper */
+.indigo-gradient {
+  background: linear-gradient(135deg, #4f46e5 0%, #c3c0ff 100%);
+}
+
+/* Tonal architecture background shift */
+.tonal-architecture-shift {
+  background: linear-gradient(to bottom, #0b1326, #060e20);
 }
