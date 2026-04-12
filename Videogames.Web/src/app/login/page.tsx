@@ -4,30 +4,20 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { ExclamationCircleIcon } from "@heroicons/react/24/outline";
-import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
-
-function FieldFeedback({ message }: { message?: string }) {
-  if (!message) return null;
-  return (
-    <p className="mt-1.5 flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 font-medium" role="alert">
-      <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
-      <span>{message}</span>
-    </p>
-  );
-}
+import { scrollToFirstError } from "../../utils/formUtils";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
   const [error, setError] = useState("");
-  const [fieldErrors, setFieldErrors] = useState<{email?: string; password?: string}>({});
+  const [fieldErrors, setFieldErrors] = useState<{ email?: string; password?: string }>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
 
   const validate = () => {
-    const next: {email?: string; password?: string} = {};
+    const next: { email?: string; password?: string } = {};
     if (!email.trim()) next.email = "Email is required";
     else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) next.email = "Invalid email format";
     if (!password) next.password = "Password is required";
@@ -39,12 +29,10 @@ export default function LoginPage() {
     setSubmitAttempted(true);
     const errors = validate();
     setFieldErrors(errors);
-
     if (Object.keys(errors).length > 0) {
       scrollToFirstError();
       return;
     }
-
     try {
       await login({ email, password });
       router.push("/");
@@ -54,87 +42,174 @@ export default function LoginPage() {
     }
   };
 
-  return (
-    <div className="flex justify-center items-center min-h-[calc(100vh-140px)] bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <div className="bg-white dark:bg-gray-800 p-10 rounded-2xl shadow-xl w-full max-w-md border border-gray-100 dark:border-gray-700">
-        <div className="text-center mb-10">
-          <h2 className="text-3xl font-bold bg-linear-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
-            Welcome Back
-          </h2>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
-            Sign in to your vMarket account
-          </p>
-        </div>
-        {error && (
-          <div className="bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 p-3 rounded-lg text-sm mb-6 border border-red-100 dark:border-red-800">
-            {error}
-          </div>
-        )}
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label
-              htmlFor="email"
-              className="block text-sm font-semibold mb-2 dark:text-gray-300"
-            >
-              Email Address
-            </label>
-            <input
-              id="email"
-              name="email"
-              type="email"
-              value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                if (submitAttempted) setFieldErrors(validate());
-              }}
-              className={getInputClassNames(!!fieldErrors.email)}
-              aria-invalid={!!fieldErrors.email}
-              placeholder="name@example.com"
-            />
-            <FieldFeedback message={fieldErrors.email} />
-          </div>
-          <div>
-            <label
-              htmlFor="password"
-              className="block text-sm font-semibold mb-2 dark:text-gray-300"
-            >
-              Password
-            </label>
-            <input
-              id="password"
-              name="password"
-              type="password"
-              value={password}
-              onChange={(e) => {
-                setPassword(e.target.value);
-                if (submitAttempted) setFieldErrors(validate());
-              }}
-              className={getInputClassNames(!!fieldErrors.password)}
-              aria-invalid={!!fieldErrors.password}
-              placeholder="••••••••"
-            />
-            <FieldFeedback message={fieldErrors.password} />
-          </div>
-          <button
-            type="submit"
-            className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/25 active:scale-[0.98]"
-          >
-            Sign In
-          </button>
+  const inputCls = (hasError: boolean) =>
+    `w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 transition-all duration-200 text-sm outline-none ${
+      hasError ? "focus:ring-error ring-1 ring-error" : "focus:ring-primary"
+    }`;
 
-          <div className="text-center mt-8 pt-6 border-t border-gray-100 dark:border-gray-700">
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              New to vMarket?{" "}
+  return (
+    <div className="fixed inset-0 bg-surface text-on-surface flex flex-col overflow-auto">
+      {/* Background orbs */}
+      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none">
+        <div className="absolute -top-[10%] -left-[5%] w-[60%] h-[60%] rounded-full bg-primary-container/10 blur-[120px]" />
+        <div className="absolute -bottom-[10%] -right-[5%] w-[50%] h-[50%] rounded-full bg-surface-container-highest/20 blur-[100px]" />
+      </div>
+
+      {/* Main content */}
+      <main className="relative z-10 grow flex items-center justify-center px-6 py-12">
+        <div className="w-full max-w-md">
+          {/* Brand */}
+          <div className="text-center mb-10">
+            <h1 className="text-3xl font-black italic tracking-tighter text-on-surface mb-2">
+              vMarket
+            </h1>
+            <p className="text-on-surface-variant font-medium tracking-tight">
+              Access your curated collection
+            </p>
+          </div>
+
+          {/* Card */}
+          <div className="bg-surface-container-low p-8 rounded-xl shadow-2xl">
+            <div className="mb-8">
+              <h2 className="text-xl font-bold text-on-surface tracking-tight mb-1">
+                Welcome Back
+              </h2>
+              <p className="text-on-surface-variant text-sm">
+                Please enter your credentials to continue.
+              </p>
+            </div>
+
+            {error && (
+              <div className="mb-6 rounded-md bg-error-container/30 border border-error/30 px-4 py-3 text-sm text-error">
+                {error}
+              </div>
+            )}
+
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {/* Email */}
+              <div className="space-y-2">
+                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block px-1">
+                  Email Address
+                </label>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">
+                    mail
+                  </span>
+                  <input
+                    id="email"
+                    name="email"
+                    type="email"
+                    value={email}
+                    onChange={(e) => {
+                      setEmail(e.target.value);
+                      if (submitAttempted) setFieldErrors(validate());
+                    }}
+                    className={inputCls(!!fieldErrors.email)}
+                    aria-invalid={!!fieldErrors.email}
+                    placeholder="curator@archive.com"
+                  />
+                </div>
+                {fieldErrors.email && (
+                  <p className="text-xs text-error px-1">{fieldErrors.email}</p>
+                )}
+              </div>
+
+              {/* Password */}
+              <div className="space-y-2">
+                <div className="flex justify-between items-center px-1">
+                  <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">
+                    Password
+                  </label>
+                  {/* FEATURE-PENDING: forgot password */}
+                </div>
+                <div className="relative group">
+                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">
+                    lock
+                  </span>
+                  <input
+                    id="password"
+                    name="password"
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (submitAttempted) setFieldErrors(validate());
+                    }}
+                    className={inputCls(!!fieldErrors.password)}
+                    aria-invalid={!!fieldErrors.password}
+                    placeholder="••••••••"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword((v) => !v)}
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    <span className="material-symbols-outlined text-lg">
+                      {showPassword ? "visibility_off" : "visibility"}
+                    </span>
+                  </button>
+                </div>
+                {fieldErrors.password && (
+                  <p className="text-xs text-error px-1">{fieldErrors.password}</p>
+                )}
+              </div>
+
+              {/* CTA */}
+              <button
+                type="submit"
+                className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:scale-[1.01] active:scale-95 transition-all duration-200"
+              >
+                Sign In
+              </button>
+            </form>
+
+            {/* Divider */}
+            <div className="flex items-center my-8 gap-4">
+              <div className="grow h-px bg-outline-variant/20" />
+              <span className="text-[0.6875rem] uppercase tracking-widest font-bold text-outline">
+                Or continue with
+              </span>
+              <div className="grow h-px bg-outline-variant/20" />
+            </div>
+
+            {/* Social (FEATURE-PENDING) */}
+            <div className="grid grid-cols-2 gap-4">
+              {/* FEATURE-PENDING: Google OAuth */}
+              <button
+                disabled
+                className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed"
+              >
+                Google
+              </button>
+              {/* FEATURE-PENDING: Apple OAuth */}
+              <button
+                disabled
+                className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed"
+              >
+                Apple
+              </button>
+            </div>
+
+            {/* Footer link */}
+            <p className="mt-8 text-center text-sm text-on-surface-variant">
+              New to the collection?{" "}
               <Link
                 href="/register"
-                className="text-blue-600 dark:text-blue-400 font-bold hover:underline ml-1"
+                className="text-primary font-bold hover:text-primary-fixed transition-colors"
               >
                 Create an account
               </Link>
             </p>
           </div>
-        </form>
-      </div>
+        </div>
+      </main>
+
+      <footer className="relative z-10 text-center py-6">
+        <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-outline">
+          © {new Date().getFullYear()} vMarket. Curated for collectors.
+        </p>
+      </footer>
     </div>
   );
 }
