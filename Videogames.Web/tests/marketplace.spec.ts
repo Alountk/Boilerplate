@@ -1,4 +1,7 @@
 import { test, expect } from '@playwright/test';
+import path from 'path';
+
+const TEST_IMAGE_PATH = path.resolve(__dirname, 'assets/test-image.png');
 
 test.beforeAll(async ({ request }) => {
   await request.post('http://localhost:5017/api/Users', {
@@ -23,9 +26,9 @@ test.describe('Marketplace Flow', () => {
     await expect(page.locator('h1')).toBeVisible();
     
     // Verify some categories
-    await expect(page.locator('text=PlayStation')).toBeVisible();
-    await expect(page.locator('text=Nintendo')).toBeVisible();
-    await expect(page.locator('text=Xbox')).toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'PlayStation' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'Nintendo' })).toBeVisible();
+    await expect(page.getByRole('heading', { level: 3, name: 'Xbox' })).toBeVisible();
   });
 
   test('should navigate to category and show subcategories', async ({ page }) => {
@@ -113,8 +116,8 @@ test.describe('Marketplace Flow', () => {
 
     // Upload multiple cover images
     await page.locator('#imageUpload').setInputFiles([
-      'tests/assets/test-image.png',
-      'tests/assets/test-image.png', // Using same image twice for testing
+      TEST_IMAGE_PATH,
+      TEST_IMAGE_PATH, // Using same image twice for testing
     ]);
     
     // Wait for uploads to complete - should see 2 image previews in grid
