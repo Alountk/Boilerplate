@@ -90,6 +90,16 @@
 			"label": "Commit Tooling Updates",
 			"type": "shell",
 			"command": "git add .env.portainer.example .gitignore .vscode/tasks.json && git commit -m \"chore(dev): update local env sample, ignore rules and vscode tasks\""
+		},
+		{
+			"label": "Verify Clean Status",
+			"type": "shell",
+			"command": "git status --short && git --no-pager log --oneline -n 3"
+		},
+		{
+			"label": "Commit Task Runner Entries",
+			"type": "shell",
+			"command": "git add .vscode/tasks.json && git commit -m \"chore(vscode): persist helper task entries used during validation\""
 		}
 	]
 }
