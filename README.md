@@ -157,6 +157,14 @@ This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
 
+### 2026-04-12: Test Stabilization, Dependency Cleanup & Item Creation Coverage
+- **Backend Resilience**: Hardened `UserService.CreateAsync` to safely handle unexpected `null` returns from repository create operations, preventing `NullReferenceException` during auth response mapping.
+- **E2E Stability**: Stabilized Playwright tests for marketplace, RAWG search, and chat flows by improving selectors, replacing brittle expectations, and making image fixture handling deterministic.
+- **Test Architecture**: Refactored Playwright tests with shared support helpers (`tests/support/auth.ts`, `tests/support/item-creation.ts`) to reduce duplication and improve maintainability.
+- **Naming Consistency**: Standardized test naming conventions by renaming `rawg_search.spec.ts` to `rawg-search.spec.ts` and syncing project documentation.
+- **New Coverage**: Added a new test in the existing marketplace suite where a registered user creates an item and verifies it appears in listings.
+- **Build Health**: Removed redundant package references in `Videogames.Infrastructure.csproj` (`Microsoft.Extensions.Configuration.Binder`, `Microsoft.Extensions.DependencyInjection.Abstractions`, `Microsoft.Extensions.Http`) that were already provided by `Microsoft.AspNetCore.App`, eliminating `NU1510` warnings.
+
 ### 2026-04-11: RAWG API Integration & Hydration Fixes
 - **Feature**: Integrated **RAWG API** to automatically fetch game metadata (name, release date, description, score, platform) during the "Sell Item" flow. Implemented a debounced search UI to improve UX and reduce API calls.
 - **Bug Fix**: Resolved **hydration mismatch** errors in `AuthContext` and `ThemeToggle`. Moved client-side state initialization (from `localStorage` and `window`) into `useEffect` hooks to ensure consistency between server-rendered HTML and client-side hydration.
