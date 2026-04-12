@@ -102,3 +102,6 @@ Desktop.ini
 # Agents
 .agents/
 skills-lock.json
+
+# DESIGN
+design/

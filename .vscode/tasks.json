@@ -1,55 +1,95 @@
 {
-    "version": "2.0.0",
-    "tasks": [
-        {
-            "label": "Docker Up",
-            "type": "shell",
-            "command": "make docker-up",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Update Database",
-            "type": "shell",
-            "command": "make migrate",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Run API",
-            "type": "shell",
-            "command": "make run-api",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Docker Down",
-            "type": "shell",
-            "command": "make docker-down",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        },
-        {
-            "label": "Run Web",
-            "type": "shell",
-            "command": "make run-web",
-            "problemMatcher": [],
-            "presentation": {
-                "reveal": "always",
-                "panel": "shared"
-            }
-        }
-    ]
+	"version": "2.0.0",
+	"tasks": [
+		{
+			"label": "Docker Up",
+			"type": "shell",
+			"command": "make docker-up",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Update Database",
+			"type": "shell",
+			"command": "make migrate",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Run API",
+			"type": "shell",
+			"command": "make run-api",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Docker Down",
+			"type": "shell",
+			"command": "make docker-down",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Run Web",
+			"type": "shell",
+			"command": "make run-web",
+			"problemMatcher": [],
+			"presentation": {
+				"reveal": "always",
+				"panel": "shared"
+			}
+		},
+		{
+			"label": "Run Playwright (CI mode diagnostic)",
+			"type": "shell",
+			"command": "cd Videogames.Web && CI=true npm run test:e2e"
+		},
+		{
+			"label": "Diagnose served frontend",
+			"type": "shell",
+			"command": "curl -s http://localhost:3000 | rg -n \"Marketplace for gamers|Shop by Category|Start Shopping\" || true; docker ps --format '{{.Names}} {{.Ports}}' | rg '3000|5017' || true"
+		},
+		{
+			"label": "Find design zip",
+			"type": "shell",
+			"command": "find /Users/alountk -name 'vMarket1.0-dark.zip' 2>/dev/null | head -n 20"
+		},
+		{
+			"label": "Git Status Snapshot",
+			"type": "shell",
+			"command": "git branch --show-current && git status --short"
+		},
+		{
+			"label": "Web Lint Snapshot",
+			"type": "shell",
+			"command": "cd Videogames.Web && npm run lint"
+		},
+		{
+			"label": "Commit Web Redesign",
+			"type": "shell",
+			"command": "git add Videogames.Web/src/app/globals.css Videogames.Web/src/app/layout.tsx Videogames.Web/src/app/page.tsx Videogames.Web/src/app/login/page.tsx Videogames.Web/src/app/register/page.tsx Videogames.Web/src/app/category/[id]/page.tsx Videogames.Web/src/app/create/page.tsx Videogames.Web/src/components/Navbar.tsx && git commit -m \"feat(web): apply stitch-dark redesign across core pages and navbar\""
+		},
+		{
+			"label": "Commit Web Redesign Retry",
+			"type": "shell",
+			"command": "git add Videogames.Web/src/app/globals.css Videogames.Web/src/app/layout.tsx Videogames.Web/src/app/page.tsx Videogames.Web/src/app/login/page.tsx Videogames.Web/src/app/register/page.tsx 'Videogames.Web/src/app/category/[id]/page.tsx' Videogames.Web/src/app/create/page.tsx Videogames.Web/src/components/Navbar.tsx && git commit -m \"feat(web): apply stitch-dark redesign across core pages and navbar\""
+		},
+		{
+			"label": "Commit Tooling Updates",
+			"type": "shell",
+			"command": "git add .env.portainer.example .gitignore .vscode/tasks.json && git commit -m \"chore(dev): update local env sample, ignore rules and vscode tasks\""
+		}
+	]
 }
