@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { Suspense, useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useChat } from "../../hooks/useChat";
 import { ChatService } from "../../infrastructure/services/ChatService";
@@ -12,7 +12,7 @@ import { ChatList } from "../../components/chat/ChatList";
 import { useSearchParams } from "next/navigation";
 import { ChatRoom } from "../../components/chat/ChatRoom";
 
-export default function MessagesPage() {
+function MessagesPageContent() {
   const searchParams = useSearchParams();
   const { user, loading: authLoading } = useAuth();
   const { 
@@ -122,5 +122,13 @@ export default function MessagesPage() {
         )}
       </main>
     </div>
+  );
+}
+
+export default function MessagesPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen animate-pulse bg-gray-50 dark:bg-gray-900" />}>
+      <MessagesPageContent />
+    </Suspense>
   );
 }

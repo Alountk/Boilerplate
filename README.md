@@ -191,6 +191,16 @@ This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
 
+### 2026-04-12: Frontend Release Failure in Docker CI (Next 16)
+- **Incident**: `docker-release.yml` failed in `Build and push Web image` with `npm run build` exit code `1`, blocking frontend image publication.
+- **Root Cause**: The `/messages` route used `useSearchParams()` without a `Suspense` boundary, which fails Next.js 16 production prerendering.
+- **Fix Applied**: Refactored the page into `MessagesPageContent` and wrapped the exported page with `<Suspense fallback=...>` in `src/app/messages/page.tsx`.
+- **Validation**: Re-ran `npm run build` in `Videogames.Web`; build now completes and `/messages` is generated successfully.
+- **Improvements**:
+   - Add a mandatory frontend production build check before pushing release-related commits.
+   - Keep hooks that depend on URL search params isolated in client-only content wrapped by `Suspense`.
+   - Treat CI annotation-only errors (`buildx ... npm run build`) as actionable by reproducing with local `next build` immediately.
+
 ### 2026-04-12: Test Stabilization, Dependency Cleanup & Item Creation Coverage
 - **Backend Resilience**: Hardened `UserService.CreateAsync` to safely handle unexpected `null` returns from repository create operations, preventing `NullReferenceException` during auth response mapping.
 - **E2E Stability**: Stabilized Playwright tests for marketplace, RAWG search, and chat flows by improving selectors, replacing brittle expectations, and making image fixture handling deterministic.
