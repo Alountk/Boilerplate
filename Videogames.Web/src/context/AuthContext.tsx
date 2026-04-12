@@ -4,7 +4,6 @@ import React, {
   createContext,
   useContext,
   useState,
-  useEffect,
   ReactNode,
 } from "react";
 import { User } from "../domain/models/User";
@@ -28,20 +27,12 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(null);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // Load user only on client side after mount
-    if (typeof window !== "undefined") {
-      const authService = new AuthService();
-      const currentUser = authService.getCurrentUser();
-      if (currentUser) {
-        setUser(currentUser);
-      }
-      setLoading(false);
-    }
-  }, []);
+  const [user, setUser] = useState<User | null>(() => {
+    if (typeof window === "undefined") return null;
+    const authService = new AuthService();
+    return authService.getCurrentUser();
+  });
+  const loading = false;
 
   const login = async (credentials: LoginRequest) => {
     const authService = new AuthService();
