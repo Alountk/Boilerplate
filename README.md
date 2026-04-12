@@ -2,7 +2,7 @@
 
 vMarket is a robust, scalable, and production-ready full-stack application built with a **Dual-Hexagonal Architecture**. It combines a high-performance .NET 10 backend with a modern Next.js 15 frontend, focusing on maintainability, testability, and a premium user experience.
 
-![Marketplace Preview]()
+![Marketplace Preview](./docs/images/ui-after.png)
 
 ## 🏗 Architecture
 
