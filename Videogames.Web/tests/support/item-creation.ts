@@ -23,7 +23,7 @@ export async function fillRequiredItemFields(page: Page, itemName: string): Prom
   await page.getByLabel('Console').fill('Test Console');
   await page.getByLabel('Release Date').fill('2023-01-01');
   await page.getByLabel('Version').fill('v1.0-Test');
-  await page.getByLabel('Category').selectOption('2');
+  await page.getByLabel('Category', { exact: true }).selectOption('2');
   await page.getByLabel('Average Market Price').fill('50');
   await page.getByLabel('Your Asking Price').fill('45');
   await page.getByLabel('Detailed Description').fill('This is a test game created by Playwright E2E.');
