@@ -7,6 +7,7 @@ import { ShoppingCartIcon, BellIcon } from "@heroicons/react/24/outline";
 
 export default function Navbar() {
   const { user, logout, isAuthenticated, loading } = useAuth();
+  const appVersion = process.env.NEXT_PUBLIC_APP_VERSION?.trim();
 
   return (
     <header className="w-full bg-white/90 dark:bg-slate-900/90 border-b border-slate-200 dark:border-slate-800 backdrop-blur-md transition-colors duration-300 sticky top-0 z-40">
@@ -51,6 +52,15 @@ export default function Navbar() {
             </Link>
           </div>
           <div className="flex items-center gap-4">
+            {appVersion && (
+              <span
+                className="hidden lg:inline-flex items-center rounded-full border border-slate-300 dark:border-slate-700 px-2 py-0.5 text-[10px] font-medium text-slate-600 dark:text-slate-300"
+                aria-label={`Application version ${appVersion}`}
+                title={`Version ${appVersion}`}
+              >
+                v{appVersion}
+              </span>
+            )}
             <Link href="#" className="hover:underline underline-offset-2 hidden md:block">
               Ship to
             </Link>
