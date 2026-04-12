@@ -135,6 +135,16 @@ npm run test:e2e
 └── .github/workflows          # CI/CD (GitHub Actions)
 ```
 
+## 🎨 UI Redesign Snapshot
+
+### Before
+
+![Before UI](./docs/images/ui-before.png)
+
+### After
+
+![After UI](./docs/images/ui-after.png)
+
 ## 🗺 Roadmap
 
 - [x] **Full-stack Foundation** (Next.js + .NET)
