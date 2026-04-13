@@ -24,6 +24,14 @@ public class InMemoryVideogameRepository : IVideogameRepository
         return Task.FromResult(_videogames.AsEnumerable());
     }
 
+    public Task<(IEnumerable<Videogame> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
+    {
+        var ordered = _videogames.AsEnumerable().Reverse();
+        var totalCount = _videogames.Count;
+        var items = ordered.Skip((page - 1) * pageSize).Take(pageSize);
+        return Task.FromResult((items, totalCount));
+    }
+
     public Task UpdateAsync(Videogame videogame)
     {
         var index = _videogames.FindIndex(v => v.Id == videogame.Id);

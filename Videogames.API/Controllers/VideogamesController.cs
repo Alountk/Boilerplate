@@ -48,8 +48,14 @@ public class VideogamesController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    public async Task<ActionResult<IEnumerable<VideogameDto>>> GetAll()
+    public async Task<ActionResult> GetAll([FromQuery] int? page, [FromQuery] int pageSize = 12)
     {
+        if (page.HasValue)
+        {
+            var paged = await _service.GetPagedAsync(page.Value, pageSize);
+            return Ok(paged);
+        }
+
         var videogames = await _service.GetAllAsync();
         return Ok(videogames);
     }

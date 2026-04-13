@@ -35,8 +35,17 @@ export interface UpdateVideogameRequest extends Partial<CreateVideogameRequest> 
 
 export interface IVideogameService {
   getAll(): Promise<Videogame[]>;
+  getPaged(page: number, pageSize: number): Promise<PagedResult<Videogame>>;
   getById(id: string): Promise<Videogame>;
   create(data: CreateVideogameRequest): Promise<Videogame>;
   update(id: string, data: UpdateVideogameRequest): Promise<Videogame>;
   delete(id: string): Promise<void>;
+}
+
+export interface PagedResult<T> {
+  items: T[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+  hasMore: boolean;
 }

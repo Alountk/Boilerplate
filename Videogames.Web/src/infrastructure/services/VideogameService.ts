@@ -1,10 +1,17 @@
-import { IVideogameService, CreateVideogameRequest, UpdateVideogameRequest } from '../../domain/ports/IVideogameService';
+import { IVideogameService, CreateVideogameRequest, UpdateVideogameRequest, PagedResult } from '../../domain/ports/IVideogameService';
 import { Videogame } from '../../domain/models/Videogame';
 import { axiosInstance } from '../api/axiosInstance';
 
 export class VideogameService implements IVideogameService {
   async getAll(): Promise<Videogame[]> {
     const response = await axiosInstance.get<Videogame[]>('/Videogames');
+    return response.data;
+  }
+
+  async getPaged(page: number, pageSize: number): Promise<PagedResult<Videogame>> {
+    const response = await axiosInstance.get<PagedResult<Videogame>>('/Videogames', {
+      params: { page, pageSize },
+    });
     return response.data;
   }
 

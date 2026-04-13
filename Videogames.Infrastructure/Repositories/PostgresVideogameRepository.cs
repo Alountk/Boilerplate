@@ -35,6 +35,21 @@ public class PostgresVideogameRepository : IVideogameRepository
             .ToListAsync();
     }
 
+    public async Task<(IEnumerable<Videogame> Items, int TotalCount)> GetPagedAsync(int page, int pageSize)
+    {
+        var query = _context.Videogames
+            .Include(v => v.Names)
+            .OrderByDescending(v => v.Id);
+
+        var totalCount = await query.CountAsync();
+        var items = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToListAsync();
+
+        return (items, totalCount);
+    }
+
     public async Task UpdateAsync(Videogame videogame)
     {
         _context.Entry(videogame).State = EntityState.Modified;

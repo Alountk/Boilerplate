@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import Link from "next/link";
 import { Videogame } from "../domain/models/Videogame";
 import { VideogameService } from "../infrastructure/services/VideogameService";
@@ -8,39 +8,81 @@ import { useAuth } from "../context/AuthContext";
 import VideogameCard from "../components/VideogameCard";
 
 import { CATEGORIES } from "../constants/categories";
+
+const PAGE_SIZE = 12;
+
 export default function Home() {
   const [videogames, setVideogames] = useState<Videogame[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const { isAuthenticated } = useAuth();
   const [videogameService] = useState(() => new VideogameService());
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const isFetchingRef = useRef(false);
 
-  const loadVideogames = useCallback(async () => {
-    try {
-      const data = await videogameService.getAll();
-      setVideogames(data);
-    } catch (error) {
-      console.error("Failed to load videogames", error);
-    } finally {
-      setLoading(false);
-    }
-  }, [videogameService]);
+  const loadPage = useCallback(
+    async (pageNum: number, replace = false) => {
+      if (isFetchingRef.current) return;
+      isFetchingRef.current = true;
 
+      try {
+        const result = await videogameService.getPaged(pageNum, PAGE_SIZE);
+        setVideogames((prev) => (replace ? result.items : [...prev, ...result.items]));
+        setHasMore(result.hasMore);
+        setPage(pageNum);
+      } catch (error) {
+        console.error("Failed to load videogames", error);
+      } finally {
+        isFetchingRef.current = false;
+        setLoading(false);
+        setLoadingMore(false);
+      }
+    },
+    [videogameService]
+  );
+
+  // Initial load
   useEffect(() => {
-    loadVideogames();
-  }, [loadVideogames]);
+    loadPage(1, true);
+  }, [loadPage]);
+
+  // IntersectionObserver sentinel
+  useEffect(() => {
+    const sentinel = sentinelRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetchingRef.current) {
+          setLoadingMore(true);
+          loadPage(page + 1);
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [hasMore, page, loadPage]);
 
   const handleDelete = useCallback(
     async (id: string) => {
       if (confirm("Are you sure you want to delete this listing?")) {
         try {
           await videogameService.delete(id);
-          loadVideogames();
+          // Reload from page 1 to keep state consistent
+          setLoading(true);
+          setVideogames([]);
+          setHasMore(true);
+          loadPage(1, true);
         } catch (error) {
           console.error("Failed to delete videogame", error);
         }
       }
     },
-    [loadVideogames, videogameService]
+    [loadPage, videogameService]
   );
 
   return (
@@ -122,38 +164,58 @@ export default function Home() {
       <section id="recently-added" className="px-8 md:px-12 py-12 max-w-[1440px] mx-auto">
         <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">Recently Added</h2>
         <p className="text-on-surface-variant mb-12">Fresh listings from the community right now.</p>
+
+        {/* Initial skeleton */}
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-            {[1, 2, 3, 4, 5, 6].map((i) => (
-              <div
-                key={i}
-                className="aspect-3/4 bg-surface-container rounded-xl animate-pulse"
-              />
+            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+              <div key={i} className="aspect-3/4 bg-surface-container rounded-xl animate-pulse" />
             ))}
+          </div>
+        ) : videogames.length === 0 ? (
+          <div className="py-20 text-center bg-surface-container-low rounded-2xl" role="status">
+            <span className="material-symbols-outlined text-5xl text-outline mb-4 block">inventory_2</span>
+            <p className="text-on-surface-variant mb-4">No videogames listed yet. Be the first to publish one.</p>
+            <Link
+              href="/create"
+              className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-bold text-sm inline-block hover:opacity-90 transition-all"
+            >
+              List an item now
+            </Link>
           </div>
         ) : (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12">
-            {videogames.map((game) => (
-              <VideogameCard
-                key={game.id}
-                videogame={game}
-                isAuthenticated={isAuthenticated}
-                onDelete={handleDelete}
-              />
-            ))}
-            {videogames.length === 0 && (
-              <div className="col-span-full py-20 text-center bg-surface-container-low rounded-2xl" role="status">
-                <span className="material-symbols-outlined text-5xl text-outline mb-4 block">inventory_2</span>
-                <p className="text-on-surface-variant mb-4">No videogames listed yet in this section. Be the first to publish one.</p>
-                <Link
-                  href="/create"
-                  className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-bold text-sm inline-block hover:opacity-90 transition-all"
-                >
-                  List an item now
-                </Link>
+          <>
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12">
+              {videogames.map((game) => (
+                <VideogameCard
+                  key={game.id}
+                  videogame={game}
+                  isAuthenticated={isAuthenticated}
+                  onDelete={handleDelete}
+                />
+              ))}
+            </div>
+
+            {/* Load-more skeleton — shown while fetching next page */}
+            {loadingMore && (
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12 mt-12">
+                {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                  <div key={i} className="aspect-3/4 bg-surface-container rounded-xl animate-pulse" />
+                ))}
               </div>
             )}
-          </div>
+
+            {/* Sentinel: IntersectionObserver target */}
+            {hasMore && (
+              <div ref={sentinelRef} className="h-1 mt-8" aria-hidden="true" />
+            )}
+
+            {!hasMore && videogames.length > 0 && (
+              <p className="text-center text-on-surface-variant/50 text-sm mt-16">
+                You&apos;ve seen all listings.
+              </p>
+            )}
+          </>
         )}
       </section>
 
