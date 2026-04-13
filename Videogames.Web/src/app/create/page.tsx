@@ -25,7 +25,7 @@ import { useAuth } from "../../context/AuthContext";
 function FieldFeedback({ message }: { message?: string }) {
   if (!message) return null;
   return (
-    <p className="mt-1 flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400 font-medium">
+    <p className="mt-1 flex items-center gap-1.5 text-xs text-error font-medium">
       <ExclamationCircleIcon className="h-4 w-4 shrink-0" />
       <span>{message}</span>
     </p>
@@ -928,7 +928,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Left Side
                   </label>
                   {contents[0].leftSideUrl && (
@@ -937,7 +937,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].leftSideUrl)}
                         alt="Left side preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ELeft%3C/text%3E%3C/svg%3E';
@@ -958,7 +958,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="leftSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["leftSideUrl"]
                         ? "Uploading..."
@@ -974,7 +974,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Top
                   </label>
                   {contents[0].topSideUrl && (
@@ -983,7 +983,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].topSideUrl)}
                         alt="Top preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ETop%3C/text%3E%3C/svg%3E';
@@ -1004,7 +1004,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="topSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["topSideUrl"]
                         ? "Uploading..."
@@ -1020,7 +1020,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Bottom
                   </label>
                   {contents[0].bottomSideUrl && (
@@ -1029,7 +1029,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].bottomSideUrl)}
                         alt="Bottom preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EBottom%3C/text%3E%3C/svg%3E';
@@ -1050,7 +1050,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="bottomSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["bottomSideUrl"]
                         ? "Uploading..."

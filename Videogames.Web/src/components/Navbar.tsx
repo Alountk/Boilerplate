@@ -8,8 +8,8 @@ export default function Navbar() {
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION?.trim();
 
   return (
-    <header className="w-full top-0 sticky z-50 bg-surface shadow-none">
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 bg-surface-container-low py-3">
+    <header className="w-full top-0 sticky z-50 bg-surface-container-low shadow-none">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-6 min-w-0">
             <Link

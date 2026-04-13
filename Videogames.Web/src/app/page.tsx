@@ -182,7 +182,7 @@ export default function Home() {
           <div className="mb-8 md:mb-0">
             <span className="text-on-surface font-black italic text-xl">vMarket</span>
             <p className="text-on-surface-variant mt-2 text-xs opacity-80">
-              © {new Date().getFullYear()} vMarket. Curated for collectors.
+              © {new Date().getFullYear()} vMarket. The gamer marketplace.
             </p>
           </div>
           <div className="flex flex-wrap justify-center gap-8">
