@@ -27,6 +27,13 @@ public class InMemoryUserRepository : IUserRepository
         return Task.FromResult(user);
     }
 
+    public Task<User?> GetByOAuthAsync(string provider, string subject)
+    {
+        var user = _users.Values
+            .FirstOrDefault(u => u.OAuthProvider == provider && u.OAuthSubject == subject);
+        return Task.FromResult(user);
+    }
+
     public Task<IEnumerable<User>> GetAllAsync()
     {
         return Task.FromResult<IEnumerable<User>>(_users.Values.ToList());

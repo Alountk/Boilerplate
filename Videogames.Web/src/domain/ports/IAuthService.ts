@@ -36,7 +36,9 @@ export interface UpdateUserRequest {
 export interface IAuthService {
   login(credentials: LoginRequest): Promise<AuthResponse>;
   register(data: RegisterRequest): Promise<AuthResponse>;
+  loginWithGoogle(idToken: string): Promise<AuthResponse>;
+  loginWithApple(idToken: string): Promise<AuthResponse>;
   logout(): void;
   getCurrentUser(): User | null;
-  updateUser(id: string, data: UpdateUserRequest): Promise<User>;
+  updateUser(id: string, data: Partial<RegisterRequest>): Promise<User>;
 }

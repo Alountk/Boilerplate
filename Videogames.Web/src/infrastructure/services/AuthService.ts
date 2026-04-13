@@ -22,6 +22,24 @@ export class AuthService implements IAuthService {
     return response.data;
   }
 
+  async loginWithGoogle(idToken: string): Promise<AuthResponse> {
+    const response = await axiosInstance.post<AuthResponse>('/Auth/google', { idToken });
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+
+  async loginWithApple(idToken: string): Promise<AuthResponse> {
+    const response = await axiosInstance.post<AuthResponse>('/Auth/apple', { idToken });
+    if (response.data.token) {
+      localStorage.setItem('token', response.data.token);
+      localStorage.setItem('user', JSON.stringify(response.data.user));
+    }
+    return response.data;
+  }
+
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');

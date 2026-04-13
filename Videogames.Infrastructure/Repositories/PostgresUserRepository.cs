@@ -33,6 +33,13 @@ public class PostgresUserRepository : IUserRepository
         return users.FirstOrDefault(u => u.Email.Value == lowerEmail);
     }
 
+    public async Task<User?> GetByOAuthAsync(string provider, string subject)
+    {
+        var users = await _context.Users.ToListAsync();
+        return users.FirstOrDefault(u =>
+            u.OAuthProvider == provider && u.OAuthSubject == subject);
+    }
+
     public async Task<IEnumerable<User>> GetAllAsync()
     {
         return await _context.Users.ToListAsync();
