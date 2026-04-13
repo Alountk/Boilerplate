@@ -61,7 +61,7 @@ export default function LoginPage() {
           {/* Brand */}
           <div className="text-center mb-10">
             <h1 className="text-3xl font-black italic tracking-tighter text-on-surface mb-2">
-              vMarket
+              The Archive
             </h1>
             <p className="text-on-surface-variant font-medium tracking-tight">
               Access your curated collection
@@ -160,7 +160,7 @@ export default function LoginPage() {
                 type="submit"
                 className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:scale-[1.01] active:scale-95 transition-all duration-200"
               >
-                Sign In
+                Sign In to The Archive
               </button>
             </form>
 
@@ -207,9 +207,32 @@ export default function LoginPage() {
 
       <footer className="relative z-10 text-center py-6">
         <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-outline">
-          © {new Date().getFullYear()} vMarket. Curated for collectors.
+          © {new Date().getFullYear()} The Nocturnal Archive. Curated for the Elite.
         </p>
       </footer>
+
+      <div className="hidden lg:block fixed left-12 top-1/2 -translate-y-1/2 space-y-8 opacity-20 select-none z-0">
+        <span className="text-[0.6875rem] uppercase tracking-[0.5em] font-bold block rotate-180" style={{ writingMode: "vertical-rl" }}>
+          AUTHENTICATION_PROTOCOL_V4
+        </span>
+        <div className="w-px h-32 bg-outline-variant mx-auto" />
+        <span className="text-[0.6875rem] uppercase tracking-[0.5em] font-bold block rotate-180" style={{ writingMode: "vertical-rl" }}>
+          SECURE_VAULT_ACCESS
+        </span>
+      </div>
+
+      <div className="hidden xl:block fixed right-0 top-0 bottom-0 w-1/3 z-0 pointer-events-none opacity-40">
+        <div className="h-full w-full bg-surface-container-low flex items-center justify-center p-20">
+          <div className="w-full h-full rounded-xl overflow-hidden grayscale">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              alt="Dark library artwork"
+              className="w-full h-full object-cover mix-blend-overlay opacity-30"
+              src="https://lh3.googleusercontent.com/aida-public/AB6AXuDB3zDZCQppCi5kPfnR72cUfeppbRhr9FLKDTtDLDDJf1DvXnNzjd27OvVsuY9bSP6nvArY7oaPLieOD0F6k4OzL8YT_LUOlVptmoOeAdXfS9d8S7z0Kty3XkqyXXJtFBxjmmQS4Tf4s9RCBquls5Z1TS_0jyg7AUs2HcZZlSSh4sqxZEwj1_AU_AuH8oSu4EcXVY6Xpp7B3QLTgffceNN6lo7XsBCeIdfH_M6Zo-b2-KE5UPuEg9rPII8vRPDn2qB3p02i5hw6kLg"
+            />
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

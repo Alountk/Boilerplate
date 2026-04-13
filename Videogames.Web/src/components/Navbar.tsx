@@ -8,34 +8,44 @@ export default function Navbar() {
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION?.trim();
 
   return (
-    <header className="w-full top-0 sticky z-50 bg-surface-container-low/95 backdrop-blur-md border-b border-outline-variant/25">
-      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between gap-4 py-3">
-          <div className="flex items-center gap-4 sm:gap-6 min-w-0">
+    <header className="w-full top-0 sticky z-50 bg-surface shadow-none">
+      <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 bg-surface-container-low py-3">
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-6 min-w-0">
             <Link
               href="/"
               className="text-xl sm:text-2xl font-bold text-on-surface tracking-tighter whitespace-nowrap shrink-0"
             >
-              vMarket
+              The Archive
             </Link>
-            <nav className="hidden lg:flex items-center gap-6">
+            <nav className="hidden md:flex items-center gap-6">
               <Link
                 href="/"
                 className="text-primary font-bold border-b-2 border-primary-container pb-1 hover:text-on-surface transition-colors duration-200"
               >
                 Browse
               </Link>
-              {/* FEATURE-PENDING: Collectibles category page */}
-              {false && <span className="text-on-surface-variant">Collectibles</span>}
-              {/* FEATURE-PENDING: Antiques category page */}
-              {false && <span className="text-on-surface-variant">Antiques</span>}
+              <span className="text-on-surface-variant">Collectibles</span>
+              <span className="text-on-surface-variant">Antiques</span>
             </nav>
+          </div>
+
+          <div className="flex-1 max-w-md mx-8 hidden lg:block">
+            <div className="relative flex items-center">
+              <span className="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+              <input
+                className="w-full bg-surface-container-highest border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/60 outline-none"
+                placeholder="Search the vault..."
+                type="text"
+                aria-label="Search"
+              />
+            </div>
           </div>
 
           <div className="flex items-center gap-2 sm:gap-4 shrink-0">
             {appVersion && (
               <span
-                className="hidden lg:inline-flex items-center rounded-full border border-outline-variant/40 bg-surface-container px-2 py-0.5 text-[10px] font-bold text-on-surface-variant tracking-widest uppercase"
+                className="hidden xl:inline-flex items-center rounded-full border border-outline-variant/40 bg-surface-container px-2 py-0.5 text-[10px] font-bold text-on-surface-variant tracking-widest uppercase"
                 aria-label={`Application version ${appVersion}`}
               >
                 v{appVersion}
@@ -84,16 +94,13 @@ export default function Navbar() {
 
             <Link
               href="/create"
-              className="inline-flex bg-primary-container text-on-primary-container px-4 sm:px-5 py-2 rounded-xl font-bold text-sm scale-95 hover:scale-100 duration-200 transition-all"
+              className="inline-flex bg-primary-container text-on-primary-container px-4 sm:px-6 py-2 rounded-xl font-bold text-sm scale-95 hover:scale-100 duration-200 transition-all"
             >
-              Sell
+              Sell Now
             </Link>
 
             <div className="flex items-center gap-3 text-on-surface-variant">
-              {/* FEATURE-PENDING: Shopping cart */}
-              {false && (
-                <span className="material-symbols-outlined hover:text-on-surface cursor-pointer">shopping_cart</span>
-              )}
+              <span className="material-symbols-outlined hover:text-on-surface cursor-pointer">shopping_cart</span>
               <Link href={isAuthenticated ? "/profile" : "/login"} aria-label="Account">
                 <span className="material-symbols-outlined hover:text-on-surface cursor-pointer text-[26px]">account_circle</span>
               </Link>
@@ -101,7 +108,7 @@ export default function Navbar() {
           </div>
         </div>
 
-        <div className="md:hidden flex items-center justify-between gap-3 pb-3 text-sm">
+        <div className="md:hidden flex items-center justify-between gap-3 pt-3 text-sm">
           <Link href="/" className="text-primary font-semibold hover:text-on-surface transition-colors">
             Browse
           </Link>

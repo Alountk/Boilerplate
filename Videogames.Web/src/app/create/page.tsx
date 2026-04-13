@@ -353,17 +353,17 @@ export default function CreateVideogamePage() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
-      <div className="max-w-4xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
-        <div className="bg-blue-600 p-6 text-white text-center">
-          <h2 className="text-3xl font-bold">List an Item for Sale</h2>
-          <p className="opacity-80">Share your game with the community</p>
+    <div className="min-h-screen py-12 px-4 bg-surface text-on-surface">
+      <div className="max-w-5xl mx-auto bg-surface-container-low rounded-3xl shadow-2xl overflow-hidden border border-outline-variant/20">
+        <div className="indigo-gradient p-8 text-on-primary-container text-center">
+          <h2 className="text-3xl font-bold">Create Listing</h2>
+          <p className="opacity-80">Curate your next masterpiece</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-10">
           {/* Basic Info */}
           <section>
-            <div className="flex items-center gap-2 mb-6 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 pb-2">
+            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
               <BeakerIcon className="h-6 w-6" />
               <h3 className="text-xl font-bold">Basic Information</h3>
             </div>
@@ -371,7 +371,7 @@ export default function CreateVideogamePage() {
               <div>
                 <label
                   htmlFor="englishName"
-                  className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
                 >
                   English Name
                 </label>
@@ -389,17 +389,17 @@ export default function CreateVideogamePage() {
                   <FieldFeedback message={showFieldError('englishName')} />
                   {searching && (
                     <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <div className="animate-spin h-4 w-4 border-2 border-blue-500 border-t-transparent rounded-full"></div>
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
                     </div>
                   )}
                   {showSearch && searchResults.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 rounded-lg shadow-2xl border border-gray-100 dark:border-gray-700 max-h-60 overflow-y-auto">
+                    <div className="absolute z-50 w-full mt-1 bg-surface-container rounded-lg shadow-2xl border border-outline-variant/30 max-h-60 overflow-y-auto">
                       {searchResults.map((game) => (
                         <button
                           key={game.id}
                           type="button"
                           onClick={() => handleSelectGame(game)}
-                          className="w-full flex items-center gap-3 p-3 hover:bg-gray-50 dark:hover:bg-gray-700/50 text-left transition-colors border-b last:border-0 border-gray-50 dark:border-gray-700"
+                          className="w-full flex items-center gap-3 p-3 hover:bg-surface-container-high text-left transition-colors border-b last:border-0 border-outline-variant/20"
                         >
                           {game.background_image ? (
                             <img 
@@ -408,13 +408,13 @@ export default function CreateVideogamePage() {
                               className="w-12 h-12 object-cover rounded shadow-sm"
                             />
                           ) : (
-                            <div className="w-12 h-12 bg-gray-100 dark:bg-gray-700 flex items-center justify-center rounded">
-                              <MagnifyingGlassIcon className="h-4 w-4 text-gray-400" />
+                            <div className="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded">
+                              <MagnifyingGlassIcon className="h-4 w-4 text-outline" />
                             </div>
                           )}
                           <div className="flex-1">
-                            <div className="font-bold text-gray-900 dark:text-gray-100 text-sm">{game.name}</div>
-                            <div className="text-xs text-gray-500">
+                            <div className="font-bold text-on-surface text-sm">{game.name}</div>
+                            <div className="text-xs text-on-surface-variant">
                               {game.released ? new Date(game.released).getFullYear() : 'TBA'} • {game.platforms?.[0]?.platform.name || 'Unknown platform'}
                             </div>
                           </div>
@@ -427,7 +427,7 @@ export default function CreateVideogamePage() {
               <div>
                 <label
                   htmlFor="console"
-                  className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
                 >
                   Console
                 </label>
@@ -446,7 +446,7 @@ export default function CreateVideogamePage() {
               <div>
                 <label
                   htmlFor="releaseDate"
-                  className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
                 >
                   Release Date
                 </label>
@@ -465,7 +465,7 @@ export default function CreateVideogamePage() {
               <div>
                 <label
                   htmlFor="versionGame"
-                  className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
                 >
                   Version
                 </label>
@@ -481,7 +481,7 @@ export default function CreateVideogamePage() {
               <div>
                 <label
                   htmlFor="category"
-                  className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
                 >
                   Category
                 </label>
@@ -503,7 +503,7 @@ export default function CreateVideogamePage() {
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     QR Code
                   </label>
                   <input
@@ -515,7 +515,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     Barcode
                   </label>
                   <input
@@ -532,7 +532,7 @@ export default function CreateVideogamePage() {
 
           {/* Multilingual Names */}
           <section>
-            <div className="flex items-center gap-2 mb-6 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 pb-2">
+            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
               <GlobeAltIcon className="h-6 w-6" />
               <h3 className="text-xl font-bold">Localized Names</h3>
             </div>
@@ -540,10 +540,10 @@ export default function CreateVideogamePage() {
               {names.map((name, index) => (
                 <div
                   key={index}
-                  className="flex gap-4 items-end bg-gray-50 dark:bg-gray-900/50 p-4 rounded-lg"
+                  className="flex gap-4 items-end bg-surface-container p-4 rounded-lg border border-outline-variant/20"
                 >
                   <div className="flex-1">
-                    <label className="block text-xs font-bold mb-1 dark:text-gray-400 uppercase">
+                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                       Language
                     </label>
                     <input
@@ -555,7 +555,7 @@ export default function CreateVideogamePage() {
                     />
                   </div>
                   <div className="flex-2">
-                    <label className="block text-xs font-bold mb-1 dark:text-gray-400 uppercase">
+                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                       Localized Name
                     </label>
                     <input
@@ -569,7 +569,7 @@ export default function CreateVideogamePage() {
                   <button
                     type="button"
                     onClick={() => removeName(index)}
-                    className="p-2 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg"
+                    className="p-2 text-error hover:bg-error/10 rounded-lg"
                   >
                     <TrashIcon className="h-5 w-5" />
                   </button>
@@ -578,7 +578,7 @@ export default function CreateVideogamePage() {
               <button
                 type="button"
                 onClick={addName}
-                className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold hover:underline"
+                className="flex items-center gap-2 text-primary font-bold hover:underline"
               >
                 <PlusIcon className="h-4 w-4" /> Add Another Language
               </button>
@@ -588,7 +588,7 @@ export default function CreateVideogamePage() {
           {/* Pricing & State */}
           <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
             <div>
-              <div className="flex items-center gap-2 mb-6 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 pb-2">
+              <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
                 <CurrencyDollarIcon className="h-6 w-6" />
                 <h3 className="text-xl font-bold">Pricing</h3>
               </div>
@@ -597,7 +597,7 @@ export default function CreateVideogamePage() {
                   <div className="flex-1">
                     <label
                       htmlFor="averagePrice"
-                      className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                      className="block text-sm font-semibold mb-2 text-on-surface-variant"
                     >
                       Average Market Price
                     </label>
@@ -614,7 +614,7 @@ export default function CreateVideogamePage() {
                   <div className="flex-1">
                     <label
                       htmlFor="ownPrice"
-                      className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                      className="block text-sm font-semibold mb-2 text-on-surface-variant"
                     >
                       Your Asking Price
                     </label>
@@ -633,7 +633,7 @@ export default function CreateVideogamePage() {
                   </div>
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     Accept Offers Range (%)
                   </label>
                   <input
@@ -649,13 +649,13 @@ export default function CreateVideogamePage() {
             </div>
 
             <div>
-              <div className="flex items-center gap-2 mb-6 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 pb-2">
+              <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
                 <TagIcon className="h-6 w-6" />
                 <h3 className="text-xl font-bold">Condition</h3>
               </div>
               <div className="space-y-4">
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     General State (0-10)
                   </label>
                   <input
@@ -668,7 +668,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     Official Score
                   </label>
                   <input
@@ -681,7 +681,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-semibold mb-2 dark:text-gray-300">
+                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
                     Packaging State
                   </label>
                   <select
@@ -701,7 +701,7 @@ export default function CreateVideogamePage() {
 
           {/* Media & 6-Side Details */}
           <section>
-            <div className="flex items-center gap-2 mb-6 text-blue-600 dark:text-blue-400 border-b border-gray-100 dark:border-gray-700 pb-2">
+            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
               <PhotoIcon className="h-6 w-6" />
               <h3 className="text-xl font-bold">Photos & Dimensions</h3>
             </div>
@@ -709,7 +709,7 @@ export default function CreateVideogamePage() {
             <div className="mb-6">
               <label
                 htmlFor="imageUpload"
-                className="block text-sm font-semibold mb-2 dark:text-gray-300"
+                className="block text-sm font-semibold mb-2 text-on-surface-variant"
               >
                 Upload Cover Images
               </label>
@@ -724,14 +724,14 @@ export default function CreateVideogamePage() {
                     className="form-input"
                     disabled={uploading}
                   />
-                  <p className="mt-1 text-xs text-gray-500">
+                  <p className="mt-1 text-xs text-on-surface-variant">
                     JPG, PNG or WebP. Max 5MB each. You can upload multiple
                     images.
                   </p>
                 </div>
                 {uploading && (
-                  <div className="flex items-center gap-2 text-blue-600 text-sm font-medium">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                  <div className="flex items-center gap-2 text-primary text-sm font-medium">
+                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
                     Uploading...
                   </div>
                 )}
@@ -744,7 +744,7 @@ export default function CreateVideogamePage() {
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={handleDragOver}
                         onDrop={() => handleDrop(index)}
-                        className="relative group cursor-move rounded-lg overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue-500 transition-all"
+                        className="relative group cursor-move rounded-lg overflow-hidden border-2 border-outline-variant/30 hover:border-primary transition-all"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
@@ -756,13 +756,13 @@ export default function CreateVideogamePage() {
                               'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage%3C/text%3E%3C/svg%3E';
                           }}
                         />
-                        <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                        <div className="absolute top-1 left-1 bg-primary-container text-on-primary-container text-xs px-2 py-1 rounded">
                           {index + 1}
                         </div>
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
-                          className="absolute top-1 right-1 bg-red-500 hover:bg-red-600 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                          className="absolute top-1 right-1 bg-error hover:brightness-110 text-on-error rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
                         >
                           <svg
                             className="w-4 h-4"
@@ -786,13 +786,13 @@ export default function CreateVideogamePage() {
               <input type="hidden" name="urlImg" value={formData.urlImg} />
             </div>
 
-            <div className="bg-gray-50 dark:bg-gray-900/50 p-6 rounded-xl space-y-6">
-              <h4 className="font-bold text-gray-700 dark:text-gray-300 mb-4 uppercase text-xs tracking-widest">
+            <div className="bg-surface-container p-6 rounded-xl space-y-6 border border-outline-variant/20">
+              <h4 className="font-bold text-on-surface-variant mb-4 uppercase text-xs tracking-widest">
                 The 6 Sides (URLs)
               </h4>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Front
                   </label>
                   {contents[0].frontalUrl && (
@@ -801,7 +801,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].frontalUrl)}
                         alt="Front preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EFront%3C/text%3E%3C/svg%3E';
@@ -822,7 +822,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="frontalUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["frontalUrl"]
                         ? "Uploading..."
@@ -838,7 +838,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Back
                   </label>
                   {contents[0].backUrl && (
@@ -847,7 +847,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].backUrl)}
                         alt="Back preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EBack%3C/text%3E%3C/svg%3E';
@@ -868,7 +868,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="backUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["backUrl"] ? "Uploading..." : "Upload"}
                     </label>
@@ -882,7 +882,7 @@ export default function CreateVideogamePage() {
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-bold mb-1 dark:text-gray-500 uppercase">
+                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
                     Right Side
                   </label>
                   {contents[0].rightSideUrl && (
@@ -891,7 +891,7 @@ export default function CreateVideogamePage() {
                       <img
                         src={getImageUrl(contents[0].rightSideUrl)}
                         alt="Right side preview"
-                        className="w-full h-24 object-cover rounded border border-gray-300 dark:border-gray-600"
+                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
                         onError={(e) => {
                           (e.target as HTMLImageElement).src =
                             'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ERight%3C/text%3E%3C/svg%3E';
@@ -912,7 +912,7 @@ export default function CreateVideogamePage() {
                     />
                     <label
                       htmlFor="rightSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-blue-500 hover:bg-blue-600 text-white text-xs py-2 px-3 rounded text-center transition-colors"
+                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
                     >
                       {uploadingStates["rightSideUrl"]
                         ? "Uploading..."
@@ -1072,7 +1072,7 @@ export default function CreateVideogamePage() {
           <section>
             <label
               htmlFor="description"
-              className="block text-sm font-semibold mb-2 dark:text-gray-300"
+              className="block text-sm font-semibold mb-2 text-on-surface-variant"
             >
               Detailed Description
             </label>
@@ -1087,18 +1087,18 @@ export default function CreateVideogamePage() {
             />
           </section>
 
-          <div className="pt-8 border-t border-gray-100 dark:border-gray-700 flex justify-end gap-4">
+          <div className="pt-8 border-t border-outline-variant/20 flex justify-end gap-4">
             <button
               type="button"
               onClick={() => router.back()}
-              className="px-8 py-3 font-bold text-gray-600 hover:text-gray-800 dark:text-gray-400 dark:hover:text-gray-200 transition-colors"
+              className="px-8 py-3 font-bold text-on-surface-variant hover:text-on-surface transition-colors"
             >
               Cancel
             </button>
             <button
               type="submit"
               disabled={loading}
-              className="px-12 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-full transition-all shadow-lg shadow-blue-500/25 disabled:opacity-50"
+              className="px-12 py-3 indigo-gradient text-on-primary-container font-bold rounded-xl transition-all shadow-lg shadow-primary-container/25 disabled:opacity-50"
             >
               {loading ? "Publishing..." : "List Item Now"}
             </button>
@@ -1109,21 +1109,20 @@ export default function CreateVideogamePage() {
       <style jsx>{`
         .form-input {
           width: 100%;
-          padding: 0.75rem;
+          padding: 0.875rem 1rem;
           border-radius: 0.5rem;
-          border: 1px solid #e5e7eb;
-          background-color: transparent;
+          border: 1px solid rgba(70, 69, 85, 0.4);
+          background-color: #2d3449;
+          color: #dae2fd;
           transition: all 0.2s;
         }
-        :global(.dark) .form-input {
-          border-color: #374151;
-          color: white;
+        .form-input::placeholder {
+          color: rgba(145, 143, 161, 0.75);
         }
         .form-input:focus {
           outline: none;
-          ring: 2px;
-          ring-color: #3b82f6;
-          border-color: #3b82f6;
+          border-color: #c3c0ff;
+          box-shadow: 0 0 0 2px rgba(195, 192, 255, 0.35);
         }
       `}</style>
     </div>

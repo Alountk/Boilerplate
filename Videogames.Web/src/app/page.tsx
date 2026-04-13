@@ -9,6 +9,8 @@ import VideogameCard from "../components/VideogameCard";
 
 import { CATEGORIES } from "../constants/categories";
 
+const CATEGORY_ICONS = ["devices", "apparel", "chair", "watch", "auto_stories", "auto_awesome"];
+
 export default function Home() {
   const [videogames, setVideogames] = useState<Videogame[]>([]);
   const [loading, setLoading] = useState(true);
@@ -44,16 +46,25 @@ export default function Home() {
     [loadVideogames, videogameService]
   );
 
+  const archiveCategories = CATEGORIES.slice(0, 6).map((cat, index) => ({
+    ...cat,
+    icon: CATEGORY_ICONS[index] ?? "auto_awesome",
+  }));
+
   return (
     <div className="min-h-screen bg-surface text-on-surface">
       {/* ─── Hero ─────────────────────────────────────── */}
-      <section className="relative w-full min-h-[520px] flex items-center overflow-hidden">
-        {/* Ambient glows */}
-        <div className="absolute inset-0 z-0 pointer-events-none">
-          <div className="absolute -top-20 left-1/4 w-[50%] h-[50%] rounded-full bg-primary-container/10 blur-[140px]" />
-          <div className="absolute bottom-0 right-0 w-[40%] h-[60%] rounded-full bg-primary/5 blur-[100px]" />
+      <section className="relative w-full h-[614px] flex items-center overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="https://lh3.googleusercontent.com/aida-public/AB6AXuApJdBiy1QMDWtKSSDJm3J5r8XHSoKyckcPsnqILeSGaB6fcGMJal8FTK08McueRbotPTgPCmdhHnkV_d40ngUPrUH9Le5hNQjc7L1lFHAWPw2-q1F0XyihpUISzizzHSPMHa01hum5tRiPNo0jNnHnUdi9BE-N310AZu_BhETX888NmG3mj3FKc86HHOO60h6wO3qvEj1TLzzVEAC_s6twfHu3onThu1CrLcCZSw0vB7fGeDk_ruwTMistNAN5ixIH4aV_S5YapVY"
+            alt="Minimalist retro tech setup with atmospheric indigo lighting"
+            className="w-full h-full object-cover opacity-30 grayscale"
+          />
+          <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/60 to-transparent" />
         </div>
-        <div className="relative z-10 px-8 md:px-24 max-w-[1440px] mx-auto w-full py-24">
+        <div className="relative z-10 px-8 md:px-24 max-w-4xl w-full">
           <span className="text-primary-fixed uppercase tracking-[0.3em] font-bold text-xs mb-4 block">
             Curated Excellence
           </span>
@@ -61,11 +72,11 @@ export default function Home() {
             Discovery in the{" "}
             <br />
             <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary">
-              Vault.
+              Shadows.
             </span>
           </h1>
           <p className="text-on-surface-variant text-lg max-w-xl mb-10 leading-relaxed">
-            A curated marketplace of rare videogames, accessories, and collectibles for the discerning collector.
+            Access a subterranean marketplace of rare electronics, high-fashion archives, and timeless artifacts curated for the discerning eye.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -74,12 +85,6 @@ export default function Home() {
             >
               Explore Collection
               <span className="material-symbols-outlined">arrow_forward</span>
-            </Link>
-            <Link
-              href="/create"
-              className="bg-surface-container-high text-on-surface px-8 py-4 rounded-xl font-bold hover:bg-surface-bright transition-colors"
-            >
-              Sell an Item
             </Link>
           </div>
         </div>
@@ -93,24 +98,16 @@ export default function Home() {
             <p className="text-on-surface-variant mt-2">Filter by archive department</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-6">
-          {CATEGORIES.map((cat) => (
+        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+          {archiveCategories.map((cat) => (
             <Link
               key={cat.id}
               href={`/category/${cat.id}`}
               className="group cursor-pointer"
             >
-              <div className="relative aspect-square rounded-xl overflow-hidden bg-surface-container-low transition-all duration-300 group-hover:bg-surface-container-high group-hover:-translate-y-2">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cat.img}
-                  alt={cat.name}
-                  className="w-full h-full object-cover opacity-40 group-hover:opacity-60 transition-opacity duration-300"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-surface-container-lowest/80 to-transparent" />
-                <div className="absolute bottom-4 left-0 right-0 text-center">
-                  <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface">{cat.name}</h3>
-                </div>
+              <div className="bg-surface-container-low aspect-square rounded-full flex flex-col items-center justify-center gap-4 transition-all duration-300 group-hover:bg-surface-container-high group-hover:-translate-y-2">
+                <span className="material-symbols-outlined text-4xl text-primary">{cat.icon}</span>
+                <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface text-center px-3">{cat.name}</h3>
               </div>
             </Link>
           ))}
