@@ -1,6 +1,6 @@
-# Version of the stack for Portainer
+# Local development stack
 # Services: API (.NET) + Web (Next.js)
-# Note: MinIO and PostgreSQL are assumed to be external/already running.
+# Note: this file builds local images and should not be used as a Portainer/GitOps deploy stack.
 
 services:
   api:

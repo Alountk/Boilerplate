@@ -122,19 +122,28 @@ npm run test:e2e
 
 Deployments can be pinned to an immutable image version generated in CI on every push to `main`.
 
+Important: use `docker-compose.deploy.yml` in Portainer or remote deployments. The root `docker-compose.yml` is for local builds and uses local image names, so a remote engine may try to inspect `docker.io/library/...` and fail.
+
 1. Set deployment variables (based on `.env.portainer.example`):
 ```bash
-APP_VERSION=main-<runNumber>-<shortSha>
+APP_VERSION=main-latest
 API_IMAGE_REPO=ghcr.io/<owner>/vmarket-api
 WEB_IMAGE_REPO=ghcr.io/<owner>/vmarket-web
 ```
 
-2. Deploy exact versions:
+2. For a fixed rollback-friendly release, replace `APP_VERSION` with the exact CI tag:
+```bash
+APP_VERSION=main-<runNumber>-<shortSha>
+```
+
+3. Deploy exact versions:
 ```bash
 docker compose -f docker-compose.deploy.yml up -d
 ```
 
-3. Rollback to a previous release by changing only `APP_VERSION` and re-running deploy.
+4. If the GHCR packages are private, configure Portainer with registry credentials for `ghcr.io` before deploying.
+
+5. Rollback to a previous release by changing only `APP_VERSION` and re-running deploy.
 
 Helper make targets:
 ```bash
