@@ -176,23 +176,23 @@ export default function RegisterPage() {
           <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/10 blur-[80px]" />
         </div>
         <div className="relative z-10">
-          <h1 className="text-2xl font-extrabold tracking-tighter text-on-surface italic">The Archive</h1>
+          <h1 className="text-2xl font-extrabold tracking-tighter text-on-surface italic">vMarket</h1>
         </div>
         <div className="relative z-10 max-w-md">
           <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4 block">
-            Exclusive Membership
+            Gamer Community
           </span>
           <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-on-surface mb-6">
-            Curating the{" "}
-            <span className="text-primary-container">extraordinary</span> since the midnight hour.
+            Build your{" "}
+            <span className="text-primary-container">gamer profile</span> and start trading.
           </h2>
           <p className="text-on-surface-variant text-lg leading-relaxed font-light">
-            Join an elite circle of collectors and scholars dedicated to preserving the world&apos;s most elusive digital artifacts.
+            Join players, collectors and sellers buying and listing videogames every day.
           </p>
         </div>
         <div className="relative z-10">
           <p className="text-sm text-outline font-medium tracking-wide">
-            © {new Date().getFullYear()} The Nocturnal Archive.
+            © {new Date().getFullYear()} vMarket.
           </p>
         </div>
       </section>
@@ -201,7 +201,7 @@ export default function RegisterPage() {
       <section className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 bg-surface overflow-y-auto">
         {/* Mobile brand */}
         <div className="md:hidden w-full mb-10 flex justify-center">
-          <h1 className="text-xl font-black italic tracking-tighter text-on-surface">The Archive</h1>
+          <h1 className="text-xl font-black italic tracking-tighter text-on-surface">vMarket</h1>
         </div>
 
         <div className="w-full max-w-lg">
@@ -210,7 +210,7 @@ export default function RegisterPage() {
               Create your account
             </h3>
             <p className="text-on-surface-variant text-sm">
-              Welcome to the inner circle. Please provide your credentials.
+              Create your profile to buy, sell and chat with other gamers.
             </p>
           </header>
 

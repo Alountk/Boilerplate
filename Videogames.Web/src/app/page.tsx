@@ -9,7 +9,7 @@ import VideogameCard from "../components/VideogameCard";
 
 import { CATEGORIES } from "../constants/categories";
 
-const CATEGORY_ICONS = ["devices", "apparel", "chair", "watch", "auto_stories", "auto_awesome"];
+const CATEGORY_ICONS = ["sports_esports", "stadia_controller", "memory", "joystick", "tv", "trophy"];
 
 export default function Home() {
   const [videogames, setVideogames] = useState<Videogame[]>([]);
@@ -58,25 +58,25 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://lh3.googleusercontent.com/aida-public/AB6AXuApJdBiy1QMDWtKSSDJm3J5r8XHSoKyckcPsnqILeSGaB6fcGMJal8FTK08McueRbotPTgPCmdhHnkV_d40ngUPrUH9Le5hNQjc7L1lFHAWPw2-q1F0XyihpUISzizzHSPMHa01hum5tRiPNo0jNnHnUdi9BE-N310AZu_BhETX888NmG3mj3FKc86HHOO60h6wO3qvEj1TLzzVEAC_s6twfHu3onThu1CrLcCZSw0vB7fGeDk_ruwTMistNAN5ixIH4aV_S5YapVY"
-            alt="Minimalist retro tech setup with atmospheric indigo lighting"
+            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2000&q=80"
+            alt="Neon gaming setup with monitors and controller"
             className="w-full h-full object-cover opacity-30 grayscale"
           />
           <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/60 to-transparent" />
         </div>
         <div className="relative z-10 px-8 md:px-24 max-w-4xl w-full">
           <span className="text-primary-fixed uppercase tracking-[0.3em] font-bold text-xs mb-4 block">
-            Curated Excellence
+            Gamer Marketplace
           </span>
           <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface leading-none mb-6">
-            Discovery in the{" "}
+            Find your next{" "}
             <br />
             <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary">
-              Shadows.
+              Legendary Game.
             </span>
           </h1>
           <p className="text-on-surface-variant text-lg max-w-xl mb-10 leading-relaxed">
-            Access a subterranean marketplace of rare electronics, high-fashion archives, and timeless artifacts curated for the discerning eye.
+            Buy and sell retro titles, modern hits, limited editions, consoles, and gaming accessories in one trusted marketplace.
           </p>
           <div className="flex flex-wrap gap-4">
             <Link
@@ -95,7 +95,7 @@ export default function Home() {
         <div className="flex justify-between items-end mb-12">
           <div>
             <h2 className="text-3xl font-bold tracking-tight text-on-surface">Categories</h2>
-            <p className="text-on-surface-variant mt-2">Filter by archive department</p>
+            <p className="text-on-surface-variant mt-2">Browse by gaming category</p>
           </div>
         </div>
         <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
@@ -117,7 +117,7 @@ export default function Home() {
       {/* ─── Recently Added ───────────────────────────── */}
       <section id="recently-added" className="px-8 md:px-12 py-12 max-w-[1440px] mx-auto">
         <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">Recently Added</h2>
-        <p className="text-on-surface-variant mb-12">New acquisitions entered into the archive today.</p>
+        <p className="text-on-surface-variant mb-12">Fresh listings from the community right now.</p>
         {loading ? (
           <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
             {[1, 2, 3, 4, 5, 6].map((i) => (
@@ -140,7 +140,7 @@ export default function Home() {
             {videogames.length === 0 && (
               <div className="col-span-full py-20 text-center bg-surface-container-low rounded-2xl" role="status">
                 <span className="material-symbols-outlined text-5xl text-outline mb-4 block">inventory_2</span>
-                <p className="text-on-surface-variant mb-4">No items found in the archive. Be the first to contribute.</p>
+                <p className="text-on-surface-variant mb-4">No videogames listed yet in this section. Be the first to publish one.</p>
                 <Link
                   href="/create"
                   className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-bold text-sm inline-block hover:opacity-90 transition-all"
@@ -159,7 +159,7 @@ export default function Home() {
         <div className="relative z-10 flex-1">
           <h2 className="text-4xl font-black tracking-tighter mb-4">Stay in the Loop.</h2>
           <p className="text-on-surface-variant max-w-md">
-            Receive weekly manifests of newly archived collectibles before they hit the public vault.
+            Get weekly updates about hot listings, price drops, and newly published games.
           </p>
         </div>
         <div className="relative z-10 w-full md:w-auto flex gap-4">

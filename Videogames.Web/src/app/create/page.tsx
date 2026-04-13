@@ -357,7 +357,7 @@ export default function CreateVideogamePage() {
       <div className="max-w-5xl mx-auto bg-surface-container-low rounded-3xl shadow-2xl overflow-hidden border border-outline-variant/20">
         <div className="indigo-gradient p-8 text-on-primary-container text-center">
           <h2 className="text-3xl font-bold">Create Listing</h2>
-          <p className="opacity-80">Curate your next masterpiece</p>
+          <p className="opacity-80">Publish your next videogame listing</p>
         </div>
 
         <form onSubmit={handleSubmit} className="p-8 space-y-10">
@@ -711,7 +711,7 @@ export default function CreateVideogamePage() {
                 htmlFor="imageUpload"
                 className="block text-sm font-semibold mb-2 text-on-surface-variant"
               >
-                Upload Cover Images
+                  Upload game photos
               </label>
               <div className="space-y-4">
                 <div>
@@ -1100,7 +1100,7 @@ export default function CreateVideogamePage() {
               disabled={loading}
               className="px-12 py-3 indigo-gradient text-on-primary-container font-bold rounded-xl transition-all shadow-lg shadow-primary-container/25 disabled:opacity-50"
             >
-              {loading ? "Publishing..." : "List Item Now"}
+              {loading ? "Publishing..." : "Publish Listing"}
             </button>
           </div>
         </form>

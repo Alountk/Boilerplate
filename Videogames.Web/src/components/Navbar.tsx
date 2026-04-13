@@ -16,17 +16,17 @@ export default function Navbar() {
               href="/"
               className="text-xl sm:text-2xl font-bold text-on-surface tracking-tighter whitespace-nowrap shrink-0"
             >
-              The Archive
+              vMarket
             </Link>
             <nav className="hidden md:flex items-center gap-6">
               <Link
                 href="/"
                 className="text-primary font-bold border-b-2 border-primary-container pb-1 hover:text-on-surface transition-colors duration-200"
               >
-                Browse
+                Explore
               </Link>
-              <span className="text-on-surface-variant">Collectibles</span>
-              <span className="text-on-surface-variant">Antiques</span>
+              <span className="text-on-surface-variant">Consoles</span>
+              <span className="text-on-surface-variant">Deals</span>
             </nav>
           </div>
 
@@ -35,7 +35,7 @@ export default function Navbar() {
               <span className="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
               <input
                 className="w-full bg-surface-container-highest border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/60 outline-none"
-                placeholder="Search the vault..."
+                placeholder="Search games, consoles, accessories..."
                 type="text"
                 aria-label="Search"
               />
@@ -110,7 +110,7 @@ export default function Navbar() {
 
         <div className="md:hidden flex items-center justify-between gap-3 pt-3 text-sm">
           <Link href="/" className="text-primary font-semibold hover:text-on-surface transition-colors">
-            Browse
+            Explore
           </Link>
           {loading ? (
             <div className="h-4 w-24 bg-surface-container animate-pulse rounded" />
