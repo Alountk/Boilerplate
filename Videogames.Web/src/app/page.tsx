@@ -8,9 +8,6 @@ import { useAuth } from "../context/AuthContext";
 import VideogameCard from "../components/VideogameCard";
 
 import { CATEGORIES } from "../constants/categories";
-
-const CATEGORY_ICONS = ["sports_esports", "stadia_controller", "memory", "joystick", "tv", "trophy"];
-
 export default function Home() {
   const [videogames, setVideogames] = useState<Videogame[]>([]);
   const [loading, setLoading] = useState(true);
@@ -45,11 +42,6 @@ export default function Home() {
     },
     [loadVideogames, videogameService]
   );
-
-  const archiveCategories = CATEGORIES.slice(0, 6).map((cat, index) => ({
-    ...cat,
-    icon: CATEGORY_ICONS[index] ?? "auto_awesome",
-  }));
 
   return (
     <div className="min-h-screen bg-surface text-on-surface">
@@ -91,23 +83,35 @@ export default function Home() {
       </section>
 
       {/* ─── Categories ───────────────────────────────── */}
+      {/* ─── Categories ───────────────────────────────── */}
       <section className="px-8 md:px-12 py-20 max-w-[1440px] mx-auto">
-        <div className="flex justify-between items-end mb-12">
+        <div className="flex justify-between items-end mb-10">
           <div>
-            <h2 className="text-3xl font-bold tracking-tight text-on-surface">Categories</h2>
-            <p className="text-on-surface-variant mt-2">Browse by gaming category</p>
+            <h2 className="text-3xl font-bold tracking-tight text-on-surface">Browse Platforms</h2>
+            <p className="text-on-surface-variant mt-2">Find games by console</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
-          {archiveCategories.map((cat) => (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+          {CATEGORIES.map((cat) => (
             <Link
               key={cat.id}
               href={`/category/${cat.id}`}
-              className="group cursor-pointer"
+              className="group relative rounded-2xl overflow-hidden aspect-3/4 bg-surface-container block"
             >
-              <div className="bg-surface-container-low aspect-square rounded-full flex flex-col items-center justify-center gap-4 transition-all duration-300 group-hover:bg-surface-container-high group-hover:-translate-y-2">
-                <span className="material-symbols-outlined text-4xl text-primary">{cat.icon}</span>
-                <h3 className="text-xs font-bold uppercase tracking-widest text-on-surface text-center px-3">{cat.name}</h3>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={cat.img}
+                alt={cat.name}
+                className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale transition-all duration-500 group-hover:opacity-80 group-hover:grayscale-0 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/40 to-transparent" />
+              <div className="absolute inset-x-0 bottom-0 p-5">
+                <h3 className="text-base font-black uppercase tracking-widest text-on-surface leading-tight">
+                  {cat.name}
+                </h3>
+                <p className="text-xs text-primary font-bold mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                  Explore <span className="material-symbols-outlined text-xs leading-none">arrow_forward</span>
+                </p>
               </div>
             </Link>
           ))}
