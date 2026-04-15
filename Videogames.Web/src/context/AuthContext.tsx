@@ -18,6 +18,8 @@ interface AuthContextType {
   user: User | null;
   login: (credentials: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
+  loginWithGoogle: (idToken: string) => Promise<void>;
+  loginWithApple: (idToken: string) => Promise<void>;
   logout: () => void;
   updateUser: (id: string, data: UpdateUserRequest) => Promise<void>;
   isAuthenticated: boolean;
@@ -60,12 +62,26 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     setUser(updatedUser);
   };
 
+  const loginWithGoogle = async (idToken: string) => {
+    const authService = new AuthService();
+    const response = await authService.loginWithGoogle(idToken);
+    setUser(response.user);
+  };
+
+  const loginWithApple = async (idToken: string) => {
+    const authService = new AuthService();
+    const response = await authService.loginWithApple(idToken);
+    setUser(response.user);
+  };
+
   return (
     <AuthContext.Provider
       value={{
         user,
         login,
         register,
+        loginWithGoogle,
+        loginWithApple,
         logout,
         updateUser,
         isAuthenticated: !!user,

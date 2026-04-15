@@ -5,6 +5,7 @@ using Videogames.Application.Services;
 using Videogames.Domain.Entities;
 using Videogames.Domain.Ports;
 using Videogames.Domain.ValueObjects;
+using Microsoft.Extensions.Configuration;
 using Xunit;
 
 namespace Videogames.Tests.Application;
@@ -13,13 +14,15 @@ public class UserServiceTests
 {
     private readonly Mock<IUserRepository> _mockRepository;
     private readonly Mock<ITokenService> _mockTokenService;
+    private readonly Mock<IConfiguration> _mockConfiguration;
     private readonly UserService _service;
 
     public UserServiceTests()
     {
         _mockRepository = new Mock<IUserRepository>();
         _mockTokenService = new Mock<ITokenService>();
-        _service = new UserService(_mockRepository.Object, _mockTokenService.Object);
+        _mockConfiguration = new Mock<IConfiguration>();
+        _service = new UserService(_mockRepository.Object, _mockTokenService.Object, _mockConfiguration.Object);
     }
 
     [Fact]

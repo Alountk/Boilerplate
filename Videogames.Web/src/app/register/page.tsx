@@ -314,7 +314,7 @@ export default function RegisterPage() {
               Create Account
             </button>
 
-            {/* Social / alternative — FEATURE-PENDING */}
+            {/* Social / alternative (FEATURE-PENDING) */}
             <div className="mt-8">
               <div className="flex items-center gap-4 mb-6">
                 <div className="h-px flex-1 bg-surface-container-highest" />
@@ -322,8 +322,21 @@ export default function RegisterPage() {
                 <div className="h-px flex-1 bg-surface-container-highest" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <button disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">Google</button>
-                <button disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">GitHub</button>
+                <button
+                  type="button"
+                  disabled
+                  className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed"
+                >
+                  Google
+                </button>
+                <button
+                  type="button"
+                  disabled
+                  className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-30 cursor-not-allowed"
+                  title="GitHub sign-in coming soon"
+                >
+                  GitHub
+                </button>
               </div>
             </div>
           </form>

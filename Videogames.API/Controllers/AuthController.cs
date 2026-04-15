@@ -38,4 +38,51 @@ public class AuthController : ControllerBase
             return StatusCode(500, new { error = "An error occurred during login" });
         }
     }
+
+    [HttpPost("google")]
+    public async Task<ActionResult<AuthResponseDto>> GoogleLogin([FromBody] OAuthLoginDto dto)
+    {
+        try
+        {
+            _logger.LogInformation("Google OAuth login attempt");
+            var response = await _userService.OAuthLoginAsync("google", dto);
+            return Ok(response);
+        }
+        catch (UnauthorizedAccessException ex)
+        {
+            _logger.LogWarning("Invalid Google ID token: {Message}", ex.Message);
+            return Unauthorized(new { error = "Invalid Google token" });
+        }
+        catch (Exception ex) when (ex.GetType().Name.Contains("InvalidJwt") || ex.Message.Contains("JWT"))
+        {
+            _logger.LogWarning("Invalid Google ID token: {Message}", ex.Message);
+            return Unauthorized(new { error = "Invalid Google token" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Google OAuth login");
+            return StatusCode(500, new { error = "An error occurred during Google login" });
+        }
+    }
+
+    [HttpPost("apple")]
+    public async Task<ActionResult<AuthResponseDto>> AppleLogin([FromBody] OAuthLoginDto dto)
+    {
+        try
+        {
+            _logger.LogInformation("Apple OAuth login attempt");
+            var response = await _userService.OAuthLoginAsync("apple", dto);
+            return Ok(response);
+        }
+        catch (Microsoft.IdentityModel.Tokens.SecurityTokenException ex)
+        {
+            _logger.LogWarning("Invalid Apple ID token: {Message}", ex.Message);
+            return Unauthorized(new { error = "Invalid Apple token" });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error during Apple OAuth login");
+            return StatusCode(500, new { error = "An error occurred during Apple login" });
+        }
+    }
 }

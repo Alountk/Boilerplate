@@ -175,15 +175,15 @@ export default function LoginPage() {
 
             {/* Social (FEATURE-PENDING) */}
             <div className="grid grid-cols-2 gap-4">
-              {/* FEATURE-PENDING: Google OAuth */}
               <button
+                type="button"
                 disabled
                 className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed"
               >
                 Google
               </button>
-              {/* FEATURE-PENDING: Apple OAuth */}
               <button
+                type="button"
                 disabled
                 className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed"
               >
