@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { getVideogameImageCandidates } from "../utils/videogameImages";
 
 interface VideogameCoverProps {
@@ -24,24 +24,28 @@ export default function VideogameCover({
     () => getVideogameImageCandidates({ images, urlImg }),
     [images, urlImg]
   );
-  const [index, setIndex] = useState(0);
-  const [showFallback, setShowFallback] = useState(candidates.length === 0);
+  const candidatesKey = useMemo(() => candidates.join("|"), [candidates]);
+  const [state, setState] = useState(() => ({
+    key: candidatesKey,
+    failedSources: new Set<string>(),
+  }));
 
-  useEffect(() => {
-    setIndex(0);
-    setShowFallback(candidates.length === 0);
-  }, [candidates]);
+  const runtimeState = state.key === candidatesKey
+    ? state
+    : { key: candidatesKey, failedSources: new Set<string>() };
 
-  const currentSrc = candidates[index];
+  const currentSrc = candidates.find(
+    (src) => !runtimeState.failedSources.has(src)
+  );
 
-  if (showFallback || !currentSrc) {
+  if (!currentSrc) {
     return (
       <div
         className={`${fallbackClassName} flex items-center justify-center p-4 bg-surface-container-low text-on-surface`}
         aria-label={alt ?? title}
       >
         <div className="w-full max-w-[90%]">
-          <p className="text-sm md:text-base font-black tracking-tight leading-tight [overflow-wrap:anywhere] line-clamp-6 text-center">
+          <p className="text-sm md:text-base font-black tracking-tight leading-tight wrap-anywhere line-clamp-6 text-center">
             {title}
           </p>
         </div>
@@ -56,11 +60,18 @@ export default function VideogameCover({
       alt={alt ?? title}
       className={imgClassName}
       onError={() => {
-        if (index + 1 < candidates.length) {
-          setIndex(index + 1);
-          return;
-        }
-        setShowFallback(true);
+        setState((prev) => {
+          const prevKeyState = prev.key === candidatesKey
+            ? prev
+            : { key: candidatesKey, failedSources: new Set<string>() };
+
+          const nextFailed = new Set(prevKeyState.failedSources);
+          nextFailed.add(currentSrc);
+          return {
+            key: candidatesKey,
+            failedSources: nextFailed,
+          };
+        });
       }}
     />
   );
