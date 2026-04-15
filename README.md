@@ -31,6 +31,12 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
   - **Secure Presigned URLs** for direct, high-performance image access
   - Real-time preview thumbnails
   - MinIO/S3-compatible storage integration
+- **Robust Cover Fallback System**:
+  - `VideogameCover` component with a three-tier priority chain: uploaded images → `urlImg` → text-based placeholder
+  - State keying pattern — zero `useEffect` / mounted-ref overhead; fallback chain self-resets synchronously in render when the product changes
+  - Auto-fetch official cover from RAWG API at listing creation time if no images are provided
+  - Utility helpers `resolveVideogameImageSrc` and `getVideogameImageCandidates` for reuse across the app
+- **Social Login Scaffolding** (Google & Apple): OAuth flow wired end-to-end; UI buttons disabled until provider credentials are configured (`FEATURE-PENDING`)
 - **Dual-Hexagonal Pattern**: Decoupled layers for maximum testability.
 - **Responsive Design**: Premium UI with Dark Mode support and micro-animations.
 - **Clean CI/CD**: Automated GitHub Actions pipeline for backend and frontend with E2E tests.
@@ -186,6 +192,9 @@ make docker-deploy-down
 - [x] **Sell Item Flow** (Forms + API integration)
 - [x] **CI/CD Pipeline** (Automated Linters + Tests)
 - [x] **Image Upload System**: MinIO/S3 integration with multi-image support and drag-to-reorder
+- [x] **Cover Fallback System**: `VideogameCover` component + RAWG API auto-fetch + text placeholder
+- [x] **Social Login Scaffolding**: Google & Apple OAuth flow wired; buttons gated behind `FEATURE-PENDING`
+- [ ] **Social Login Activation**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Messaging System**: Real-time chat between buyers and sellers.
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.
 - [ ] **Payment Integration**: Stripe or PayPal checkout.
@@ -199,6 +208,13 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
+
+### 2026-04-15: Social Login Gating & Cover Fallback System (PR #15, PR #16)
+- **Social Login Buttons Disabled**: Removed `useGoogleLogin`, `loginWithApple`, and `oauthLoading` from `login/page.tsx` and `register/page.tsx`. Buttons rendered as `disabled` / `FEATURE-PENDING`. Underlying OAuth service and token exchange logic are intact—re-enabling requires only restoring the handlers once provider credentials exist.
+- **`VideogameCover` Component**: New component with a three-tier priority chain — uploaded images → `urlImg` → text-based placeholder. Renders the first non-errored source; on full exhaustion shows a styled block with the game title that adapts to any container.
+- **State Keying Pattern**: Initial `VideogameCover` implementation used a `hasComponentMounted` ref + `useEffect` to reset fallback state on product change. Identified as a cascading-render anti-pattern and replaced with a state object keyed by `candidatesKey` (join of all candidate URLs): state resets synchronously in render with zero effects or refs.
+- **RAWG Auto-Fetch at Creation**: `create/page.tsx` queries the RAWG API at submit time if no images are provided, storing an official cover URL in `urlImg`. Keeps catalogue visually consistent without requiring seller effort.
+- **Tailwind v4 Migration Note**: Linter flagged `[overflow-wrap:anywhere]` (arbitrary CSS escape). Replaced with the first-class utility `wrap-anywhere`.
 
 ### 2026-04-12: Frontend Release Failure in Docker CI (Next 16)
 - **Incident**: `docker-release.yml` failed in `Build and push Web image` with `npm run build` exit code `1`, blocking frontend image publication.
