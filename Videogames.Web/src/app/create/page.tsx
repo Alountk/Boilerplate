@@ -315,9 +315,18 @@ export default function CreateVideogamePage() {
 
     setLoading(true);
     try {
+      let resolvedUrlImg = formData.urlImg;
+
+      // If there are no uploaded images and no cover URL, fetch an official cover from RAWG.
+      if (images.length === 0 && !resolvedUrlImg.trim() && formData.englishName.trim().length >= 3) {
+        const officialMatches = await rawgService.searchGames(formData.englishName.trim());
+        resolvedUrlImg = officialMatches[0]?.background_image || "";
+      }
+
       // Ensure numeric fields are numbers and filter empty localized names
       const payload = {
         ...formData,
+        urlImg: resolvedUrlImg,
         generalState: Number(formData.generalState),
         averagePrice: Number(formData.averagePrice),
         ownPrice: Number(formData.ownPrice),

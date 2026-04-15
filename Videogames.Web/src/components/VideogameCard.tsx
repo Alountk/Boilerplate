@@ -2,6 +2,7 @@ import { TrashIcon, HeartIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { StarIcon } from "@heroicons/react/24/solid";
 import { Videogame } from "../domain/models/Videogame";
+import VideogameCover from "./VideogameCover";
 
 interface VideogameCardProps {
   videogame: Videogame;
@@ -23,11 +24,12 @@ export default function VideogameCard({
     >
       {/* Image Container */}
       <div className="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-950">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={videogame.urlImg || "/placeholder-game.jpg"}
-          alt={videogame.englishName}
-          className="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+        <VideogameCover
+          title={videogame.englishName}
+          images={videogame.images}
+          urlImg={videogame.urlImg}
+          imgClassName="w-full h-full object-cover group-hover:scale-[1.02] transition-transform duration-300"
+          fallbackClassName="w-full h-full"
         />
         <button
           type="button"
