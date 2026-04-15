@@ -6,6 +6,8 @@ import { VideogameService } from "../../../infrastructure/services/VideogameServ
 import { ChatService } from "../../../infrastructure/services/ChatService";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
+import VideogameCover from "../../../components/VideogameCover";
+import { resolveVideogameImageSrc } from "../../../utils/videogameImages";
 import { 
   ChatBubbleLeftRightIcon, 
   ChevronLeftIcon,
@@ -88,11 +90,12 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
           {/* Left: Images Column */}
           <div className="space-y-6">
             <div className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-2xl overflow-hidden border border-gray-200 dark:border-gray-700 shadow-sm relative group">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img 
-                src={videogame.urlImg || "/placeholder-game.jpg"} 
-                alt={videogame.englishName}
-                className="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+              <VideogameCover
+                title={videogame.englishName}
+                images={videogame.images}
+                urlImg={videogame.urlImg}
+                imgClassName="w-full h-full object-cover transform transition-transform duration-700 group-hover:scale-105"
+                fallbackClassName="w-full h-full"
               />
               <div className="absolute top-4 left-4">
                 <span className="px-3 py-1 bg-blue-600 text-white text-xs font-bold uppercase rounded-full shadow-lg">
@@ -103,10 +106,10 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
 
             {/* Thumbnail Grid for other sides */}
             <div className="grid grid-cols-6 gap-2">
-               {videogame.images?.map((img, i) => (
+              {videogame.images?.map((img, i) => (
                   <div key={i} className="aspect-square bg-gray-100 dark:bg-gray-800 rounded-lg overflow-hidden border border-gray-200 dark:border-gray-700 cursor-pointer hover:border-blue-500 transition-all">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={img} alt={`Side ${i}`} className="w-full h-full object-cover" />
+                  <img src={resolveVideogameImageSrc(img) || ""} alt={`Side ${i}`} className="w-full h-full object-cover" />
                   </div>
                ))}
             </div>
