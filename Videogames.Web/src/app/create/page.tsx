@@ -6,15 +6,16 @@ import { VideogameService } from "../../infrastructure/services/VideogameService
 import { ImageService } from "../../infrastructure/services/ImageService";
 import { GameState } from "../../domain/models/Videogame";
 import {
+  ArrowLeftIcon,
+  MagnifyingGlassIcon,
+  ExclamationCircleIcon,
+  TrashIcon,
+  PlusIcon,
   PhotoIcon,
   CurrencyDollarIcon,
   BeakerIcon,
   GlobeAltIcon,
-  PlusIcon,
-  TrashIcon,
   TagIcon,
-  MagnifyingGlassIcon,
-  ExclamationCircleIcon,
 } from "@heroicons/react/24/outline";
 import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
 import { RAWGService } from "../../infrastructure/services/RAWGService";
@@ -94,7 +95,6 @@ export default function CreateVideogamePage() {
   const [images, setImages] = useState<string[]>([]);
   const [draggedIndex, setDraggedIndex] = useState<number | null>(null);
 
-
   const [names, setNames] = useState([{ language: "", name: "" }]);
   const [contents, setContents] = useState([
     {
@@ -166,27 +166,12 @@ export default function CreateVideogamePage() {
         category: category,
         urlImg: details.background_image || prev.urlImg
       }));
-
-      // If there is an image, we could add it to the images array too
-      if (details.background_image) {
-        // Note: This image is external, won't be in our S3, but we can store the URL for now
-        // if the system supports external URLs in urlImg
-      }
-
     } catch (error) {
       console.error("Failed to fetch game details", error);
     } finally {
       setLoading(false);
     }
   };
-
-  if (authLoading || !user) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-surface">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-container" />
-      </div>
-    );
-  }
 
   const handleChange = (
     e: React.ChangeEvent<
@@ -362,412 +347,98 @@ export default function CreateVideogamePage() {
   };
 
   return (
-    <div className="min-h-screen py-12 px-4 bg-surface text-on-surface">
-      <div className="max-w-5xl mx-auto bg-surface-container-low rounded-3xl shadow-2xl overflow-hidden border border-outline-variant/20">
-        <div className="indigo-gradient p-8 text-on-primary-container text-center">
-          <h2 className="text-3xl font-bold">Create Listing</h2>
-          <p className="opacity-80">Publish your next videogame listing</p>
-        </div>
+    <div className="min-h-screen bg-surface text-on-surface flex flex-col">
+      {/* Back to Dashboard */}
+      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 py-12">
+        <a 
+          href="/" 
+          className="inline-flex items-center gap-2 text-primary hover:text-on-surface transition-colors group mb-8"
+        >
+          <ArrowLeftIcon className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
+          <span className="text-sm font-bold tracking-widest uppercase">Back to Marketplace</span>
+        </a>
 
-        <form onSubmit={handleSubmit} className="p-8 space-y-10">
-          {/* Basic Info */}
-          <section>
-            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
-              <BeakerIcon className="h-6 w-6" />
-              <h3 className="text-xl font-bold">Basic Information</h3>
-            </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <div>
-                <label
-                  htmlFor="englishName"
-                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                >
-                  English Name
-                </label>
-                <div className="relative">
-                  <input
-                    id="englishName"
-                    name="englishName"
-                    value={formData.englishName}
-                    onChange={handleChange}
-                    onBlur={handleBlur}
-                    className={getInputClassNames(!!showFieldError('englishName'))}
-                    aria-invalid={!!showFieldError('englishName')}
-                    placeholder="e.g. The Legend of Zelda"
-                  />
-                  <FieldFeedback message={showFieldError('englishName')} />
-                  {searching && (
-                    <div className="absolute right-3 top-1/2 -translate-y-1/2">
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
-                    </div>
-                  )}
-                  {showSearch && searchResults.length > 0 && (
-                    <div className="absolute z-50 w-full mt-1 bg-surface-container rounded-lg shadow-2xl border border-outline-variant/30 max-h-60 overflow-y-auto">
-                      {searchResults.map((game) => (
-                        <button
-                          key={game.id}
-                          type="button"
-                          onClick={() => handleSelectGame(game)}
-                          className="w-full flex items-center gap-3 p-3 hover:bg-surface-container-high text-left transition-colors border-b last:border-0 border-outline-variant/20"
-                        >
-                          {game.background_image ? (
-                            <img 
-                              src={game.background_image} 
-                              alt={game.name} 
-                              className="w-12 h-12 object-cover rounded shadow-sm"
-                            />
-                          ) : (
-                            <div className="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded">
-                              <MagnifyingGlassIcon className="h-4 w-4 text-outline" />
-                            </div>
-                          )}
-                          <div className="flex-1">
-                            <div className="font-bold text-on-surface text-sm">{game.name}</div>
-                            <div className="text-xs text-on-surface-variant">
-                              {game.released ? new Date(game.released).getFullYear() : 'TBA'} • {game.platforms?.[0]?.platform.name || 'Unknown platform'}
-                            </div>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-              <div>
-                <label
-                  htmlFor="console"
-                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                >
-                  Console
-                </label>
-                <input
-                  id="console"
-                  name="console"
-                  value={formData.console}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={getInputClassNames(!!showFieldError('console'))}
-                  aria-invalid={!!showFieldError('console')}
-                  placeholder="e.g. Nintendo Switch"
-                />
-                <FieldFeedback message={showFieldError('console')} />
-              </div>
-              <div>
-                <label
-                  htmlFor="releaseDate"
-                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                >
-                  Release Date
-                </label>
-                <input
-                  id="releaseDate"
-                  name="releaseDate"
-                  type="date"
-                  value={formData.releaseDate}
-                  onChange={handleChange}
-                  onBlur={handleBlur}
-                  className={getInputClassNames(!!showFieldError('releaseDate'))}
-                  aria-invalid={!!showFieldError('releaseDate')}
-                />
-                <FieldFeedback message={showFieldError('releaseDate')} />
-              </div>
-              <div>
-                <label
-                  htmlFor="versionGame"
-                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                >
-                  Version
-                </label>
-                <input
-                  id="versionGame"
-                  name="versionGame"
-                  value={formData.versionGame}
-                  onChange={handleChange}
-                  className="form-input"
-                  placeholder="e.g. PAL-ESP, NTSC"
-                />
-              </div>
-              <div>
-                <label
-                  htmlFor="category"
-                  className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                >
-                  Category
-                </label>
-                <select
-                  id="category"
-                  name="category"
-                  value={formData.category}
-                  onChange={handleChange}
-                  className="form-input"
-                  required
-                >
-                  <option value={0}>PlayStation</option>
-                  <option value={1}>Xbox</option>
-                  <option value={2}>Nintendo</option>
-                  <option value={3}>Sega</option>
-                  <option value={4}>PC</option>
-                  <option value={5}>Other</option>
-                </select>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    QR Code
-                  </label>
-                  <input
-                    name="qr"
-                    value={formData.qr}
-                    onChange={handleChange}
-                    className="form-input"
-                    placeholder="QR Reference"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    Barcode
-                  </label>
-                  <input
-                    name="codebar"
-                    value={formData.codebar}
-                    onChange={handleChange}
-                    className="form-input"
-                    placeholder="EAN/UPC"
-                  />
-                </div>
-              </div>
-            </div>
-          </section>
+        {/* Main Grid: Left Hero + Upload | Right Form */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16">
+          {/* LEFT SIDE: Hero & Upload Zone */}
+          <div className="lg:col-span-5">
+            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-8 leading-[1.1]">
+              List your <br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary-container to-primary">
+                next favorite
+              </span><br/>
+              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary-container to-primary">
+                game.
+              </span>
+            </h1>
+            <p className="text-on-surface-variant text-lg leading-relaxed mb-12 max-w-md">
+              Share detailed information and high-quality images of your videogame. Help collectors and gamers find their next treasure.
+            </p>
 
-          {/* Multilingual Names */}
-          <section>
-            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
-              <GlobeAltIcon className="h-6 w-6" />
-              <h3 className="text-xl font-bold">Localized Names</h3>
-            </div>
+            {/* Media Upload Zone */}
             <div className="space-y-4">
-              {names.map((name, index) => (
-                <div
-                  key={index}
-                  className="flex gap-4 items-end bg-surface-container p-4 rounded-lg border border-outline-variant/20"
-                >
-                  <div className="flex-1">
-                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                      Language
-                    </label>
-                    <input
-                      name="language"
-                      value={name.language}
-                      onChange={(e) => handleNameChange(index, e)}
-                      className="form-input"
-                      placeholder="e.g. ES, FR, JP"
-                    />
-                  </div>
-                  <div className="flex-2">
-                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                      Localized Name
-                    </label>
-                    <input
-                      name="name"
-                      value={name.name}
-                      onChange={(e) => handleNameChange(index, e)}
-                      className="form-input"
-                      placeholder="e.g. La Leyenda de Zelda"
-                    />
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => removeName(index)}
-                    className="p-2 text-error hover:bg-error/10 rounded-lg"
-                  >
-                    <TrashIcon className="h-5 w-5" />
-                  </button>
-                </div>
-              ))}
-              <button
-                type="button"
-                onClick={addName}
-                className="flex items-center gap-2 text-primary font-bold hover:underline"
-              >
-                <PlusIcon className="h-4 w-4" /> Add Another Language
-              </button>
-            </div>
-          </section>
-
-          {/* Pricing & State */}
-          <section className="grid grid-cols-1 md:grid-cols-2 gap-10">
-            <div>
-              <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
-                <CurrencyDollarIcon className="h-6 w-6" />
-                <h3 className="text-xl font-bold">Pricing</h3>
-              </div>
-              <div className="space-y-4">
-                <div className="flex gap-4">
-                  <div className="flex-1">
-                    <label
-                      htmlFor="averagePrice"
-                      className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                    >
-                      Average Market Price
-                    </label>
-                    <input
-                      id="averagePrice"
-                      name="averagePrice"
-                      type="number"
-                      step="0.01"
-                      value={formData.averagePrice}
-                      onChange={handleChange}
-                      className="form-input"
-                    />
-                  </div>
-                  <div className="flex-1">
-                    <label
-                      htmlFor="ownPrice"
-                      className="block text-sm font-semibold mb-2 text-on-surface-variant"
-                    >
-                      Your Asking Price
-                    </label>
-                    <input
-                      id="ownPrice"
-                      name="ownPrice"
-                      type="number"
-                      step="0.01"
-                      value={formData.ownPrice}
-                      onChange={handleChange}
-                      onBlur={handleBlur}
-                      className={getInputClassNames(!!showFieldError('ownPrice'))}
-                      aria-invalid={!!showFieldError('ownPrice')}
-                    />
-                    <FieldFeedback message={showFieldError('ownPrice')} />
-                  </div>
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    Accept Offers Range (%)
-                  </label>
-                  <input
-                    name="acceptOffersRange"
-                    type="number"
-                    value={formData.acceptOffersRange}
-                    onChange={handleChange}
-                    className="form-input"
-                    placeholder="e.g. 10 for 10% range"
-                  />
-                </div>
-              </div>
-            </div>
-
-            <div>
-              <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
-                <TagIcon className="h-6 w-6" />
-                <h3 className="text-xl font-bold">Condition</h3>
-              </div>
-              <div className="space-y-4">
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    General State (0-10)
-                  </label>
-                  <input
-                    name="generalState"
-                    type="number"
-                    step="0.1"
-                    value={formData.generalState}
-                    onChange={handleChange}
-                    className="form-input"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    Official Score
-                  </label>
-                  <input
-                    name="score"
-                    type="number"
-                    step="0.1"
-                    value={formData.score}
-                    onChange={handleChange}
-                    className="form-input"
-                  />
-                </div>
-                <div>
-                  <label className="block text-sm font-semibold mb-2 text-on-surface-variant">
-                    Packaging State
-                  </label>
-                  <select
-                    name="state"
-                    value={formData.state}
-                    onChange={handleChange}
-                    className="form-input"
-                  >
-                    <option value={GameState.Sealed}>Sealed (New)</option>
-                    <option value={GameState.Opened}>Opened (Used)</option>
-                    <option value={GameState.Damaged}>Damaged</option>
-                  </select>
-                </div>
-              </div>
-            </div>
-          </section>
-
-          {/* Media & 6-Side Details */}
-          <section>
-            <div className="flex items-center gap-2 mb-6 text-primary border-b border-outline-variant/20 pb-2">
-              <PhotoIcon className="h-6 w-6" />
-              <h3 className="text-xl font-bold">Photos & Dimensions</h3>
-            </div>
-
-            <div className="mb-6">
-              <label
-                htmlFor="imageUpload"
-                className="block text-sm font-semibold mb-2 text-on-surface-variant"
-              >
-                  Upload game photos
+              <label className="block text-xs font-bold tracking-widest uppercase text-primary mb-4">
+                Game Gallery
               </label>
-              <div className="space-y-4">
-                <div>
-                  <input
-                    id="imageUpload"
-                    type="file"
-                    accept="image/*"
-                    multiple
-                    onChange={handleMultipleFilesChange}
-                    className="form-input"
-                    disabled={uploading}
-                  />
-                  <p className="mt-1 text-xs text-on-surface-variant">
-                    JPG, PNG or WebP. Max 5MB each. You can upload multiple
-                    images.
-                  </p>
+              <div className="grid grid-cols-2 gap-4 h-[400px]">
+                {/* Main upload area */}
+                <div className="relative group cursor-pointer overflow-hidden rounded-2xl border-2 border-dashed border-outline-variant/30 hover:border-primary/50 transition-all bg-surface-container-low flex items-center justify-center col-span-2 row-span-1"
+                  onDragOver={(e) => { e.preventDefault(); }}
+                  onDrop={(e) => {
+                    e.preventDefault();
+                    const files = e.dataTransfer.files;
+                    if (files && files.length > 0) {
+                      const input = document.getElementById('imageUpload') as HTMLInputElement;
+                      if (input) {
+                        input.files = files;
+                        const event = new Event('change', { bubbles: true });
+                        input.dispatchEvent(event);
+                      }
+                    }
+                  }}
+                >
+                  <label className="cursor-pointer w-full h-full flex items-center justify-center">
+                    <div className="text-center p-8">
+                      <div className="material-symbols-outlined text-4xl text-primary mb-3 block text-center">
+                        add_a_photo
+                      </div>
+                      <p className="text-sm font-medium text-on-surface">Upload game photos</p>
+                      <p className="text-xs text-on-surface-variant mt-1">PNG, JPG up to 5MB each</p>
+                      <input
+                        id="imageUpload"
+                        type="file"
+                        accept="image/*"
+                        multiple
+                        onChange={handleMultipleFilesChange}
+                        className="hidden"
+                        disabled={uploading}
+                      />
+                    </div>
+                  </label>
                 </div>
-                {uploading && (
-                  <div className="flex items-center gap-2 text-primary text-sm font-medium">
-                    <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
-                    Uploading...
-                  </div>
-                )}
-                {images.length > 0 && !uploading && (
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {images.map((img, index) => (
+
+                {/* Image thumbnails grid */}
+                {images.length > 0 && (
+                  <>
+                    {images.slice(0, 3).map((img, index) => (
                       <div
                         key={index}
                         draggable
                         onDragStart={() => handleDragStart(index)}
                         onDragOver={handleDragOver}
                         onDrop={() => handleDrop(index)}
-                        className="relative group cursor-move rounded-lg overflow-hidden border-2 border-outline-variant/30 hover:border-primary transition-all"
+                        className="relative group cursor-move overflow-hidden rounded-xl border border-outline-variant/10 hover:border-primary/50 transition-all bg-surface-container-highest flex items-center justify-center"
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
                           src={getImageUrl(img)}
                           alt={`Preview ${index + 1}`}
-                          className="w-full h-32 object-cover"
+                          className="w-full h-full object-cover"
                           onError={(e) => {
                             (e.target as HTMLImageElement).src =
-                              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EImage%3C/text%3E%3C/svg%3E';
+                              'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23222a3d" width="100" height="100"/%3E%3Ctext fill="%23666" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E%3C/text%3E%3C/svg%3E';
                           }}
                         />
-                        <div className="absolute top-1 left-1 bg-primary-container text-on-primary-container text-xs px-2 py-1 rounded">
-                          {index + 1}
-                        </div>
                         <button
                           type="button"
                           onClick={() => removeImage(index)}
@@ -789,330 +460,440 @@ export default function CreateVideogamePage() {
                         </button>
                       </div>
                     ))}
-                  </div>
+                  </>
                 )}
               </div>
-              <input type="hidden" name="urlImg" value={formData.urlImg} />
+              {uploading && (
+                <div className="flex items-center gap-2 text-primary text-sm font-medium">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  Uploading...
+                </div>
+              )}
+              {images.length > 3 && (
+                <p className="text-xs text-on-surface-variant">
+                  +{images.length - 3} more image{images.length - 3 !== 1 ? 's' : ''}
+                </p>
+              )}
             </div>
+          </div>
 
-            <div className="bg-surface-container p-6 rounded-xl space-y-6 border border-outline-variant/20">
-              <h4 className="font-bold text-on-surface-variant mb-4 uppercase text-xs tracking-widest">
-                The 6 Sides (URLs)
-              </h4>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Front
-                  </label>
-                  {contents[0].frontalUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].frontalUrl)}
-                        alt="Front preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EFront%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("frontalUrl", file);
-                      }}
-                      className="hidden"
-                      id="frontalUrl-upload"
-                    />
-                    <label
-                      htmlFor="frontalUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
-                    >
-                      {uploadingStates["frontalUrl"]
-                        ? "Uploading..."
-                        : "Upload"}
-                    </label>
-                  </div>
+          {/* RIGHT SIDE: Form */}
+          <div className="lg:col-span-7 bg-surface-container-low p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden">
+            <div className="absolute top-0 right-0 w-96 h-96 bg-primary-container/5 blur-[120px] -z-10"></div>
+
+            <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Game Title */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1">
+                  Game Title
+                </label>
+                <div className="relative">
                   <input
-                    name="frontalUrl"
-                    value={contents[0].frontalUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
+                    id="englishName"
+                    name="englishName"
+                    value={formData.englishName}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface placeholder:text-outline/50 transition-all font-medium"
+                    aria-invalid={!!showFieldError('englishName')}
+                    placeholder="e.g. The Legend of Zelda"
                   />
-                </div>
-                <div>
-                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Back
-                  </label>
-                  {contents[0].backUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].backUrl)}
-                        alt="Back preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EBack%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
+                  <FieldFeedback message={showFieldError('englishName')} />
+                  {searching && (
+                    <div className="absolute right-4 top-1/2 -translate-y-1/2">
+                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full"></div>
                     </div>
                   )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("backUrl", file);
-                      }}
-                      className="hidden"
-                      id="backUrl-upload"
-                    />
-                    <label
-                      htmlFor="backUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
+                  {showSearch && searchResults.length > 0 && (
+                    <div className="absolute z-50 w-full mt-2 bg-surface-container rounded-lg shadow-2xl border border-outline-variant/30 max-h-60 overflow-y-auto top-full">
+                      {searchResults.map((game) => (
+                        <button
+                          key={game.id}
+                          type="button"
+                          onClick={() => handleSelectGame(game)}
+                          className="w-full flex items-center gap-3 p-3 hover:bg-surface-container-high text-left transition-colors border-b last:border-0 border-outline-variant/20"
+                        >
+                          {game.background_image ? (
+                            <img 
+                              src={game.background_image} 
+                              alt={game.name} 
+                              className="w-12 h-12 object-cover rounded shadow-sm"
+                            />
+                          ) : (
+                            <div className="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded">
+                              <MagnifyingGlassIcon className="h-4 w-4 text-outline" />
+                            </div>
+                          )}
+                          <div className="flex-1">
+                            <div className="font-bold text-on-surface text-sm">{game.name}</div>
+                            <div className="text-xs text-on-surface-variant">
+                              {game.released ? new Date(game.released).getFullYear() : 'TBA'} • {game.platforms?.[0]?.platform.name || 'Platform'}
+                            </div>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Category & Condition */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1">
+                    Platform
+                  </label>
+                  <div className="relative">
+                    <select
+                      id="category"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      className="w-full appearance-none bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface transition-all font-medium cursor-pointer"
                     >
-                      {uploadingStates["backUrl"] ? "Uploading..." : "Upload"}
-                    </label>
+                      <option value={0}>PlayStation</option>
+                      <option value={1}>Xbox</option>
+                      <option value={2}>Nintendo</option>
+                      <option value={3}>Sega</option>
+                      <option value={4}>PC</option>
+                      <option value={5}>Other</option>
+                    </select>
+                    <svg className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+                    </svg>
                   </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1">
+                    Condition
+                  </label>
+                  <div className="relative">
+                    <select
+                      name="state"
+                      value={formData.state}
+                      onChange={handleChange}
+                      className="w-full appearance-none bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface transition-all font-medium cursor-pointer"
+                    >
+                      <option value={GameState.Sealed}>Sealed</option>
+                      <option value={GameState.Opened}>Like New</option>
+                      <option value={GameState.Damaged}>Good</option>
+                    </select>
+                    <svg className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-outline w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14.828 14.828a4 4 0 01-5.656 0M7.172 7.172C5.026 9.318 5.026 12.682 7.172 14.828m10.656-10.656C18.974 9.318 18.974 12.682 16.828 14.828" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+
+              {/* Price */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1">
+                  Asking Price
+                </label>
+                <div className="relative">
+                  <span className="absolute left-6 top-1/2 -translate-y-1/2 text-primary font-bold text-lg">$</span>
                   <input
-                    name="backUrl"
-                    value={contents[0].backUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
+                    id="ownPrice"
+                    name="ownPrice"
+                    type="number"
+                    step="0.01"
+                    value={formData.ownPrice}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl pl-14 pr-6 py-4 text-on-surface placeholder:text-outline/50 transition-all font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    aria-invalid={!!showFieldError('ownPrice')}
+                    placeholder="0.00"
                   />
+                  <FieldFeedback message={showFieldError('ownPrice')} />
                 </div>
-                <div>
-                    <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Right Side
-                  </label>
-                  {contents[0].rightSideUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].rightSideUrl)}
-                        alt="Right side preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ERight%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("rightSideUrl", file);
-                      }}
-                      className="hidden"
-                      id="rightSideUrl-upload"
-                    />
-                    <label
-                      htmlFor="rightSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
-                    >
-                      {uploadingStates["rightSideUrl"]
-                        ? "Uploading..."
-                        : "Upload"}
-                    </label>
-                  </div>
+              </div>
+
+              {/* Description */}
+              <div className="space-y-2">
+                <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1">
+                  Game Description
+                </label>
+                <textarea
+                  id="description"
+                  name="description"
+                  value={formData.description}
+                  onChange={handleChange}
+                  className="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface placeholder:text-outline/50 transition-all font-medium resize-none"
+                  placeholder="Describe the game, condition, and any notable details..."
+                  rows={6}
+                />
+              </div>
+
+              {/* Action Buttons */}
+              <div className="pt-6 flex flex-col md:flex-row gap-4">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="flex-1 bg-gradient-to-br from-primary-container to-[#6366F1] text-on-primary-container py-4 rounded-xl font-extrabold text-base tracking-tight hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary-container/20 disabled:opacity-50"
+                >
+                  {loading ? "Publishing..." : "Publish Listing"}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => router.back()}
+                  className="px-8 py-4 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-highest transition-colors active:scale-[0.98]"
+                >
+                  Save Draft
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+
+        {/* Collapsible Advanced Section */}
+        <details className="mt-16 bg-surface-container-low p-8 rounded-2xl border border-outline-variant/20 group">
+          <summary className="cursor-pointer font-bold text-on-surface flex items-center gap-2 hover:text-primary transition-colors">
+            <span className="transition-transform group-open:rotate-90 inline-block">▶</span>
+            Advanced Options
+          </summary>
+          <div className="mt-6 space-y-8">
+            {/* Console / Release Date / Version */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Release Information</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Console</label>
                   <input
-                    name="rightSideUrl"
-                    value={contents[0].rightSideUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
+                    id="console"
+                    name="console"
+                    value={formData.console}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={getInputClassNames(!!showFieldError('console'))}
+                    placeholder="e.g. Nintendo Switch"
                   />
+                  <FieldFeedback message={showFieldError('console')} />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Left Side
-                  </label>
-                  {contents[0].leftSideUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].leftSideUrl)}
-                        alt="Left side preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ELeft%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("leftSideUrl", file);
-                      }}
-                      className="hidden"
-                      id="leftSideUrl-upload"
-                    />
-                    <label
-                      htmlFor="leftSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
-                    >
-                      {uploadingStates["leftSideUrl"]
-                        ? "Uploading..."
-                        : "Upload"}
-                    </label>
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Release Date</label>
                   <input
-                    name="leftSideUrl"
-                    value={contents[0].leftSideUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
+                    id="releaseDate"
+                    name="releaseDate"
+                    type="date"
+                    value={formData.releaseDate}
+                    onChange={handleChange}
+                    onBlur={handleBlur}
+                    className={getInputClassNames(!!showFieldError('releaseDate'))}
                   />
+                  <FieldFeedback message={showFieldError('releaseDate')} />
                 </div>
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Top
-                  </label>
-                  {contents[0].topSideUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].topSideUrl)}
-                        alt="Top preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3ETop%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("topSideUrl", file);
-                      }}
-                      className="hidden"
-                      id="topSideUrl-upload"
-                    />
-                    <label
-                      htmlFor="topSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
-                    >
-                      {uploadingStates["topSideUrl"]
-                        ? "Uploading..."
-                        : "Upload"}
-                    </label>
-                  </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Version</label>
                   <input
-                    name="topSideUrl"
-                    value={contents[0].topSideUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">
-                    Bottom
-                  </label>
-                  {contents[0].bottomSideUrl && (
-                    <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={getImageUrl(contents[0].bottomSideUrl)}
-                        alt="Bottom preview"
-                        className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23ddd" width="100" height="100"/%3E%3Ctext fill="%23999" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3EBottom%3C/text%3E%3C/svg%3E';
-                        }}
-                      />
-                    </div>
-                  )}
-                  <div className="flex gap-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={(e) => {
-                        const file = e.target.files?.[0];
-                        if (file) handleSideImageUpload("bottomSideUrl", file);
-                      }}
-                      className="hidden"
-                      id="bottomSideUrl-upload"
-                    />
-                    <label
-                      htmlFor="bottomSideUrl-upload"
-                      className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors"
-                    >
-                      {uploadingStates["bottomSideUrl"]
-                        ? "Uploading..."
-                        : "Upload"}
-                    </label>
-                  </div>
-                  <input
-                    name="bottomSideUrl"
-                    value={contents[0].bottomSideUrl}
-                    onChange={(e) => handleContentChange(0, e)}
-                    className="form-input text-xs mt-2"
-                    placeholder="Or paste URL"
+                    id="versionGame"
+                    name="versionGame"
+                    value={formData.versionGame}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                    placeholder="PAL-ESP, NTSC, etc."
                   />
                 </div>
               </div>
-            </div>
-          </section>
+            </section>
 
-          <section>
-            <label
-              htmlFor="description"
-              className="block text-sm font-semibold mb-2 text-on-surface-variant"
-            >
-              Detailed Description
-            </label>
-            <textarea
-              id="description"
-              name="description"
-              value={formData.description}
-              onChange={handleChange}
-              rows={5}
-              className="form-input"
-              placeholder="Describe the item condition, history, etc..."
-            />
-          </section>
+            {/* Barcodes */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Product Identifiers</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">QR Code</label>
+                  <input
+                    name="qr"
+                    value={formData.qr}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                    placeholder="Optional QR reference"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Barcode (EAN/UPC)</label>
+                  <input
+                    name="codebar"
+                    value={formData.codebar}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                    placeholder="Optional barcode"
+                  />
+                </div>
+              </div>
+            </section>
 
-          <div className="pt-8 border-t border-outline-variant/20 flex justify-end gap-4">
-            <button
-              type="button"
-              onClick={() => router.back()}
-              className="px-8 py-3 font-bold text-on-surface-variant hover:text-on-surface transition-colors"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="px-12 py-3 indigo-gradient text-on-primary-container font-bold rounded-xl transition-all shadow-lg shadow-primary-container/25 disabled:opacity-50"
-            >
-              {loading ? "Publishing..." : "Publish Listing"}
-            </button>
+            {/* Pricing Details */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Pricing Details</h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Market Average</label>
+                  <input
+                    id="averagePrice"
+                    name="averagePrice"
+                    type="number"
+                    step="0.01"
+                    value={formData.averagePrice}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Accept Offers Range (%)</label>
+                  <input
+                    name="acceptOffersRange"
+                    type="number"
+                    value={formData.acceptOffersRange}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                    placeholder="e.g. 10"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Condition Score (0-10)</label>
+                  <input
+                    name="generalState"
+                    type="number"
+                    step="0.1"
+                    value={formData.generalState}
+                    onChange={handleChange}
+                    className={getInputClassNames(false)}
+                  />
+                </div>
+              </div>
+            </section>
+
+            {/* Ratings */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Ratings & Scores</h3>
+              <div className="space-y-2">
+                <label className="text-xs font-bold tracking-widest uppercase text-on-surface-variant">Critical Score</label>
+                <input
+                  name="score"
+                  type="number"
+                  step="0.1"
+                  value={formData.score}
+                  onChange={handleChange}
+                  className={getInputClassNames(false)}
+                  placeholder="Metacritic or similar score"
+                />
+              </div>
+            </section>
+
+            {/* Localized Names */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Localized Titles</h3>
+              <div className="space-y-4">
+                {names.map((name, index) => (
+                  <div
+                    key={index}
+                    className="flex gap-4 items-end bg-surface-container p-4 rounded-lg border border-outline-variant/20"
+                  >
+                    <div className="flex-1">
+                      <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">Language</label>
+                      <input
+                        name="language"
+                        value={name.language}
+                        onChange={(e) => handleNameChange(index, e)}
+                        className={getInputClassNames(false)}
+                        placeholder="ES, FR, JP, etc."
+                      />
+                    </div>
+                    <div className="flex-2">
+                      <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase">Localized Title</label>
+                      <input
+                        name="name"
+                        value={name.name}
+                        onChange={(e) => handleNameChange(index, e)}
+                        className={getInputClassNames(false)}
+                        placeholder="Translated game title"
+                      />
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeName(index)}
+                      className="p-2 text-error hover:bg-error/10 rounded-lg"
+                    >
+                      <TrashIcon className="h-5 w-5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={addName}
+                  className="flex items-center gap-2 text-primary font-bold hover:underline text-sm"
+                >
+                  <PlusIcon className="h-4 w-4" /> Add Translation
+                </button>
+              </div>
+            </section>
+
+            {/* Box Art (6 Sides) */}
+            <section>
+              <h3 className="text-sm font-bold text-primary mb-4 uppercase tracking-widest">Box Art (6 Sides)</h3>
+              <p className="text-xs text-on-surface-variant mb-6">Upload or link high-resolution scans of each side of the game box.</p>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {['frontalUrl', 'backUrl', 'rightSideUrl', 'leftSideUrl', 'topSideUrl', 'bottomSideUrl'].map((side, i) => {
+                  const sideLabel = {
+                    frontalUrl: 'Front',
+                    backUrl: 'Back',
+                    rightSideUrl: 'Right',
+                    leftSideUrl: 'Left',
+                    topSideUrl: 'Top',
+                    bottomSideUrl: 'Bottom',
+                  }[side] || side;
+
+                  return (
+                    <div key={i}>
+                      <label className="block text-xs font-bold mb-2 text-on-surface-variant uppercase">
+                        {sideLabel}
+                      </label>
+                      {contents[0][side as keyof typeof contents[0]] && (
+                        <div className="mb-2">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img
+                            src={getImageUrl(contents[0][side as keyof typeof contents[0]] as string)}
+                            alt={`${sideLabel} preview`}
+                            className="w-full h-24 object-cover rounded border border-outline-variant/30"
+                            onError={(e) => {
+                              (e.target as HTMLImageElement).src =
+                                'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100"%3E%3Crect fill="%23222a3d" width="100" height="100"/%3E%3C/svg%3E';
+                            }}
+                          />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={(e) => {
+                          const file = e.target.files?.[0];
+                          if (file) handleSideImageUpload(side, file);
+                        }}
+                        className="hidden"
+                        id={`${side}-upload`}
+                      />
+                      <label
+                        htmlFor={`${side}-upload`}
+                        className="flex-1 cursor-pointer bg-primary-container hover:brightness-110 text-on-primary-container text-xs py-2 px-3 rounded text-center transition-colors block"
+                      >
+                        {uploadingStates[side] ? "Uploading..." : "Upload"}
+                      </label>
+                      <input
+                        name={side}
+                        value={contents[0][side as keyof typeof contents[0]] as string}
+                        onChange={(e) => handleContentChange(0, e)}
+                        className={getInputClassNames(false) + " text-xs mt-2"}
+                        placeholder="Or paste URL"
+                      />
+                    </div>
+                  );
+                })}
+              </div>
+            </section>
           </div>
-        </form>
+        </details>
       </div>
 
       <style jsx>{`
@@ -1137,3 +918,4 @@ export default function CreateVideogamePage() {
     </div>
   );
 }
+
