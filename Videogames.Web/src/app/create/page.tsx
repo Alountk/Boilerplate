@@ -1,6 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
+import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { VideogameService } from "../../infrastructure/services/VideogameService";
 import { ImageService } from "../../infrastructure/services/ImageService";
@@ -11,11 +13,6 @@ import {
   ExclamationCircleIcon,
   TrashIcon,
   PlusIcon,
-  PhotoIcon,
-  CurrencyDollarIcon,
-  BeakerIcon,
-  GlobeAltIcon,
-  TagIcon,
 } from "@heroicons/react/24/outline";
 import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
 import { RAWGService } from "../../infrastructure/services/RAWGService";
@@ -73,12 +70,14 @@ export default function CreateVideogamePage() {
   };
 
   const router = useRouter();
-  const videogameService = new VideogameService();
-  const imageService = new ImageService();
-  const rawgService = new RAWGService();
+  const videogameService = useMemo(() => new VideogameService(), []);
+  const imageService = useMemo(() => new ImageService(), []);
+  const rawgService = useMemo(() => new RAWGService(), []);
   const [loading, setLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [searching, setSearching] = useState(false);
+  const [ocrLoading, setOcrLoading] = useState(false);
+  const [ocrMessage, setOcrMessage] = useState<string | null>(null);
   const [searchResults, setSearchResults] = useState<RAWGGame[]>([]);
   const [showSearch, setShowSearch] = useState(false);
 
@@ -136,7 +135,91 @@ export default function CreateVideogamePage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [formData.englishName]);
+  }, [formData.englishName, rawgService]);
+
+  const getLikelyTitleFromOcr = (rawText: string) => {
+    const blockedTerms = new Set([
+      "playstation",
+      "ps4",
+      "ps5",
+      "xbox",
+      "xbox one",
+      "nintendo",
+      "switch",
+      "rated",
+      "teen",
+      "mature",
+      "pegi",
+      "www",
+      "ubisoft",
+      "electronic arts",
+      "capcom",
+      "konami",
+      "bandai",
+      "namco",
+      "square enix",
+      "activision",
+      "sega",
+    ]);
+
+    const candidates = rawText
+      .split("\n")
+      .map((line) => line.trim())
+      .filter((line) => line.length >= 4 && line.length <= 60)
+      .filter((line) => /[a-zA-Z]/.test(line))
+      .filter((line) => !blockedTerms.has(line.toLowerCase()))
+      .filter((line) => !/^\d+$/.test(line));
+
+    if (candidates.length === 0) return "";
+
+    const best = candidates
+      .sort((a, b) => b.length - a.length)
+      .find((line) => {
+        const lower = line.toLowerCase();
+        return !Array.from(blockedTerms).some((term) => lower.includes(term));
+      });
+
+    return (best || candidates[0]).replace(/[^\w\s:'-]/g, "").trim();
+  };
+
+  const runOcrAutofillFromImage = async (file: File) => {
+    setOcrLoading(true);
+    setOcrMessage("Analizando portada para detectar el juego...");
+
+    try {
+      const { createWorker } = await import("tesseract.js");
+      const worker = await createWorker("eng");
+      const {
+        data: { text },
+      } = await worker.recognize(file);
+      await worker.terminate();
+
+      const detectedTitle = getLikelyTitleFromOcr(text);
+      if (!detectedTitle || detectedTitle.length < 3) {
+        setOcrMessage("No se pudo detectar un titulo claro en la portada.");
+        return;
+      }
+
+      const results = await rawgService.searchGames(detectedTitle);
+      if (!results.length) {
+        setFormData((prev) => ({
+          ...prev,
+          englishName: prev.englishName || detectedTitle,
+        }));
+        setOcrMessage(`Texto detectado: ${detectedTitle}. No hubo match exacto en RAWG.`);
+        return;
+      }
+
+      setOcrMessage(`Detectado: ${detectedTitle}. Completando datos con RAWG...`);
+      await handleSelectGame(results[0]);
+      setOcrMessage(`Autocompletado listo: ${results[0].name}.`);
+    } catch (error) {
+      console.error("OCR autofill failed", error);
+      setOcrMessage("No se pudo analizar la imagen automaticamente.");
+    } finally {
+      setOcrLoading(false);
+    }
+  };
 
   const handleSelectGame = async (game: RAWGGame) => {
     setShowSearch(false);
@@ -200,8 +283,10 @@ export default function CreateVideogamePage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
+    console.log({files})
     setUploading(true);
     try {
+      console.log({files})
       const uploadPromises = Array.from(files).map((file) =>
         imageService.uploadImage(file)
       );
@@ -211,6 +296,11 @@ export default function CreateVideogamePage() {
       // Set first image as urlImg for backward compatibility
       if (images.length === 0 && fileNames.length > 0) {
         setFormData((prev) => ({ ...prev, urlImg: fileNames[0] }));
+      }
+
+      // MVP: OCR on first uploaded image to infer game title and autofill via RAWG.
+      if (formData.englishName.trim().length === 0 && files[0]) {
+        void runOcrAutofillFromImage(files[0]);
       }
     } catch (error) {
       console.error("Image upload failed", error);
@@ -350,13 +440,13 @@ export default function CreateVideogamePage() {
     <div className="min-h-screen bg-surface text-on-surface flex flex-col">
       {/* Back to Dashboard */}
       <div className="max-w-7xl w-full mx-auto px-6 md:px-12 py-12">
-        <a 
-          href="/" 
+        <Link
+          href="/"
           className="inline-flex items-center gap-2 text-primary hover:text-on-surface transition-colors group mb-8"
         >
           <ArrowLeftIcon className="h-5 w-5 group-hover:-translate-x-1 transition-transform" />
           <span className="text-sm font-bold tracking-widest uppercase">Back to Marketplace</span>
-        </a>
+        </Link>
 
         {/* Main Grid: Left Hero + Upload | Right Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16">
@@ -364,10 +454,10 @@ export default function CreateVideogamePage() {
           <div className="lg:col-span-5">
             <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-8 leading-[1.1]">
               List your <br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary-container to-primary">
+              <span className="text-transparent bg-clip-text bg-linear-to-br from-primary-container to-primary">
                 next favorite
               </span><br/>
-              <span className="text-transparent bg-clip-text bg-gradient-to-br from-primary-container to-primary">
+              <span className="text-transparent bg-clip-text bg-linear-to-br from-primary-container to-primary">
                 game.
               </span>
             </h1>
@@ -469,6 +559,17 @@ export default function CreateVideogamePage() {
                   Uploading...
                 </div>
               )}
+              {ocrLoading && (
+                <div className="flex items-center gap-2 text-primary text-sm font-medium">
+                  <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-primary"></div>
+                  Analizando portada con OCR...
+                </div>
+              )}
+              {ocrMessage && (
+                <p className="text-xs text-on-surface-variant bg-surface-container-high rounded-lg px-3 py-2 border border-outline-variant/20">
+                  {ocrMessage}
+                </p>
+              )}
               {images.length > 3 && (
                 <p className="text-xs text-on-surface-variant">
                   +{images.length - 3} more image{images.length - 3 !== 1 ? 's' : ''}
@@ -514,10 +615,13 @@ export default function CreateVideogamePage() {
                           className="w-full flex items-center gap-3 p-3 hover:bg-surface-container-high text-left transition-colors border-b last:border-0 border-outline-variant/20"
                         >
                           {game.background_image ? (
-                            <img 
-                              src={game.background_image} 
-                              alt={game.name} 
+                            <Image
+                              src={game.background_image}
+                              alt={game.name}
+                              width={48}
+                              height={48}
                               className="w-12 h-12 object-cover rounded shadow-sm"
+                              unoptimized
                             />
                           ) : (
                             <div className="w-12 h-12 bg-surface-container-high flex items-center justify-center rounded">
@@ -630,7 +734,7 @@ export default function CreateVideogamePage() {
                 <button
                   type="submit"
                   disabled={loading}
-                  className="flex-1 bg-gradient-to-br from-primary-container to-[#6366F1] text-on-primary-container py-4 rounded-xl font-extrabold text-base tracking-tight hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary-container/20 disabled:opacity-50"
+                  className="flex-1 bg-linear-to-br from-primary-container to-[#6366F1] text-on-primary-container py-4 rounded-xl font-extrabold text-base tracking-tight hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary-container/20 disabled:opacity-50"
                 >
                   {loading ? "Publishing..." : "Publish Listing"}
                 </button>

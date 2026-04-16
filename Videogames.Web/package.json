@@ -14,11 +14,12 @@
     "@heroicons/react": "^2.2.0",
     "@microsoft/signalr": "^10.0.0",
     "@react-oauth/google": "^0.13.5",
-    "axios": "^1.13.2",
+    "axios": "1.15.0",
     "iconoir-react": "^7.11.0",
     "next": "16.1.0",
     "react": "19.2.0",
-    "react-dom": "19.2.0"
+    "react-dom": "19.2.0",
+    "tesseract.js": "^7.0.0"
   },
   "devDependencies": {
     "@playwright/browser-chromium": "1.57.0",

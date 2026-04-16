@@ -15,12 +15,24 @@ public class MinioStorageAdapter : IStoragePort
     public MinioStorageAdapter(IOptions<MinioSettings> settings)
     {
         _settings = settings.Value;
+        var endpoint = string.IsNullOrWhiteSpace(_settings.Endpoint)
+            ? "http://localhost:9000"
+            : _settings.Endpoint;
+
+        if (!endpoint.StartsWith("http://", StringComparison.OrdinalIgnoreCase) &&
+            !endpoint.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            endpoint = $"http://{endpoint}";
+        }
 
         var config = new AmazonS3Config
         {
-            ServiceURL = _settings.Endpoint,
+            ServiceURL = endpoint,
+            AuthenticationRegion = string.IsNullOrWhiteSpace(_settings.Region)
+                ? "us-east-1"
+                : _settings.Region,
             ForcePathStyle = true, // Required for MinIO
-            UseHttp = !_settings.UseSSL
+            UseHttp = !_settings.UseSSL,
         };
 
         _s3Client = new AmazonS3Client(_settings.User, _settings.Secret, config);

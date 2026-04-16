@@ -50,6 +50,22 @@
                 "reveal": "always",
                 "panel": "shared"
             }
+        },
+        {
+            "label": "build: Videogames.API",
+            "command": "dotnet",
+            "type": "process",
+            "args": [
+                "build",
+                "${workspaceFolder}/Videogames.API/Videogames.API.csproj",
+                "/property:GenerateFullPaths=true",
+                "/consoleloggerparameters:NoSummary"
+            ],
+            "problemMatcher": "$msCompile",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
         }
     ]
 }
