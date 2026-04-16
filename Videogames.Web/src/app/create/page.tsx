@@ -13,6 +13,7 @@ import {
   ExclamationCircleIcon,
   TrashIcon,
   PlusIcon,
+  PhotoIcon,
 } from "@heroicons/react/24/outline";
 import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
 import { RAWGService } from "../../infrastructure/services/RAWGService";
@@ -489,9 +490,7 @@ export default function CreateVideogamePage() {
                 >
                   <label className="cursor-pointer w-full h-full flex items-center justify-center">
                     <div className="text-center p-8">
-                      <div className="material-symbols-outlined text-4xl text-primary mb-3 block text-center">
-                        add_a_photo
-                      </div>
+                      <PhotoIcon className="mx-auto mb-3 h-10 w-10 text-primary" />
                       <p className="text-sm font-medium text-on-surface">Upload game photos</p>
                       <p className="text-xs text-on-surface-variant mt-1">PNG, JPG up to 5MB each</p>
                       <input

@@ -4,6 +4,14 @@ import { useCallback, useMemo, useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import {
+  EnvelopeIcon,
+  ExclamationCircleIcon,
+  HomeIcon,
+  IdentificationIcon,
+  LockClosedIcon,
+  UserIcon,
+} from "@heroicons/react/24/outline";
 import { scrollToFirstError } from "../../utils/formUtils";
 
 type RegisterForm = {
@@ -70,7 +78,7 @@ function FieldFeedback({
   if (!message) return null;
   return (
     <p id={id} role="alert" className="mt-1 text-xs text-error px-1 flex items-center gap-1">
-      <span className="material-symbols-outlined text-[14px]">error</span>
+      <ExclamationCircleIcon className="h-3.5 w-3.5" />
       <span>{message}</span>
     </p>
   );
@@ -236,7 +244,7 @@ export default function RegisterPage() {
                   First Name <span className="text-error">*</span>
                 </label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">person</span>
+                  <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                   <input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="John" />
                 </div>
                 <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
@@ -246,7 +254,7 @@ export default function RegisterPage() {
                   Last Name <span className="text-error">*</span>
                 </label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">badge</span>
+                  <IdentificationIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                   <input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Doe" />
                 </div>
                 <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
@@ -257,7 +265,7 @@ export default function RegisterPage() {
                 Email Address <span className="text-error">*</span>
               </label>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">mail</span>
+                <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                 <input id="email" name="email" type="email" inputMode="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="curator@nocturnalarchive.com" />
               </div>
               <FieldFeedback id="err-email" message={showFieldError("email")} />
@@ -270,7 +278,7 @@ export default function RegisterPage() {
                 <span className="text-[0.625rem] text-outline italic">Min. 8 characters</span>
               </div>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">lock</span>
+                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                 <input id="password" name="password" type="password" value={formData.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
               </div>
               <FieldFeedback id="err-password" message={showFieldError("password")} />
@@ -283,7 +291,7 @@ export default function RegisterPage() {
             <div className="space-y-1">
               <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="address">Address</label>
               <div className="relative group">
-                <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">home</span>
+                <HomeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                 <input id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Street, number" />
               </div>
               <FieldFeedback id="err-address" message={showFieldError("address")} />

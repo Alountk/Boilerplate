@@ -36,6 +36,10 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
   - State keying pattern — zero `useEffect` / mounted-ref overhead; fallback chain self-resets synchronously in render when the product changes
   - Auto-fetch official cover from RAWG API at listing creation time if no images are provided
   - Utility helpers `resolveVideogameImageSrc` and `getVideogameImageCandidates` for reuse across the app
+- **Frontend Asset Hardening**:
+   - Critical UI icons migrated from Material Symbols font ligatures to bundled Heroicons SVGs
+   - Marketplace category cards now use local images served from `Videogames.Web/public/assets/categories`
+   - Removes runtime dependence on external font/CDN availability for core navigation and homepage visuals
 - **Social Login Scaffolding** (Google & Apple): OAuth flow wired end-to-end; UI buttons disabled until provider credentials are configured (`FEATURE-PENDING`)
 - **Dual-Hexagonal Pattern**: Decoupled layers for maximum testability.
 - **Responsive Design**: Premium UI with Dark Mode support and micro-animations.
@@ -167,6 +171,7 @@ make docker-deploy-down
 ├── Videogames.Web             # Next.js 15 Frontend
 │   ├── src/app                # App Router (Pages)
 │   ├── src/components         # UI Components
+│   ├── public/assets          # Local category and UI image assets
 │   ├── src/context            # Auth & State Contexts
 │   ├── src/domain             # Frontend Models & Ports
 │   ├── src/infrastructure     # API Services & Axios Setup
@@ -215,6 +220,11 @@ This project is licensed under the MIT License.
 - **State Keying Pattern**: Initial `VideogameCover` implementation used a `hasComponentMounted` ref + `useEffect` to reset fallback state on product change. Identified as a cascading-render anti-pattern and replaced with a state object keyed by `candidatesKey` (join of all candidate URLs): state resets synchronously in render with zero effects or refs.
 - **RAWG Auto-Fetch at Creation**: `create/page.tsx` queries the RAWG API at submit time if no images are provided, storing an official cover URL in `urlImg`. Keeps catalogue visually consistent without requiring seller effort.
 - **Tailwind v4 Migration Note**: Linter flagged `[overflow-wrap:anywhere]` (arbitrary CSS escape). Replaced with the first-class utility `wrap-anywhere`.
+
+### 2026-04-16: Icon Reliability & Local Category Assets
+- **Heroicons Migration for Critical UI**: Replaced remaining `material-symbols-outlined` usages in navbar, login, register, home, and create flows with bundled Heroicons SVG components. This removes dependency on the Google Material Symbols stylesheet for critical navigation and form affordances.
+- **Local Category Images**: Moved marketplace category card images off remote Unsplash URLs into local assets under `Videogames.Web/public/assets/categories`, preventing CDN failures and 404s from breaking the homepage category grid.
+- **Recovery Detail**: One Nintendo image URL had already started returning `404`; the recovery standardized all category imagery behind local static paths so a single external outage cannot degrade the marketplace UI again.
 
 ### 2026-04-12: Frontend Release Failure in Docker CI (Next 16)
 - **Incident**: `docker-release.yml` failed in `Build and push Web image` with `npm run build` exit code `1`, blocking frontend image publication.

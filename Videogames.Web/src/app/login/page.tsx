@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { EnvelopeIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from "@heroicons/react/24/outline";
 import { scrollToFirstError } from "../../utils/formUtils";
 
 export default function LoginPage() {
@@ -92,9 +93,7 @@ export default function LoginPage() {
                   Email Address
                 </label>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">
-                    mail
-                  </span>
+                  <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                   <input
                     id="email"
                     name="email"
@@ -123,9 +122,7 @@ export default function LoginPage() {
                   {/* FEATURE-PENDING: forgot password */}
                 </div>
                 <div className="relative group">
-                  <span className="material-symbols-outlined absolute left-4 top-1/2 -translate-y-1/2 text-outline text-lg transition-colors group-focus-within:text-primary">
-                    lock
-                  </span>
+                  <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
                   <input
                     id="password"
                     name="password"
@@ -145,9 +142,7 @@ export default function LoginPage() {
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
-                    <span className="material-symbols-outlined text-lg">
-                      {showPassword ? "visibility_off" : "visibility"}
-                    </span>
+                    {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
                   </button>
                 </div>
                 {fieldErrors.password && (

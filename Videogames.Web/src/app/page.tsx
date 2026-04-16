@@ -6,6 +6,7 @@ import { Videogame } from "../domain/models/Videogame";
 import { VideogameService } from "../infrastructure/services/VideogameService";
 import { useAuth } from "../context/AuthContext";
 import VideogameCard from "../components/VideogameCard";
+import { ArchiveBoxIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 import { CATEGORIES } from "../constants/categories";
 
@@ -118,7 +119,7 @@ export default function Home() {
               className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all"
             >
               Explore Collection
-              <span className="material-symbols-outlined">arrow_forward</span>
+              <ArrowRightIcon className="h-5 w-5" />
             </Link>
           </div>
         </div>
@@ -152,7 +153,7 @@ export default function Home() {
                   {cat.name}
                 </h3>
                 <p className="text-xs text-primary font-bold mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Explore <span className="material-symbols-outlined text-xs leading-none">arrow_forward</span>
+                  Explore <ArrowRightIcon className="h-3 w-3" />
                 </p>
               </div>
             </Link>
@@ -174,7 +175,7 @@ export default function Home() {
           </div>
         ) : videogames.length === 0 ? (
           <div className="py-20 text-center bg-surface-container-low rounded-2xl" role="status">
-            <span className="material-symbols-outlined text-5xl text-outline mb-4 block">inventory_2</span>
+            <ArchiveBoxIcon className="mx-auto mb-4 h-12 w-12 text-outline" />
             <p className="text-on-surface-variant mb-4">No videogames listed yet. Be the first to publish one.</p>
             <Link
               href="/create"

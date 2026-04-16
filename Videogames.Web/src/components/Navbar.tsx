@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { MagnifyingGlassIcon, ShoppingCartIcon, UserCircleIcon } from "@heroicons/react/24/outline";
 import { useAuth } from "../context/AuthContext";
 
 export default function Navbar() {
@@ -32,7 +33,7 @@ export default function Navbar() {
 
           <div className="flex-1 max-w-md mx-8 hidden lg:block">
             <div className="relative flex items-center">
-              <span className="material-symbols-outlined absolute left-3 text-on-surface-variant">search</span>
+              <MagnifyingGlassIcon className="absolute left-3 h-5 w-5 text-on-surface-variant" />
               <input
                 className="w-full bg-surface-container-highest border-none rounded-xl py-2 pl-10 pr-4 text-sm focus:ring-1 focus:ring-primary placeholder:text-on-surface-variant/60 outline-none"
                 placeholder="Search games, consoles, accessories..."
@@ -100,9 +101,9 @@ export default function Navbar() {
             </Link>
 
             <div className="flex items-center gap-3 text-on-surface-variant">
-              <span className="material-symbols-outlined hover:text-on-surface cursor-pointer">shopping_cart</span>
+              <ShoppingCartIcon className="h-6 w-6 hover:text-on-surface cursor-pointer" aria-label="Shopping cart" />
               <Link href={isAuthenticated ? "/profile" : "/login"} aria-label="Account">
-                <span className="material-symbols-outlined hover:text-on-surface cursor-pointer text-[26px]">account_circle</span>
+                <UserCircleIcon className="h-7 w-7 hover:text-on-surface cursor-pointer" aria-hidden="true" />
               </Link>
             </div>
           </div>
