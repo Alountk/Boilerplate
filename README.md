@@ -214,6 +214,19 @@ This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
 
+### 2026-04-21: Presigned Upload Rollout (Phase 1) + API Coverage
+- **Presigned Upload Endpoint**: Added `POST /api/Images/presigned-upload` for private, short-lived upload URLs in the Images API flow.
+- **Safe Fallback Kept**: Frontend upload now tries presigned first and automatically falls back to legacy multipart `POST /api/Images/upload` if unavailable/failing, preserving compatibility during rollout.
+- **Input Hardening**: Added server/client-side constraints for image upload flow (allowed MIME set and max file size policy in create flow).
+- **Create Flow Resilience**: Replaced all-or-nothing upload behavior with partial success handling (`Promise.allSettled`) so one failed image no longer blocks the whole batch.
+- **API Test Coverage Added**: New controller tests for `ImagesController` now cover:
+   - valid `presigned-upload` request (`200`),
+   - validation/service argument failures (`400`),
+   - legacy upload size guard (`400`),
+   - legacy successful upload response (`200`),
+   - image retrieval redirect behavior.
+- **Regression Status**: Backend suite remains green after this phase (`44/44` tests passing).
+
 ### 2026-04-15: Social Login Gating & Cover Fallback System (PR #15, PR #16)
 - **Social Login Buttons Disabled**: Removed `useGoogleLogin`, `loginWithApple`, and `oauthLoading` from `login/page.tsx` and `register/page.tsx`. Buttons rendered as `disabled` / `FEATURE-PENDING`. Underlying OAuth service and token exchange logic are intact—re-enabling requires only restoring the handlers once provider credentials exist.
 - **`VideogameCover` Component**: New component with a three-tier priority chain — uploaded images → `urlImg` → text-based placeholder. Renders the first non-errored source; on full exhaustion shows a styled block with the game title that adapts to any container.

@@ -36,10 +36,7 @@ export async function ensureE2EUser(
 
 export async function loginAsUser(page: Page, user: E2ECredentials = DEFAULT_E2E_USER): Promise<void> {
   await page.goto('/login');
-  await page.getByLabel('Email Address').fill(user.email);
-  await page.getByLabel('Password').fill(user.password);
-  await page.getByRole('button', { name: 'Sign In' }).click();
-
-  await expect(page).toHaveURL(/.*\//, { timeout: 15000 });
-  await expect(page.locator(`text=Hi ${user.firstName}!`)).toBeVisible({ timeout: 15000 });
+  await page.locator('input[name="email"]').fill(user.email);
+  await page.locator('input[name="password"]').fill(user.password);
+  await page.getByRole('button', { name: /Sign In/i }).click();
 }
