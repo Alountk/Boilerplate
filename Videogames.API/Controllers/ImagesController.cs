@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
+using Videogames.Application.DTOs;
 using Videogames.Application.Services;
 
 namespace Videogames.API.Controllers;
@@ -9,6 +10,8 @@ namespace Videogames.API.Controllers;
 [Authorize]
 public class ImagesController : ControllerBase
 {
+    private const long MaxUploadSizeBytes = 5 * 1024 * 1024;
+
     private readonly IImageService _imageService;
     private readonly ILogger<ImagesController> _logger;
 
@@ -16,6 +19,35 @@ public class ImagesController : ControllerBase
     {
         _imageService = imageService;
         _logger = logger;
+    }
+
+    [HttpPost("presigned-upload")]
+    public async Task<IActionResult> CreatePresignedUpload([FromBody] CreatePresignedUploadRequestDto request)
+    {
+        if (request is null)
+        {
+            return BadRequest("Request body is required.");
+        }
+
+        if (!ModelState.IsValid)
+        {
+            return ValidationProblem(ModelState);
+        }
+
+        try
+        {
+            var result = await _imageService.CreatePresignedUploadAsync(request.ContentType, request.SizeBytes);
+            return Ok(result);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error creating presigned upload URL");
+            return StatusCode(500, "Internal server error during presigned upload URL generation.");
+        }
     }
 
     [HttpPost("upload")]
@@ -27,6 +59,11 @@ public class ImagesController : ControllerBase
             return BadRequest("No file uploaded.");
         }
 
+        if (file.Length > MaxUploadSizeBytes)
+        {
+            return BadRequest($"File size exceeds allowed limit of {MaxUploadSizeBytes} bytes.");
+        }
+
         try
         {
             _logger.LogInformation("Uploading image: {FileName}, ContentType: {ContentType}", file.FileName, file.ContentType);
@@ -35,6 +72,10 @@ public class ImagesController : ControllerBase
             var fileName = await _imageService.UploadImageAsync(stream, file.ContentType);
 
             return Ok(new { fileName });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {

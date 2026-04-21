@@ -18,8 +18,17 @@ import {
 import { scrollToFirstError, getInputClassNames } from "../../utils/formUtils";
 import { RAWGService } from "../../infrastructure/services/RAWGService";
 import { RAWGGame } from "../../domain/ports/IRAWGService";
+import { resolveVideogameImageSrc } from "../../utils/videogameImages";
 
 import { useAuth } from "../../context/AuthContext";
+
+const MAX_UPLOAD_BYTES = 5 * 1024 * 1024;
+const ALLOWED_IMAGE_TYPES = new Set([
+  "image/jpeg",
+  "image/png",
+  "image/gif",
+  "image/webp",
+]);
 
 function FieldFeedback({ message }: { message?: string }) {
   if (!message) return null;
@@ -82,13 +91,22 @@ export default function CreateVideogamePage() {
   const [searchResults, setSearchResults] = useState<RAWGGame[]>([]);
   const [showSearch, setShowSearch] = useState(false);
 
-  const getImageUrl = (filename: string) => {
-    // We must use the full filename (with extension) because that's how it's stored in S3.
-    // The backend proxy endpoint /api/Images/{fileName} will stream the image content.
-    const baseUrl =
-      process.env.NEXT_PUBLIC_API_URL || "http://localhost:5017/api";
-    return `${baseUrl}/Images/${filename}`;
+  const validateImageFile = (file: File): string | null => {
+    if (!ALLOWED_IMAGE_TYPES.has(file.type)) {
+      return `Unsupported image type: ${file.type || "unknown"}.`;
+    }
+
+    if (file.size <= 0) {
+      return "Image file is empty.";
+    }
+
+    if (file.size > MAX_UPLOAD_BYTES) {
+      return `Image ${file.name} exceeds 5MB.`;
+    }
+
+    return null;
   };
+
   const [uploadingStates, setUploadingStates] = useState<
     Record<string, boolean>
   >({});
@@ -284,24 +302,53 @@ export default function CreateVideogamePage() {
     const files = e.target.files;
     if (!files || files.length === 0) return;
 
-    console.log({files})
+    const selectedFiles = Array.from(files);
+    const invalidErrors: string[] = [];
+    const validFiles = selectedFiles.filter((file) => {
+      const error = validateImageFile(file);
+      if (error) {
+        invalidErrors.push(error);
+        return false;
+      }
+
+      return true;
+    });
+
+    if (validFiles.length === 0) {
+      alert(invalidErrors.join("\n") || "No valid images selected.");
+      return;
+    }
+
     setUploading(true);
     try {
-      console.log({files})
-      const uploadPromises = Array.from(files).map((file) =>
-        imageService.uploadImage(file)
+      const uploadResults = await Promise.allSettled(
+        validFiles.map((file) => imageService.uploadImage(file))
       );
-      const fileNames = await Promise.all(uploadPromises);
 
-      setImages((prev) => [...prev, ...fileNames]);
-      // Set first image as urlImg for backward compatibility
-      if (images.length === 0 && fileNames.length > 0) {
-        setFormData((prev) => ({ ...prev, urlImg: fileNames[0] }));
+      const uploadedFileNames = uploadResults
+        .filter((result): result is PromiseFulfilledResult<string> => result.status === "fulfilled")
+        .map((result) => result.value);
+
+      const uploadErrors = uploadResults
+        .filter((result): result is PromiseRejectedResult => result.status === "rejected")
+        .map((result) => String(result.reason));
+
+      if (uploadedFileNames.length > 0) {
+        setImages((prev) => [...prev, ...uploadedFileNames]);
+        setFormData((prev) => ({
+          ...prev,
+          urlImg: prev.urlImg || uploadedFileNames[0],
+        }));
       }
 
       // MVP: OCR on first uploaded image to infer game title and autofill via RAWG.
-      if (formData.englishName.trim().length === 0 && files[0]) {
-        void runOcrAutofillFromImage(files[0]);
+      if (formData.englishName.trim().length === 0 && validFiles[0]) {
+        void runOcrAutofillFromImage(validFiles[0]);
+      }
+
+      const allErrors = [...invalidErrors, ...uploadErrors];
+      if (allErrors.length > 0) {
+        alert(`Some images failed to upload:\n${allErrors.join("\n")}`);
       }
     } catch (error) {
       console.error("Image upload failed", error);
@@ -339,6 +386,12 @@ export default function CreateVideogamePage() {
   };
 
   const handleSideImageUpload = async (side: string, file: File) => {
+    const validationError = validateImageFile(file);
+    if (validationError) {
+      alert(validationError);
+      return;
+    }
+
     setUploadingStates((prev) => ({ ...prev, [side]: true }));
     try {
       const fileName = await imageService.uploadImage(file);
@@ -520,7 +573,7 @@ export default function CreateVideogamePage() {
                       >
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                          src={getImageUrl(img)}
+                          src={resolveVideogameImageSrc(img) ?? ""}
                           alt={`Preview ${index + 1}`}
                           className="w-full h-full object-cover"
                           onError={(e) => {
@@ -957,7 +1010,7 @@ export default function CreateVideogamePage() {
                         <div className="mb-2">
                           {/* eslint-disable-next-line @next/next/no-img-element */}
                           <img
-                            src={getImageUrl(contents[0][side as keyof typeof contents[0]] as string)}
+                            src={resolveVideogameImageSrc(contents[0][side as keyof typeof contents[0]] as string) ?? ""}
                             alt={`${sideLabel} preview`}
                             className="w-full h-24 object-cover rounded border border-outline-variant/30"
                             onError={(e) => {
