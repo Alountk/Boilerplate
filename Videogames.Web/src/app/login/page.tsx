@@ -223,7 +223,7 @@ export default function LoginPage() {
             <img
               alt="Gaming desk artwork"
               className="w-full h-full object-cover mix-blend-overlay opacity-30"
-              src="https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1200&q=80"
+              src="/assets/backgrounds/login-gaming-desk.jpg"
             />
           </div>
         </div>
