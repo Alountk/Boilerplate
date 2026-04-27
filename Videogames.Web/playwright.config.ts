@@ -43,7 +43,11 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run dev',
-      url: 'http://localhost:3000',
+      url: 'http://[::1]:3000',
+      env: {
+        ...process.env,
+        NEXT_PUBLIC_API_URL: 'http://localhost:5017/api',
+      },
       reuseExistingServer: !process.env.CI,
       stdout: 'pipe',
       stderr: 'pipe',
@@ -51,7 +55,7 @@ export default defineConfig({
     },
     {
       command: 'dotnet run --project ../Videogames.API/Videogames.API.csproj --urls http://localhost:5017',
-      url: 'http://localhost:5017/swagger/index.html',
+      url: 'http://localhost:5017/api/Videogames',
       reuseExistingServer: !process.env.CI,
       stdout: 'pipe',
       stderr: 'pipe',
