@@ -57,6 +57,20 @@ public class MinioStorageAdapter : IStoragePort
         return fileName;
     }
 
+    public Task<string> GetUploadFileUrlAsync(string fileName, string contentType, DateTime expiresAtUtc)
+    {
+        var request = new GetPreSignedUrlRequest
+        {
+            BucketName = _settings.BucketName,
+            Key = fileName,
+            Verb = HttpVerb.PUT,
+            ContentType = contentType,
+            Expires = expiresAtUtc
+        };
+
+        return Task.FromResult(_s3Client.GetPreSignedURL(request));
+    }
+
     public async Task<Stream> GetFileAsync(string fileName)
     {
         var request = new Amazon.S3.Model.GetObjectRequest

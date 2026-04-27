@@ -93,7 +93,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="https://images.unsplash.com/photo-1542751371-adc38448a05e?auto=format&fit=crop&w=2000&q=80"
+            src="/assets/backgrounds/home-hero-gaming.jpg"
             alt="Neon gaming setup with monitors and controller"
             className="w-full h-full object-cover opacity-30 grayscale"
           />

@@ -22,6 +22,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Videogames.Domain\Videogames.Domain.csproj" />
     <ProjectReference Include="..\Videogames.Application\Videogames.Application.csproj" />
+    <ProjectReference Include="..\Videogames.API\Videogames.API.csproj" />
   </ItemGroup>
 
 </Project>

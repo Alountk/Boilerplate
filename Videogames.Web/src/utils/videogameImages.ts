@@ -1,4 +1,4 @@
-import { API_BASE_URL } from "../constants/config";
+import { API_BASE_URL, IMAGE_BASE_URL } from "../constants/config";
 
 const HTTP_URL_REGEX = /^https?:\/\//i;
 
@@ -13,6 +13,13 @@ export function resolveVideogameImageSrc(value?: string | null): string | null {
 
   if (isExternalImageUrl(trimmed)) return trimmed;
   if (trimmed.startsWith("/")) return trimmed;
+
+  if (IMAGE_BASE_URL) {
+    const normalizedBaseUrl = IMAGE_BASE_URL.endsWith("/")
+      ? IMAGE_BASE_URL.slice(0, -1)
+      : IMAGE_BASE_URL;
+    return `${normalizedBaseUrl}/${trimmed}`;
+  }
 
   return `${API_BASE_URL}/Images/${trimmed}`;
 }
