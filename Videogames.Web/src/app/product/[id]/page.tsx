@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, use } from "react";
+import { useEffect, useState, use, useMemo } from "react";
 import { Videogame } from "../../../domain/models/Videogame";
 import { VideogameService } from "../../../infrastructure/services/VideogameService";
 import { ChatService } from "../../../infrastructure/services/ChatService";
@@ -30,8 +30,8 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
   const { isAuthenticated } = useAuth();
   const router = useRouter();
   
-  const videogameService = new VideogameService();
-  const chatService = new ChatService();
+  const videogameService = useMemo(() => new VideogameService(), []);
+  const chatService = useMemo(() => new ChatService(), []);
 
   useEffect(() => {
     videogameService.getById(id).then((data) => {
@@ -41,7 +41,7 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
       console.error(err);
       setLoading(false);
     });
-  }, [id]);
+  }, [id, videogameService]);
 
   const handleContactSeller = async () => {
     if (!isAuthenticated) {
