@@ -32,7 +32,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
   const activeConvIdRef = useRef<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
 
   // Keep ref in sync so SignalR handlers always see the latest value
   useEffect(() => {
