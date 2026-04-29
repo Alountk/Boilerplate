@@ -6,6 +6,7 @@ import { Message, Conversation } from "../domain/models/Chat";
 import { useAuth } from "./AuthContext";
 import { HUB_URL } from "../constants/config";
 import { ChatService } from "../infrastructure/services/ChatService";
+import { TokenService } from "../infrastructure/services/TokenService";
 
 interface ChatContextType {
   connection: signalR.HubConnection | null;
@@ -60,7 +61,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     const newConnection = new signalR.HubConnectionBuilder()
       .withUrl(HUB_URL, {
-        accessTokenFactory: () => localStorage.getItem("token") || "",
+        accessTokenFactory: () => TokenService.getToken() ?? "",
       })
       .withAutomaticReconnect()
       .build();

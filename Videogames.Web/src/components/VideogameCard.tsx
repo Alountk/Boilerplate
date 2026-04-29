@@ -20,10 +20,10 @@ export default function VideogameCard({
   return (
     <Link 
       href={`/product/${videogame.id}`}
-      className="bg-white dark:bg-slate-900 rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 transition-colors group flex flex-col h-full"
+      className="bg-surface-container rounded-xl overflow-hidden border border-outline-variant/20 hover:border-primary/40 transition-colors group flex flex-col h-full"
     >
       {/* Image Container */}
-      <div className="relative aspect-square overflow-hidden bg-slate-100 dark:bg-slate-950">
+      <div className="relative aspect-square overflow-hidden bg-surface-container-lowest">
         <VideogameCover
           title={videogame.englishName}
           images={videogame.images}
@@ -34,12 +34,12 @@ export default function VideogameCard({
         <button
           type="button"
           aria-label={`Add ${videogame.englishName} to favorites`}
-          className="absolute top-2 right-2 p-1.5 bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-full text-slate-600 dark:text-slate-300 hover:text-red-500 transition-colors"
+          className="absolute top-2 right-2 min-w-11 min-h-11 flex items-center justify-center bg-surface-container/80 backdrop-blur-sm rounded-full text-on-surface-variant hover:text-error transition-colors"
         >
           <HeartIcon className="h-5 w-5" />
         </button>
         {videogame.state === 0 && (
-          <span className="absolute top-2 left-2 px-2 py-0.5 bg-emerald-600 text-white text-[10px] font-semibold uppercase rounded">
+          <span className="absolute top-2 left-2 px-2 py-0.5 bg-tertiary-container text-on-tertiary-container text-xs font-semibold uppercase rounded">
             Sealed
           </span>
         )}
@@ -47,38 +47,38 @@ export default function VideogameCard({
 
       {/* Content */}
       <div className="p-3 flex flex-col flex-1">
-        <h3 className="text-sm font-medium text-slate-900 dark:text-slate-100 line-clamp-2 min-h-10 mb-1 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors">
+        <h3 className="text-sm font-medium text-on-surface line-clamp-2 min-h-10 mb-1 group-hover:text-on-surface-variant transition-colors">
           {videogame.englishName}
         </h3>
 
         <div className="flex items-center gap-1 mb-2">
           <StarIcon className="h-3 w-3 text-yellow-500" />
-          <span className="text-xs font-semibold text-slate-700 dark:text-slate-300">
+          <span className="text-xs font-semibold text-on-surface">
             {videogame.score.toFixed(1)}
           </span>
-          <span className="text-xs text-slate-500 dark:text-slate-400">
+          <span className="text-xs text-on-surface-variant">
             • {videogame.console}
           </span>
         </div>
 
         <div className="mt-auto">
           <div className="flex items-baseline gap-1">
-            <span className="text-lg font-bold text-slate-900 dark:text-slate-100">
+            <span className="text-lg font-bold text-on-surface">
               ${videogame.ownPrice.toFixed(2)}
             </span>
             {videogame.averagePrice > videogame.ownPrice && (
-              <span className="text-xs text-slate-500 line-through">
+              <span className="text-xs text-outline line-through">
                 ${videogame.averagePrice.toFixed(2)}
               </span>
             )}
           </div>
 
-          <div className="flex items-center justify-between mt-2 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <div className="flex items-center justify-between mt-2 pt-2 border-t border-outline-variant/20">
             <span
-              className={`text-[10px] font-semibold px-1.5 py-0.5 rounded uppercase ${
+              className={`text-xs font-semibold px-2 py-0.5 rounded uppercase ${
                 isGoodCondition
-                  ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-300"
-                  : "bg-slate-100 text-slate-600 dark:bg-slate-800 dark:text-slate-300"
+                  ? "bg-tertiary-container/30 text-on-tertiary-container"
+                  : "bg-surface-container-high text-on-surface-variant"
               }`}
             >
               Condition: {videogame.generalState}/10
@@ -90,7 +90,7 @@ export default function VideogameCard({
                   e.preventDefault();
                   onDelete(videogame.id);
                 }}
-                className="p-1.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-md transition-colors"
+                className="min-w-11 min-h-11 flex items-center justify-center text-error hover:bg-error/10 rounded-md transition-colors"
                 title="Delete listing"
                 aria-label={`Delete listing ${videogame.englishName}`}
               >

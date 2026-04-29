@@ -6,13 +6,14 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
   EnvelopeIcon,
-  ExclamationCircleIcon,
   HomeIcon,
   IdentificationIcon,
   LockClosedIcon,
   UserIcon,
 } from "@heroicons/react/24/outline";
 import { scrollToFirstError } from "../../utils/formUtils";
+import { useFormState } from "../../hooks/useFormState";
+import { FieldFeedback } from "../../components/FieldFeedback";
 
 type RegisterForm = {
   firstName: string;
@@ -25,7 +26,9 @@ type RegisterForm = {
   phone: string;
 };
 
-const initialForm: RegisterForm = {
+type FieldKey = keyof RegisterForm;
+
+const initialValues: RegisterForm = {
   firstName: "",
   lastName: "",
   email: "",
@@ -35,8 +38,6 @@ const initialForm: RegisterForm = {
   country: "",
   phone: "",
 };
-
-type FieldKey = keyof RegisterForm;
 
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
@@ -68,108 +69,64 @@ function validateRegisterForm(values: RegisterForm): Partial<Record<FieldKey, st
   return next;
 }
 
-function FieldFeedback({
-  id,
-  message,
-}: {
-  id: string;
-  message?: string;
-}) {
-  if (!message) return null;
-  return (
-    <p id={id} role="alert" className="mt-1 text-xs text-error px-1 flex items-center gap-1">
-      <ExclamationCircleIcon className="h-3.5 w-3.5" />
-      <span>{message}</span>
-    </p>
-  );
-}
-
-
 export default function RegisterPage() {
-  const [formData, setFormData] = useState<RegisterForm>(initialForm);
-  const [errors, setErrors] = useState<Partial<Record<FieldKey, string>>>({});
-  const [touched, setTouched] = useState<Partial<Record<FieldKey, boolean>>>({});
-  const [submitAttempted, setSubmitAttempted] = useState(false);
-
   const { register } = useAuth();
   const router = useRouter();
-  const [error, setError] = useState("");
+  const [serverError, setServerError] = useState("");
 
-  const showFieldError = useCallback(
-    (key: FieldKey) => {
-      if (errors[key] && (touched[key] || submitAttempted)) return errors[key];
-      return undefined;
+  const validate = useCallback((form: RegisterForm) => validateRegisterForm(form), []);
+
+  const {
+    values,
+    showFieldError,
+    handleChange: formHandleChange,
+    handleBlur,
+    submitAttempted,
+    setSubmitAttempted,
+    setErrors,
+    runValidation,
+  } = useFormState<RegisterForm>({ initialValues, validate });
+
+  // Wrapper: clear server error on any field change
+  const handleChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      formHandleChange(e);
+      setServerError("");
     },
-    [errors, touched, submitAttempted]
+    [formHandleChange]
   );
 
-  const runValidation = useCallback((values: RegisterForm) => {
-    return validateRegisterForm(values);
-  }, []);
-
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    const key = name as FieldKey;
-    setFormData((prev) => {
-      const draft = { ...prev, [name]: value } as RegisterForm;
-      const fieldErrors = runValidation(draft);
-      setErrors((prevErr) => {
-        const next = { ...prevErr };
-        if (fieldErrors[key]) next[key] = fieldErrors[key];
-        else delete next[key];
-        return next;
-      });
-      return draft;
-    });
-    setError("");
-    setTouched((prev) => ({ ...prev, [key]: true }));
-  };
-
-  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
-    const name = e.target.name as FieldKey;
-    setTouched((prev) => ({ ...prev, [name]: true }));
-    const fieldErrors = runValidation(formData);
-    setErrors((prev) => ({ ...prev, [name]: fieldErrors[name] }));
-  };
-
   const missingRequiredCount = useMemo(() => {
-    const v = runValidation(formData);
+    const v = runValidation(values);
     const keys: FieldKey[] = ["firstName", "lastName", "email", "password"];
     return keys.filter((k) => v[k]).length;
-  }, [formData, runValidation]);
+  }, [runValidation, values]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitAttempted(true);
-    const fieldErrors = runValidation(formData);
+    const fieldErrors = runValidation();
     setErrors(fieldErrors);
-    const blocking = ["firstName", "lastName", "email", "password"] as const;
-    if (blocking.some((k) => fieldErrors[k])) {
-      setError("");
-      scrollToFirstError();
-      return;
-    }
-    if (Object.keys(fieldErrors).length > 0) {
-      setError("");
+    const blocking: FieldKey[] = ["firstName", "lastName", "email", "password"];
+    if (blocking.some((k) => fieldErrors[k]) || Object.keys(fieldErrors).length > 0) {
       scrollToFirstError();
       return;
     }
 
     try {
       await register({
-        ...formData,
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        email: formData.email.trim(),
-        password: formData.password,
-        address: formData.address.trim(),
-        city: formData.city.trim(),
-        country: formData.country.trim(),
-        phone: formData.phone.trim(),
+        ...values,
+        firstName: values.firstName.trim(),
+        lastName: values.lastName.trim(),
+        email: values.email.trim(),
+        address: values.address.trim(),
+        city: values.city.trim(),
+        country: values.country.trim(),
+        phone: values.phone.trim(),
       });
       router.push("/");
     } catch (err: unknown) {
-      setError("Registration failed. Please try again.");
+      setServerError("Registration failed. Please try again.");
       console.error(err);
     }
   };
@@ -177,7 +134,7 @@ export default function RegisterPage() {
   return (
     <div className="min-h-screen bg-surface text-on-surface flex flex-col md:flex-row">
       {/* Left panel — immersive visual */}
-      <section className="hidden md:flex md:w-5/12 lg:w-1/2 bg-surface-container-lowest relative overflow-hidden flex-col justify-between p-12">
+      <section className="hidden md:flex md:w-5/12 lg:w-1/2 bg-surface-container-lowest relative overflow-hidden flex-col justify-between p-12" aria-hidden="true">
         <div className="absolute inset-0 z-0">
           <div className="absolute inset-0 bg-linear-to-br from-primary-container/20 via-surface-container-lowest to-surface-container" />
           <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary-container/15 blur-[120px]" />
@@ -214,17 +171,17 @@ export default function RegisterPage() {
 
         <div className="w-full max-w-lg">
           <header className="mb-10">
-            <h3 className="text-3xl font-bold tracking-tight text-on-surface mb-2">
+            <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">
               Create your account
-            </h3>
+            </h2>
             <p className="text-on-surface-variant text-sm">
               Create your profile to buy, sell and chat with other gamers.
             </p>
           </header>
 
-          {error && (
+          {serverError && (
             <div className="mb-6 rounded-md bg-error-container/30 border border-error/30 px-4 py-3 text-sm text-error" role="alert">
-              {error}
+              {serverError}
             </div>
           )}
           {submitAttempted && missingRequiredCount > 0 && (
@@ -235,51 +192,49 @@ export default function RegisterPage() {
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
             {/* — Account fields — */}
-            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">
-              Account
-            </p>
+            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">Account</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="firstName">
-                  First Name <span className="text-error">*</span>
+                  First Name <span className="text-error" aria-hidden="true">*</span>
                 </label>
                 <div className="relative group">
-                  <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
-                  <input id="firstName" name="firstName" value={formData.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="John" />
+                  <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                  <input id="firstName" name="firstName" value={values.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-required="true" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="John" />
                 </div>
                 <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
               </div>
               <div className="space-y-1">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="lastName">
-                  Last Name <span className="text-error">*</span>
+                  Last Name <span className="text-error" aria-hidden="true">*</span>
                 </label>
                 <div className="relative group">
-                  <IdentificationIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
-                  <input id="lastName" name="lastName" value={formData.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Doe" />
+                  <IdentificationIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                  <input id="lastName" name="lastName" value={values.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-required="true" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Doe" />
                 </div>
                 <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
               </div>
             </div>
             <div className="space-y-1">
               <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="email">
-                Email Address <span className="text-error">*</span>
+                Email Address <span className="text-error" aria-hidden="true">*</span>
               </label>
               <div className="relative group">
-                <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
-                <input id="email" name="email" type="email" inputMode="email" value={formData.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="curator@nocturnalarchive.com" />
+                <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <input id="email" name="email" type="email" inputMode="email" value={values.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-required="true" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="curator@nocturnalarchive.com" />
               </div>
               <FieldFeedback id="err-email" message={showFieldError("email")} />
             </div>
             <div className="space-y-1">
               <div className="flex justify-between items-end">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant" htmlFor="password">
-                  Password <span className="text-error">*</span>
+                  Password <span className="text-error" aria-hidden="true">*</span>
                 </label>
-                <span className="text-[0.625rem] text-outline italic">Min. 8 characters</span>
+                <span className="text-[0.625rem] text-outline italic" id="password-hint">Min. 8 characters</span>
               </div>
               <div className="relative group">
-                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
-                <input id="password" name="password" type="password" value={formData.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
+                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <input id="password" name="password" type="password" value={values.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-required="true" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
               </div>
               <FieldFeedback id="err-password" message={showFieldError("password")} />
             </div>
@@ -291,58 +246,46 @@ export default function RegisterPage() {
             <div className="space-y-1">
               <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="address">Address</label>
               <div className="relative group">
-                <HomeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" />
-                <input id="address" name="address" value={formData.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Street, number" />
+                <HomeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <input id="address" name="address" value={values.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Street, number" />
               </div>
               <FieldFeedback id="err-address" message={showFieldError("address")} />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="city">City</label>
-                <input id="city" name="city" value={formData.city} onChange={handleChange} onBlur={handleBlur} autoComplete="address-level2" aria-invalid={!!showFieldError("city")} aria-describedby={showFieldError("city") ? "err-city" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="City" />
+                <input id="city" name="city" value={values.city} onChange={handleChange} onBlur={handleBlur} autoComplete="address-level2" aria-invalid={!!showFieldError("city")} aria-describedby={showFieldError("city") ? "err-city" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="City" />
                 <FieldFeedback id="err-city" message={showFieldError("city")} />
               </div>
               <div className="space-y-1">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="country">Country</label>
-                <input id="country" name="country" value={formData.country} onChange={handleChange} onBlur={handleBlur} autoComplete="country-name" aria-invalid={!!showFieldError("country")} aria-describedby={showFieldError("country") ? "err-country" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Country" />
+                <input id="country" name="country" value={values.country} onChange={handleChange} onBlur={handleBlur} autoComplete="country-name" aria-invalid={!!showFieldError("country")} aria-describedby={showFieldError("country") ? "err-country" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Country" />
                 <FieldFeedback id="err-country" message={showFieldError("country")} />
               </div>
               <div className="space-y-1">
                 <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="phone">Phone</label>
-                <input id="phone" name="phone" type="tel" inputMode="tel" value={formData.phone} onChange={handleChange} onBlur={handleBlur} autoComplete="tel" aria-invalid={!!showFieldError("phone")} aria-describedby={showFieldError("phone") ? "err-phone" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="+1 …" />
+                <input id="phone" name="phone" type="tel" inputMode="tel" value={values.phone} onChange={handleChange} onBlur={handleBlur} autoComplete="tel" aria-invalid={!!showFieldError("phone")} aria-describedby={showFieldError("phone") ? "err-phone" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="+1 …" />
                 <FieldFeedback id="err-phone" message={showFieldError("phone")} />
               </div>
             </div>
 
             {/* CTA */}
-            <button
-              type="submit"
-              className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:opacity-90 active:scale-[0.98] transition-all mt-2"
-            >
+            <button type="submit" className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:opacity-90 active:scale-[0.98] transition-all mt-2">
               Create Account
             </button>
 
             {/* Social / alternative (FEATURE-PENDING) */}
             <div className="mt-8">
-              <div className="flex items-center gap-4 mb-6">
+              <div className="flex items-center gap-4 mb-6" aria-hidden="true">
                 <div className="h-px flex-1 bg-surface-container-highest" />
                 <span className="text-[10px] uppercase tracking-widest font-bold text-outline">Alternative Entry</span>
                 <div className="h-px flex-1 bg-surface-container-highest" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed"
-                >
+                <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">
                   Google
                 </button>
-                <button
-                  type="button"
-                  disabled
-                  className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-30 cursor-not-allowed"
-                  title="GitHub sign-in coming soon"
-                >
+                <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-30 cursor-not-allowed">
                   GitHub
                 </button>
               </div>

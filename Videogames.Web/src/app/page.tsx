@@ -125,8 +125,7 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ─── Categories ───────────────────────────────── */}
-      {/* ─── Categories ───────────────────────────────── */}
+      {/* ─── Categories — Bento Grid ──────────────────── */}
       <section className="px-8 md:px-12 py-20 max-w-[1440px] mx-auto">
         <div className="flex justify-between items-end mb-10">
           <div>
@@ -134,30 +133,52 @@ export default function Home() {
             <p className="text-on-surface-variant mt-2">Find games by console</p>
           </div>
         </div>
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
-          {CATEGORIES.map((cat) => (
-            <Link
-              key={cat.id}
-              href={`/category/${cat.id}`}
-              className="group relative rounded-2xl overflow-hidden aspect-3/4 bg-surface-container block"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={cat.img}
-                alt={cat.name}
-                className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale transition-all duration-500 group-hover:opacity-80 group-hover:grayscale-0 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/40 to-transparent" />
-              <div className="absolute inset-x-0 bottom-0 p-5">
-                <h3 className="text-base font-black uppercase tracking-widest text-on-surface leading-tight">
-                  {cat.name}
-                </h3>
-                <p className="text-xs text-primary font-bold mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                  Explore <ArrowRightIcon className="h-3 w-3" />
-                </p>
-              </div>
-            </Link>
-          ))}
+        {/*
+          Bento layout (lg+): 5 cols × 2 rows, fixed height
+          ┌────────────────┬────────┬────────────────┐
+          │  PlayStation   │  Xbox  │    Nintendo    │
+          │  (2col×2row)   │(1×2row)│  (2col×1row)  │
+          │                │        ├────────┬───────┤
+          │                │        │   PC   │ Retro │
+          └────────────────┴────────┴────────┴───────┘
+          Mobile/tablet: regular 2- or 3-column grid with aspect ratio.
+        */}
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 lg:grid-rows-2 gap-4 lg:h-[520px]">
+          {CATEGORIES.map((cat, idx) => {
+            const bentoSpan = [
+              "lg:col-span-2 lg:row-span-2",
+              "lg:col-span-1 lg:row-span-2",
+              "lg:col-span-2 lg:row-span-1",
+              "lg:col-span-1 lg:row-span-1",
+              "lg:col-span-1 lg:row-span-1",
+            ][idx] ?? "";
+            const isFeatured = idx === 0;
+            return (
+              <Link
+                key={cat.id}
+                href={`/category/${cat.id}`}
+                className={`group relative rounded-2xl overflow-hidden bg-surface-container block aspect-3/4 lg:aspect-auto ${bentoSpan}`}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  src={cat.img}
+                  alt={cat.name}
+                  className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale transition-all duration-500 group-hover:opacity-80 group-hover:grayscale-0 group-hover:scale-105"
+                />
+                <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/40 to-transparent" />
+                {/* Glass border on hover */}
+                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/0 group-hover:ring-white/10 transition-all duration-300" aria-hidden="true" />
+                <div className={`absolute inset-x-0 bottom-0 ${isFeatured ? "p-8" : "p-5"}`}>
+                  <h3 className={`font-black uppercase tracking-widest text-on-surface leading-tight ${isFeatured ? "text-xl" : "text-base"}`}>
+                    {cat.name}
+                  </h3>
+                  <p className="text-xs text-primary font-bold mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    Explore <ArrowRightIcon className="h-3 w-3" aria-hidden="true" />
+                  </p>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </section>
 

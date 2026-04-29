@@ -9,7 +9,7 @@ export default function Navbar() {
   const appVersion = process.env.NEXT_PUBLIC_APP_VERSION?.trim();
 
   return (
-    <header className="w-full top-0 sticky z-50 bg-surface-container-low shadow-none">
+    <header className="w-full top-0 sticky z-50 glass-surface glass-border border-x-0 border-t-0">
       <div className="w-full max-w-[1440px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
         <div className="flex items-center justify-between gap-4">
           <div className="flex items-center gap-6 min-w-0">
@@ -19,15 +19,19 @@ export default function Navbar() {
             >
               vMarket
             </Link>
-            <nav className="hidden md:flex items-center gap-6">
+            <nav aria-label="Main navigation" className="hidden md:flex items-center gap-6">
               <Link
                 href="/"
                 className="text-primary font-bold border-b-2 border-primary-container pb-1 hover:text-on-surface transition-colors duration-200"
               >
                 Explore
               </Link>
-              <span className="text-on-surface-variant">Consoles</span>
-              <span className="text-on-surface-variant">Deals</span>
+              <button type="button" className="text-on-surface-variant hover:text-on-surface transition-colors cursor-not-allowed opacity-60" aria-disabled="true" title="Coming soon">
+                Consoles
+              </button>
+              <button type="button" className="text-on-surface-variant hover:text-on-surface transition-colors cursor-not-allowed opacity-60" aria-disabled="true" title="Coming soon">
+                Deals
+              </button>
             </nav>
           </div>
 
