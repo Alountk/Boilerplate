@@ -40,7 +40,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
   }, [activeConversationId]);
 
   const refreshConversations = useCallback(async () => {
-    if (!user) return;
+    if (!user || !TokenService.getToken()) return;
     const chatService = new ChatService();
     const data = await chatService.getConversations();
     setConversations(data);
@@ -57,11 +57,18 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       return;
     }
 
+    const token = TokenService.getToken();
+    if (!token) {
+      setConversations([]);
+      setMessages([]);
+      return;
+    }
+
     refreshConversations();
 
     const newConnection = new signalR.HubConnectionBuilder()
       .withUrl(HUB_URL, {
-        accessTokenFactory: () => TokenService.getToken() ?? "",
+        accessTokenFactory: () => token,
       })
       .withAutomaticReconnect()
       .build();

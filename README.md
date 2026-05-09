@@ -199,8 +199,8 @@ make docker-deploy-down
 - [x] **Image Upload System**: MinIO/S3 integration with multi-image support and drag-to-reorder
 - [x] **Cover Fallback System**: `VideogameCover` component + RAWG API auto-fetch + text placeholder
 - [x] **Social Login Scaffolding**: Google & Apple OAuth flow wired; buttons gated behind `FEATURE-PENDING`
-- [ ] **Social Login Activation**: Enable Google / Apple providers once credentials are registered in each OAuth console
-- [ ] **Messaging System**: Real-time chat between buyers and sellers.
+- [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.
 - [ ] **Payment Integration**: Stripe or PayPal checkout.
 

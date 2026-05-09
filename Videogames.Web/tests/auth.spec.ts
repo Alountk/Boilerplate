@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 
 const mockedAuthResponse = {
-  token: 'test-token-auth-spec',
+  token: '',
   user: {
     id: '11111111-1111-1111-1111-111111111111',
     firstName: 'Auth',
@@ -30,11 +30,28 @@ test.describe('Authentication Flow', () => {
     await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
   });
 
-  test('should logout successfully', async ({ page }) => {
+  test('should logout successfully', async ({ page, request }) => {
+    const timestamp = Date.now();
+    const registerResponse = await request.post('http://localhost:5017/api/Users', {
+      data: {
+        firstName: 'Logout',
+        lastName: 'Tester',
+        email: `logout_${timestamp}@test.com`,
+        password: 'StrongPassword123!',
+        address: '123 Test St',
+        city: 'Test City',
+        country: 'TestLand',
+        phone: '+1234567890',
+      },
+    });
+
+    expect(registerResponse.status()).toBe(201);
+    const registerPayload = (await registerResponse.json()) as { token: string; user: unknown };
+
     await page.addInitScript((auth) => {
       localStorage.setItem('token', auth.token);
       localStorage.setItem('user', JSON.stringify(auth.user));
-    }, mockedAuthResponse);
+    }, registerPayload);
 
     await page.goto('/');
     await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();

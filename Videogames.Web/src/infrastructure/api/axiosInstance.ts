@@ -1,5 +1,6 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../../constants/config';
+import { TokenService } from '../services/TokenService';
 
 const REQUEST_TIMEOUT_MS = 30000;
 const PRESIGNED_HOST_HINTS = ['amazonaws.com', 'cloudfront.net', 'minio'];
@@ -45,7 +46,7 @@ axiosInstance.interceptors.request.use(
     const shouldAttachAuth = !isPresignedUrl(config.url);
 
     if (typeof window !== 'undefined') {
-      const token = localStorage.getItem('token');
+      const token = TokenService.getToken();
       if (shouldAttachAuth && token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
