@@ -27,37 +27,60 @@ function MessagesPageContent() {
     setActiveConversationId
   } = useChat();
 
-  const [loading, setLoading] = useState(true);
+  const [conversationsLoading, setConversationsLoading] = useState(true);
+  const [historyLoading, setHistoryLoading] = useState(false);
+  const [conversationsError, setConversationsError] = useState<string | null>(null);
+  const [historyError, setHistoryError] = useState<string | null>(null);
   // Use stable service instance
   const [chatService] = useState(() => new ChatService());
+
+  const loadConversations = useCallback(async () => {
+    if (!user) return;
+
+    setConversationsLoading(true);
+    setConversationsError(null);
+
+    try {
+      const data = await chatService.getConversations();
+      setConversations(data);
+    } catch {
+      setConversationsError("We could not load your conversations. Please try again.");
+    } finally {
+      setConversationsLoading(false);
+    }
+  }, [chatService, setConversations, user]);
 
   const handleSelectConversation = useCallback(async (conv: Conversation) => {
     if (activeConversationId) {
       await leaveConversation(activeConversationId);
     }
+
+    setHistoryError(null);
     setActiveConversationId(conv.id);
-    setLoading(true);
+    setHistoryLoading(true);
+
     try {
       const history = await chatService.getMessages(conv.id);
       setMessages(history);
       await joinConversation(conv.id);
       await chatService.markAsRead(conv.id);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      setHistoryError("We could not load this conversation. Please try another chat or retry.");
     } finally {
-      setLoading(false);
+      setHistoryLoading(false);
     }
   }, [activeConversationId, chatService, joinConversation, leaveConversation, setActiveConversationId, setMessages]);
 
   // Effect 1: Load conversations when user is ready
   useEffect(() => {
     if (user) {
-      chatService.getConversations().then((data) => {
-        setConversations(data);
-        setLoading(false);
-      });
+      loadConversations();
+      return;
     }
-  }, [user, chatService, setConversations]);
+
+    setConversationsLoading(false);
+    setConversationsError(null);
+  }, [loadConversations, user]);
 
   // Effect 2: Auto-select conversation from ?conv= URL param once conversations are loaded
   useEffect(() => {
@@ -95,13 +118,34 @@ function MessagesPageContent() {
             activeTab={activeConversationId}
             onSelectConversation={handleSelectConversation}
             currentUser={user}
-            loading={loading}
+          loading={conversationsLoading}
+          errorMessage={conversationsError}
+          onRetry={loadConversations}
         />
       </aside>
 
       {/* Main Chat Area */}
       <main className={`flex-1 flex flex-col bg-gray-50 dark:bg-gray-950 ${!activeConversationId ? 'hidden md:flex' : 'flex'}`}>
-        {activeConversationId && activeConv ? (
+        {historyLoading ? (
+          <div className="flex-1 p-8 space-y-4" aria-label="Loading conversation">
+            <div className="h-5 w-40 animate-pulse rounded bg-gray-200 dark:bg-gray-700" />
+            <div className="h-24 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700" />
+            <div className="h-20 animate-pulse rounded-xl bg-gray-200 dark:bg-gray-700" />
+          </div>
+        ) : historyError ? (
+          <div className="flex-1 flex items-center justify-center p-10 text-center">
+            <div>
+              <h2 className="text-xl font-bold dark:text-white mb-2">Conversation unavailable</h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-5">{historyError}</p>
+              <button
+                onClick={() => setActiveConversationId(null)}
+                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+              >
+                Back to list
+              </button>
+            </div>
+          </div>
+        ) : activeConversationId && activeConv ? (
           <ChatRoom 
             activeConv={activeConv}
             messages={messages}
