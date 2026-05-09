@@ -8,8 +8,11 @@ import { HUB_URL } from "../constants/config";
 import { ChatService } from "../infrastructure/services/ChatService";
 import { TokenService } from "../infrastructure/services/TokenService";
 
+export type RealtimeConnectionStatus = "connecting" | "connected" | "reconnecting" | "disconnected";
+
 interface ChatContextType {
   connection: signalR.HubConnection | null;
+  realtimeStatus: RealtimeConnectionStatus;
   messages: Message[];
   conversations: Conversation[];
   loading: boolean;
@@ -28,6 +31,7 @@ const ChatContext = createContext<ChatContextType | undefined>(undefined);
 export const ChatProvider = ({ children }: { children: ReactNode }) => {
   const { user } = useAuth();
   const [connection, setConnection] = useState<signalR.HubConnection | null>(null);
+  const [realtimeStatus, setRealtimeStatus] = useState<RealtimeConnectionStatus>("disconnected");
   const [messages, setMessages] = useState<Message[]>([]);
   const [conversations, setConversations] = useState<Conversation[]>([]);
   const [activeConversationId, setActiveConversationId] = useState<string | null>(null);
@@ -52,6 +56,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         connection.stop();
         setConnection(null);
       }
+      setRealtimeStatus("disconnected");
       setConversations([]);
       setMessages([]);
       return;
@@ -59,6 +64,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     const token = TokenService.getToken();
     if (!token) {
+      setRealtimeStatus("disconnected");
       setConversations([]);
       setMessages([]);
       return;
@@ -73,13 +79,31 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       .withAutomaticReconnect()
       .build();
 
+    newConnection.onreconnecting(() => {
+      setRealtimeStatus("reconnecting");
+    });
+
+    newConnection.onreconnected(() => {
+      setRealtimeStatus("connected");
+    });
+
+    newConnection.onclose(() => {
+      setRealtimeStatus("disconnected");
+    });
+
+    setRealtimeStatus("connecting");
+
     newConnection
       .start()
       .then(() => {
         console.log("Connected to Chat Hub");
         setConnection(newConnection);
+        setRealtimeStatus("connected");
       })
-      .catch((err) => console.error("SignalR Connection Error: ", err));
+      .catch((err) => {
+        setRealtimeStatus("disconnected");
+        console.error("SignalR Connection Error: ", err);
+      });
 
     newConnection.on("ReceiveMessage", (message: Message) => {
       // Use ref to avoid stale closure — always reads current activeConversationId
@@ -110,6 +134,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     return () => {
       newConnection.stop();
+      setRealtimeStatus("disconnected");
     };
   // Only re-create the connection when the user changes (not on every conversation switch)
   // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -149,6 +174,7 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     <ChatContext.Provider
       value={{
         connection,
+        realtimeStatus,
         messages,
         conversations,
         loading,

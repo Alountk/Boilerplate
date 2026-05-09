@@ -5,6 +5,7 @@ export function useChat() {
   
   return {
     connection: context.connection,
+    realtimeStatus: context.realtimeStatus,
     messages: context.messages,
     setMessages: context.setMessages,
     conversations: context.conversations,
