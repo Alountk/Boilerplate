@@ -1,7 +1,7 @@
 "use client";
 
 import { PhotoIcon } from "@heroicons/react/24/outline";
-import { resolveVideogameImageSrc } from "../../utils/videogameImages";
+import RefreshableImage from "../RefreshableImage";
 
 interface ImageUploadZoneProps {
   images: string[];
@@ -73,15 +73,10 @@ export function ImageUploadZone({
             onDrop={() => onDrop(index)}
             className="relative group cursor-move overflow-hidden rounded-xl border border-outline-variant/10 hover:border-primary/50 transition-all bg-surface-container-highest flex items-center justify-center"
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src={resolveVideogameImageSrc(img) ?? ""}
+            <RefreshableImage
+              imageValue={img}
               alt={`Game image ${index + 1}`}
               className="w-full h-full object-cover"
-              onError={(e) => {
-                (e.target as HTMLImageElement).src =
-                  "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23222a3d' width='100' height='100'/%3E%3C/svg%3E";
-              }}
             />
             <button
               type="button"

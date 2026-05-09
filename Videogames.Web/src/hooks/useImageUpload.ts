@@ -5,6 +5,7 @@
 
 import { useState } from "react";
 import { ImageService } from "../infrastructure/services/ImageService";
+import { ImageUploadResult } from "../domain/ports/IImageService";
 import { resolveVideogameImageSrc } from "../utils/videogameImages";
 
 export { resolveVideogameImageSrc };
@@ -95,14 +96,20 @@ export function useImageUpload(): UseImageUploadReturn {
     setUploading(true);
     try {
       const uploadResults = await Promise.allSettled(
-        validFiles.map((file) => imageService.uploadImage(file))
+        validFiles.map((file) => imageService.uploadImageDetailed(file))
       );
 
-      const uploadedFileNames = uploadResults
+      const uploaded = uploadResults
         .filter(
-          (r): r is PromiseFulfilledResult<string> => r.status === "fulfilled"
+          (r): r is PromiseFulfilledResult<ImageUploadResult> =>
+            r.status === "fulfilled"
         )
         .map((r) => r.value);
+
+      const uploadedFileNames = uploaded.map((r) => r.fileName);
+      const legacyFallbackCount = uploaded.filter(
+        (r) => r.source === "legacy"
+      ).length;
 
       const uploadErrors = uploadResults
         .filter((r): r is PromiseRejectedResult => r.status === "rejected")
@@ -123,6 +130,12 @@ export function useImageUpload(): UseImageUploadReturn {
       const allErrors = [...invalidErrors, ...uploadErrors];
       if (allErrors.length > 0) {
         alert(`Some images failed to upload:\n${allErrors.join("\n")}`);
+      }
+
+      if (legacyFallbackCount > 0) {
+        alert(
+          `${legacyFallbackCount} image(s) used legacy upload fallback. Upload completed successfully.`
+        );
       }
     } catch (error) {
       console.error("Image upload failed", error);
@@ -172,8 +185,12 @@ export function useImageUpload(): UseImageUploadReturn {
 
     setUploadingStates((prev) => ({ ...prev, [side]: true }));
     try {
-      const fileName = await imageService.uploadImage(file);
-      onResolved(side, fileName);
+      const uploadResult = await imageService.uploadImageDetailed(file);
+      onResolved(side, uploadResult.fileName);
+
+      if (uploadResult.source === "legacy") {
+        console.warn(`${side} upload used legacy fallback.`);
+      }
     } catch (error) {
       console.error(`Failed to upload ${side} image`, error);
       alert(`Failed to upload ${side} image. Please try again.`);

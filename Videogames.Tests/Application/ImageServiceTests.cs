@@ -46,7 +46,7 @@ public class ImageServiceTests
         var fileName = "test-image.jpg";
         var expectedUrl = "https://s3.example.com/videogames/test-image.jpg?token=123";
         
-        _storagePortMock.Setup(s => s.GetFileUrlAsync(fileName))
+        _storagePortMock.Setup(s => s.GetFileUrlAsync(fileName, It.IsAny<DateTime>()))
             .ReturnsAsync(expectedUrl);
 
         // Act
@@ -54,7 +54,28 @@ public class ImageServiceTests
 
         // Assert
         Assert.Equal(expectedUrl, result);
-        _storagePortMock.Verify(s => s.GetFileUrlAsync(fileName), Times.Once);
+        _storagePortMock.Verify(s => s.GetFileUrlAsync(fileName, It.IsAny<DateTime>()), Times.Once);
+    }
+
+    [Fact]
+    public async Task GetImageMetadataAsync_ShouldReturnMetadata_WithExpectedFileNameAndUrl()
+    {
+        // Arrange
+        var fileName = "metadata-image.jpg";
+        var expectedUrl = "https://s3.example.com/videogames/metadata-image.jpg?token=456";
+
+        _storagePortMock
+            .Setup(s => s.GetFileUrlAsync(fileName, It.IsAny<DateTime>()))
+            .ReturnsAsync(expectedUrl);
+
+        // Act
+        var result = await _service.GetImageMetadataAsync(fileName);
+
+        // Assert
+        Assert.Equal(fileName, result.FileName);
+        Assert.Equal(expectedUrl, result.AccessUrl);
+        Assert.True(result.ExpiresAtUtc > DateTime.UtcNow.AddMinutes(59));
+        _storagePortMock.Verify(s => s.GetFileUrlAsync(fileName, It.IsAny<DateTime>()), Times.Once);
     }
 
     [Fact]

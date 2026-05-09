@@ -6,6 +6,7 @@ namespace Videogames.Application.Services;
 public class ImageService : IImageService
 {
     private const long MaxUploadSizeBytes = 5 * 1024 * 1024;
+    private const int ReadAccessUrlTtlMinutes = 60;
     private static readonly Dictionary<string, string> AllowedExtensions = new(StringComparer.OrdinalIgnoreCase)
     {
         ["image/jpeg"] = ".jpg",
@@ -59,7 +60,21 @@ public class ImageService : IImageService
 
     public async Task<string> GetImageUrlAsync(string fileName)
     {
-        return await _storagePort.GetFileUrlAsync(fileName);
+        var metadata = await GetImageMetadataAsync(fileName);
+        return metadata.AccessUrl;
+    }
+
+    public async Task<PresignedImageMetadataDto> GetImageMetadataAsync(string fileName)
+    {
+        if (string.IsNullOrWhiteSpace(fileName))
+        {
+            throw new ArgumentException("FileName is required.");
+        }
+
+        var expiresAtUtc = DateTime.UtcNow.AddMinutes(ReadAccessUrlTtlMinutes);
+        var accessUrl = await _storagePort.GetFileUrlAsync(fileName, expiresAtUtc);
+
+        return new PresignedImageMetadataDto(fileName, accessUrl, expiresAtUtc);
     }
 
     private string GetExtension(string contentType)

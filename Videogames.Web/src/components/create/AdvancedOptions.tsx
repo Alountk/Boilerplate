@@ -3,7 +3,7 @@
 import { TrashIcon, PlusIcon } from "@heroicons/react/24/outline";
 import { FieldFeedback } from "../FieldFeedback";
 import { getInputClassNames } from "../../utils/formUtils";
-import { resolveVideogameImageSrc } from "../../utils/videogameImages";
+import RefreshableImage from "../RefreshableImage";
 import { SideKey } from "../../hooks/useImageUpload";
 
 type BoxArt = Record<SideKey, string>;
@@ -198,15 +198,10 @@ export function AdvancedOptions({
                   <label className="block text-xs font-bold text-on-surface-variant uppercase">{label}</label>
                   {currentUrl && (
                     <div className="mb-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={resolveVideogameImageSrc(currentUrl) ?? ""}
+                      <RefreshableImage
+                        imageValue={currentUrl}
                         alt={`${label} preview`}
                         className="w-full h-24 object-cover rounded border border-outline-variant/30"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).src =
-                            "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Crect fill='%23222a3d' width='100' height='100'/%3E%3C/svg%3E";
-                        }}
                       />
                     </div>
                   )}

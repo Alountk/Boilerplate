@@ -66,6 +66,10 @@ public class ImagesController : ControllerBase
 
         try
         {
+            _logger.LogWarning(
+                "Legacy endpoint /api/Images/upload is deprecated and was used for file {FileName}. Prefer /api/Images/presigned-upload.",
+                file.FileName
+            );
             _logger.LogInformation("Uploading image: {FileName}, ContentType: {ContentType}", file.FileName, file.ContentType);
 
             using var stream = file.OpenReadStream();
@@ -81,6 +85,26 @@ public class ImagesController : ControllerBase
         {
             _logger.LogError(ex, "Error uploading image");
             return StatusCode(500, "Internal server error during image upload.");
+        }
+    }
+
+    [HttpGet("{fileName}/metadata")]
+    [AllowAnonymous]
+    public async Task<IActionResult> GetImageMetadata(string fileName)
+    {
+        try
+        {
+            var metadata = await _imageService.GetImageMetadataAsync(fileName);
+            return Ok(metadata);
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error retrieving image metadata {FileName}", fileName);
+            return NotFound();
         }
     }
 

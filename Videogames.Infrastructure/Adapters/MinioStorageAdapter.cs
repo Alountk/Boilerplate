@@ -85,11 +85,16 @@ public class MinioStorageAdapter : IStoragePort
 
     public Task<string> GetFileUrlAsync(string fileName)
     {
+        return GetFileUrlAsync(fileName, DateTime.UtcNow.AddHours(1));
+    }
+
+    public Task<string> GetFileUrlAsync(string fileName, DateTime expiresAtUtc)
+    {
         var request = new GetPreSignedUrlRequest
         {
             BucketName = _settings.BucketName,
             Key = fileName,
-            Expires = DateTime.UtcNow.AddHours(1)
+            Expires = expiresAtUtc
         };
 
         return Task.FromResult(_s3Client.GetPreSignedURL(request));

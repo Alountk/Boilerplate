@@ -116,4 +116,28 @@ public class ImagesControllerTests
         var redirect = Assert.IsType<RedirectResult>(result);
         Assert.Equal("https://cdn.example.com/cover.jpg", redirect.Url);
     }
+
+    [Fact]
+    public async Task GetImageMetadata_ShouldReturnOk_WhenImageExists()
+    {
+        // Arrange
+        var expected = new PresignedImageMetadataDto(
+            "cover.jpg",
+            "https://cdn.example.com/cover.jpg?token=abc",
+            DateTime.UtcNow.AddMinutes(60)
+        );
+
+        _imageServiceMock
+            .Setup(s => s.GetImageMetadataAsync("cover.jpg"))
+            .ReturnsAsync(expected);
+
+        // Act
+        var result = await _controller.GetImageMetadata("cover.jpg");
+
+        // Assert
+        var okResult = Assert.IsType<OkObjectResult>(result);
+        var payload = Assert.IsType<PresignedImageMetadataDto>(okResult.Value);
+        Assert.Equal(expected.FileName, payload.FileName);
+        Assert.Equal(expected.AccessUrl, payload.AccessUrl);
+    }
 }

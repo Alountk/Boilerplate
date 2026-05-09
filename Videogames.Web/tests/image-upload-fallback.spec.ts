@@ -29,9 +29,15 @@ test.beforeAll(async ({ request }) => {
 });
 
 test.describe('Image Upload Fallback', () => {
+  test.describe.configure({ mode: 'serial' });
+
   test('should fallback to legacy upload when presigned endpoint fails', async ({ page }) => {
     let presignedRequested = false;
     let legacyRequested = false;
+
+    page.on('dialog', async (dialog) => {
+      await dialog.accept();
+    });
 
     await page.route('**/api/Images/presigned-upload', async (route) => {
       presignedRequested = true;
@@ -72,8 +78,93 @@ test.describe('Image Upload Fallback', () => {
 
     await page.locator('#imageUpload').setInputFiles(TEST_IMAGE_PATH);
 
-    await expect(page.locator('img[alt="Preview 1"]')).toBeVisible({ timeout: 10000 });
+    await expect(page.locator('img[alt="Game image 1"]')).toBeVisible({ timeout: 10000 });
     expect(presignedRequested).toBeTruthy();
     expect(legacyRequested).toBeTruthy();
+  });
+
+  test('should refresh image access url when initial access url fails', async ({ page }) => {
+    let metadataRequestCount = 0;
+
+    page.on('dialog', async (dialog) => {
+      await dialog.accept();
+    });
+
+    await page.route('**/api/Images/presigned-upload', async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ message: 'presigned unavailable' }),
+      });
+    });
+
+    await page.route('**/api/Images/upload', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ fileName: 'refresh-image.png' }),
+      });
+    });
+
+    await page.route('**/api/Images/refresh-image.png/metadata', async (route) => {
+      metadataRequestCount += 1;
+
+      if (metadataRequestCount === 1) {
+        await route.fulfill({
+          status: 200,
+          contentType: 'application/json',
+          body: JSON.stringify({
+            fileName: 'refresh-image.png',
+            accessUrl: 'http://cdn.test/expired.png',
+            expiresAtUtc: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+          }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          fileName: 'refresh-image.png',
+          accessUrl: 'http://cdn.test/fresh.png',
+          expiresAtUtc: new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        }),
+      });
+    });
+
+    await page.route('**/expired.png', async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'text/plain',
+        body: 'expired',
+      });
+    });
+
+    await page.route('**/fresh.png', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'image/png',
+        body: Buffer.from('fresh-image-content'),
+      });
+    });
+
+    await page.addInitScript(
+      ({ token, user }) => {
+        localStorage.setItem('token', token);
+        localStorage.setItem('user', JSON.stringify(user));
+      },
+      { token: authToken, user: authUser }
+    );
+
+    await page.goto('/create');
+    await expect(page).toHaveURL(/\/create/, { timeout: 15000 });
+
+    const preview = page.locator('img[alt="Game image 1"]');
+    await page.locator('#imageUpload').setInputFiles(TEST_IMAGE_PATH);
+
+    await expect(preview).toBeVisible({ timeout: 10000 });
+    await expect(preview).toHaveAttribute('src', /fresh\.png/, { timeout: 10000 });
+    expect(metadataRequestCount).toBeGreaterThanOrEqual(2);
   });
 });

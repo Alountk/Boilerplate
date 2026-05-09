@@ -14,3 +14,9 @@ public record PresignedUploadDto(
     string UploadUrl,
     DateTime ExpiresAtUtc
 );
+
+public record PresignedImageMetadataDto(
+    string FileName,
+    string AccessUrl,
+    DateTime ExpiresAtUtc
+);

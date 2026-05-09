@@ -1,16 +1,52 @@
 import axios from 'axios';
 import { API_BASE_URL } from '../../constants/config';
 
+const REQUEST_TIMEOUT_MS = 30000;
+const PRESIGNED_HOST_HINTS = ['amazonaws.com', 'cloudfront.net', 'minio'];
+const PRESIGNED_QUERY_HINTS = [
+  'X-Amz-Algorithm',
+  'X-Amz-Credential',
+  'X-Amz-Date',
+  'X-Amz-Expires',
+  'X-Amz-Signature',
+  'X-Amz-SignedHeaders',
+];
+
+function isPresignedUrl(url?: string): boolean {
+  if (!url) return false;
+
+  const hasHintInRawUrl = PRESIGNED_QUERY_HINTS.some((hint) =>
+    url.includes(`${hint}=`)
+  );
+  if (hasHintInRawUrl) return true;
+
+  try {
+    const parsed = new URL(url);
+    const hostLooksLikeObjectStorage = PRESIGNED_HOST_HINTS.some((hint) =>
+      parsed.host.includes(hint)
+    );
+    if (!hostLooksLikeObjectStorage) return false;
+
+    return PRESIGNED_QUERY_HINTS.some((hint) => parsed.searchParams.has(hint));
+  } catch {
+    // Relative URLs are not presigned object storage URLs.
+    return false;
+  }
+}
+
 export const axiosInstance = axios.create({
   baseURL: API_BASE_URL,
+  timeout: REQUEST_TIMEOUT_MS,
 });
 
 // Request Interceptor
 axiosInstance.interceptors.request.use(
   (config) => {
+    const shouldAttachAuth = !isPresignedUrl(config.url);
+
     if (typeof window !== 'undefined') {
       const token = localStorage.getItem('token');
-      if (token && config.headers) {
+      if (shouldAttachAuth && token && config.headers) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }

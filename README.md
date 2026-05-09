@@ -214,6 +214,24 @@ This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
 
+### 2026-05-09: Presigned Read URL Refresh, Naming Cleanup & E2E Expansion
+- **Backend Metadata Endpoint**: Added `GET /api/Images/{fileName}/metadata` to return a short-lived read access URL plus expiration metadata. This enables frontend refresh-on-failure without relying on a full redirect request cycle.
+- **Legacy Upload Deprecation Signal**: Added explicit warning logs whenever `POST /api/Images/upload` (legacy multipart) is used, making rollout telemetry visible while preserving backward compatibility.
+- **Read URL Expiration Strategy**:
+   - Backend now generates read presigned URLs with explicit TTL through service/port abstractions.
+   - Frontend caches `fileName -> accessUrl + expiresAtUtc` in session storage and resolves from cache first when valid.
+   - On image load failure, frontend attempts a one-time metadata refresh and retries automatically before showing fallback.
+- **Reusable Frontend Component**: Introduced `RefreshableImage` and applied it to product side thumbnails, create upload previews, and advanced box-art previews to avoid duplicated refresh logic.
+- **Naming & Cleanup**:
+   - Renamed ambiguous state holders (for example in cover/image components) to descriptive names.
+   - Standardized test variable naming for request counters and stabilized ordering-sensitive tests with serial mode where needed.
+- **E2E Coverage Added/Updated**:
+   - Existing fallback test validated after refactor (`presigned -> legacy multipart`).
+   - New E2E scenario validates refresh flow: initial access URL fails, metadata is requested again, fresh URL is used successfully.
+- **Validation Status**:
+   - Backend targeted tests (ImageService + ImagesController) passing.
+   - Playwright fallback/refresh suite passing for the updated spec.
+
 ### 2026-04-21: Presigned Upload Rollout (Phase 1) + API Coverage
 - **Presigned Upload Endpoint**: Added `POST /api/Images/presigned-upload` for private, short-lived upload URLs in the Images API flow.
 - **Safe Fallback Kept**: Frontend upload now tries presigned first and automatically falls back to legacy multipart `POST /api/Images/upload` if unavailable/failing, preserving compatibility during rollout.

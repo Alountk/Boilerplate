@@ -7,7 +7,7 @@ import { ChatService } from "../../../infrastructure/services/ChatService";
 import { useRouter } from "next/navigation";
 import { useAuth } from "../../../context/AuthContext";
 import VideogameCover from "../../../components/VideogameCover";
-import { resolveVideogameImageSrc } from "../../../utils/videogameImages";
+import RefreshableImage from "../../../components/RefreshableImage";
 import { 
   ChatBubbleLeftRightIcon, 
   ChevronLeftIcon,
@@ -212,8 +212,11 @@ export default function ProductDetailPage({ params }: { params: Promise<{ id: st
               <div className="grid grid-cols-3 gap-1.5 h-full">
                 {videogame.images.slice(0, 6).map((img, i) => (
                   <div key={i} className="aspect-square bg-surface-container rounded-lg overflow-hidden border border-outline-variant/20 cursor-pointer hover:border-primary/50 transition-all">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img src={resolveVideogameImageSrc(img) || ""} alt={`Side ${i + 1}`} className="w-full h-full object-cover" />
+                    <RefreshableImage
+                      imageValue={img}
+                      alt={`Side ${i + 1}`}
+                      className="w-full h-full object-cover"
+                    />
                   </div>
                 ))}
               </div>
