@@ -22,7 +22,8 @@ public static class DependencyInjection
         if (!string.IsNullOrEmpty(connectionString))
         {
             services.AddDbContext<VideogamesDbContext>(options =>
-                options.UseNpgsql(connectionString));
+                options.UseNpgsql(connectionString, npgsqlOptions =>
+                    npgsqlOptions.UseQuerySplittingBehavior(QuerySplittingBehavior.SplitQuery)));
 
             services.AddScoped<IVideogameRepository, PostgresVideogameRepository>();
             services.AddScoped<IUserRepository, PostgresUserRepository>();
