@@ -15,6 +15,7 @@ public class User
     public string Phone { get; set; } = string.Empty;
     public string? OAuthProvider { get; set; }
     public string? OAuthSubject { get; set; }
+    public bool EmailVerified { get; set; } = false;
     public DateTime CreatedAt { get; set; }
     public DateTime UpdatedAt { get; set; }
 }

@@ -309,6 +309,24 @@ Outputs:
    - Step 3: progressively enforce verification in guarded actions/routes.
    - Step 4: harden operations (rate limiting, retries, observability, and provider-backed transactional email).
 
+### 2026-05-13 (continued): Registration Email Verification (Baby Step 2)
+- **Goal**: Persist email verified status in DB and return it in auth responses for progressive enforcement.
+- **Database Changes**:
+   - Added `EmailVerified` boolean column to `User` table (default: `false`).
+   - Migration: `AddEmailVerifiedToUser` applied.
+- **Backend Updates**:
+   - Added `Task MarkEmailAsVerifiedAsync(string email)` to `IUserService` + implementation.
+   - `POST /api/Auth/register-email/confirm` now calls `MarkEmailAsVerifiedAsync` after successful code validation.
+   - `UserDto` now includes `EmailVerified` field returned in all auth responses.
+- **Frontend Updates**:
+   - `User` model now includes `emailVerified: boolean` for UI-level checks.
+   - Confirmation page shows clear success state upon email verification.
+   - AuthContext stores verified status from payload.
+- **Status**:
+   - Both backend and frontend build successfully.
+   - No breaking changes; existing flows unaffected.
+- **Next Step (Baby Step 3)**: Enforce email verification gating on sensitive actions (sell item, send message, etc.).
+
 ### 2026-04-21: Presigned Upload Rollout (Phase 1) + API Coverage
 - **Presigned Upload Endpoint**: Added `POST /api/Images/presigned-upload` for private, short-lived upload URLs in the Images API flow.
 - **Safe Fallback Kept**: Frontend upload now tries presigned first and automatically falls back to legacy multipart `POST /api/Images/upload` if unavailable/failing, preserving compatibility during rollout.

@@ -143,6 +143,19 @@ public class UserService : IUserService
         await _repository.DeleteAsync(id);
     }
 
+    public async Task MarkEmailAsVerifiedAsync(string email)
+    {
+        var user = await _repository.GetByEmailAsync(email);
+        if (user == null)
+        {
+            throw new InvalidOperationException($"User with email '{email}' not found");
+        }
+
+        user.EmailVerified = true;
+        user.UpdatedAt = DateTime.UtcNow;
+        await _repository.UpdateAsync(user);
+    }
+
     public async Task<AuthResponseDto> OAuthLoginAsync(string provider, OAuthLoginDto dto)
     {
         string email;
@@ -289,6 +302,7 @@ public class UserService : IUserService
             user.City,
             user.Country,
             user.Phone,
+            user.EmailVerified,
             user.CreatedAt,
             user.UpdatedAt
         );

@@ -11,6 +11,7 @@ public record UserDto(
     string City,
     string Country,
     string Phone,
+    bool EmailVerified,
     DateTime CreatedAt,
     DateTime UpdatedAt
 );

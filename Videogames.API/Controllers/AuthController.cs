@@ -122,6 +122,7 @@ public class AuthController : ControllerBase
                 return BadRequest(new { verified = false, error = "Invalid or expired verification code" });
             }
 
+            await _userService.MarkEmailAsVerifiedAsync(dto.Email);
             return Ok(new { verified = true });
         }
         catch (Exception ex)

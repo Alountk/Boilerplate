@@ -11,5 +11,6 @@ public interface IUserService
     Task<UserDto?> GetByEmailAsync(string email);
     Task<IEnumerable<UserDto>> GetAllAsync();
     Task<UserDto> UpdateAsync(Guid id, UpdateUserDto updateDto);
+    Task MarkEmailAsVerifiedAsync(string email);
     Task DeleteAsync(Guid id);
 }
