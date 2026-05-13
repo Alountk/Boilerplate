@@ -22,6 +22,10 @@ export interface AuthResponse {
   user: User;
 }
 
+export interface RegistrationCodeConfirmResponse {
+  verified: boolean;
+}
+
 export interface UpdateUserRequest {
   firstName?: string;
   lastName?: string;
@@ -36,6 +40,8 @@ export interface UpdateUserRequest {
 export interface IAuthService {
   login(credentials: LoginRequest): Promise<AuthResponse>;
   register(data: RegisterRequest): Promise<AuthResponse>;
+  sendRegistrationCode(email: string): Promise<void>;
+  confirmRegistrationCode(email: string, code: string): Promise<RegistrationCodeConfirmResponse>;
   loginWithGoogle(idToken: string): Promise<AuthResponse>;
   loginWithApple(idToken: string): Promise<AuthResponse>;
   logout(): void;

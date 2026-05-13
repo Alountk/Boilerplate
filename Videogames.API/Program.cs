@@ -17,6 +17,7 @@ builder.Host.UseSerilog();
 // Add services to the container.
 builder.Services.AddControllers();
 builder.Services.AddSignalR();
+builder.Services.AddMemoryCache();
 
 var allowedCorsOrigins = new[]
 {

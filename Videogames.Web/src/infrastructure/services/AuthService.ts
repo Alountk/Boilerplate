@@ -1,4 +1,10 @@
-import { IAuthService, LoginRequest, RegisterRequest, AuthResponse } from '../../domain/ports/IAuthService';
+import {
+  IAuthService,
+  LoginRequest,
+  RegisterRequest,
+  AuthResponse,
+  RegistrationCodeConfirmResponse,
+} from '../../domain/ports/IAuthService';
 import { User } from '../../domain/models/User';
 import { axiosInstance } from '../api/axiosInstance';
 import { TokenService } from './TokenService';
@@ -13,6 +19,18 @@ export class AuthService implements IAuthService {
   async register(req: RegisterRequest): Promise<AuthResponse> {
     const { data } = await axiosInstance.post<AuthResponse>('/Users', req);
     if (data.token) TokenService.persist(data.token, data.user);
+    return data;
+  }
+
+  async sendRegistrationCode(email: string): Promise<void> {
+    await axiosInstance.post('/Auth/register-email/send-code', { email });
+  }
+
+  async confirmRegistrationCode(email: string, code: string): Promise<RegistrationCodeConfirmResponse> {
+    const { data } = await axiosInstance.post<RegistrationCodeConfirmResponse>('/Auth/register-email/confirm', {
+      email,
+      code,
+    });
     return data;
   }
 

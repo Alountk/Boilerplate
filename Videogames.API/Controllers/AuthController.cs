@@ -9,11 +9,16 @@ namespace Videogames.API.Controllers;
 public class AuthController : ControllerBase
 {
     private readonly IUserService _userService;
+    private readonly IRegistrationVerificationService _registrationVerificationService;
     private readonly ILogger<AuthController> _logger;
 
-    public AuthController(IUserService userService, ILogger<AuthController> logger)
+    public AuthController(
+        IUserService userService,
+        IRegistrationVerificationService registrationVerificationService,
+        ILogger<AuthController> logger)
     {
         _userService = userService;
+        _registrationVerificationService = registrationVerificationService;
         _logger = logger;
     }
 
@@ -83,6 +88,46 @@ public class AuthController : ControllerBase
         {
             _logger.LogError(ex, "Error during Apple OAuth login");
             return StatusCode(500, new { error = "An error occurred during Apple login" });
+        }
+    }
+
+    [HttpPost("register-email/send-code")]
+    public async Task<IActionResult> SendRegistrationCode([FromBody] SendRegistrationCodeDto dto)
+    {
+        try
+        {
+            await _registrationVerificationService.SendCodeAsync(dto.Email);
+            return Ok(new { sent = true });
+        }
+        catch (InvalidOperationException ex)
+        {
+            _logger.LogWarning("Unable to send registration verification code: {Message}", ex.Message);
+            return BadRequest(new { error = ex.Message });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error sending registration verification code");
+            return StatusCode(500, new { error = "An error occurred while sending the verification code" });
+        }
+    }
+
+    [HttpPost("register-email/confirm")]
+    public async Task<IActionResult> ConfirmRegistrationCode([FromBody] ConfirmRegistrationCodeDto dto)
+    {
+        try
+        {
+            var verified = await _registrationVerificationService.ConfirmCodeAsync(dto.Email, dto.Code);
+            if (!verified)
+            {
+                return BadRequest(new { verified = false, error = "Invalid or expired verification code" });
+            }
+
+            return Ok(new { verified = true });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error confirming registration verification code");
+            return StatusCode(500, new { error = "An error occurred while confirming the verification code" });
         }
     }
 }

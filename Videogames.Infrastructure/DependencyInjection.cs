@@ -48,8 +48,10 @@ public static class DependencyInjection
         // Application Services
         services.AddScoped<IVideogameService, VideogameService>();
         services.AddScoped<IUserService, UserService>();
+        services.AddScoped<IRegistrationVerificationService, RegistrationVerificationService>();
         services.AddScoped<ITokenService, TokenService>();
         services.AddScoped<IImageService, ImageService>();
+        services.AddScoped<IEmailSender, SmtpEmailSender>();
 
         // Adapters
         services.AddScoped<IStoragePort, MinioStorageAdapter>();

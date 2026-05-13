@@ -18,6 +18,8 @@ interface AuthContextType {
   user: User | null;
   login: (credentials: LoginRequest) => Promise<void>;
   register: (data: RegisterRequest) => Promise<void>;
+  sendRegistrationCode: (email: string) => Promise<void>;
+  confirmRegistrationCode: (email: string, code: string) => Promise<boolean>;
   loginWithGoogle: (idToken: string) => Promise<void>;
   loginWithApple: (idToken: string) => Promise<void>;
   logout: () => void;
@@ -50,6 +52,17 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     }
   };
 
+  const sendRegistrationCode = async (email: string) => {
+    const authService = new AuthService();
+    await authService.sendRegistrationCode(email);
+  };
+
+  const confirmRegistrationCode = async (email: string, code: string): Promise<boolean> => {
+    const authService = new AuthService();
+    const response = await authService.confirmRegistrationCode(email, code);
+    return !!response.verified;
+  };
+
   const logout = () => {
     const authService = new AuthService();
     authService.logout();
@@ -80,6 +93,8 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
         user,
         login,
         register,
+        sendRegistrationCode,
+        confirmRegistrationCode,
         loginWithGoogle,
         loginWithApple,
         logout,

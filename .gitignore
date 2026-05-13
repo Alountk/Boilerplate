@@ -103,4 +103,8 @@ Desktop.ini
 .agents/
 skills-lock.json
 
+# Operational outputs
+audit-output/
+test-results/
+
 /design

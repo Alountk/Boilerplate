@@ -70,7 +70,7 @@ function validateRegisterForm(values: RegisterForm): Partial<Record<FieldKey, st
 }
 
 export default function RegisterPage() {
-  const { register } = useAuth();
+  const { register, sendRegistrationCode } = useAuth();
   const router = useRouter();
   const [serverError, setServerError] = useState("");
 
@@ -114,17 +114,28 @@ export default function RegisterPage() {
     }
 
     try {
+      const normalizedEmail = values.email.trim();
+
       await register({
         ...values,
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
-        email: values.email.trim(),
+        email: normalizedEmail,
         address: values.address.trim(),
         city: values.city.trim(),
         country: values.country.trim(),
         phone: values.phone.trim(),
       });
-      router.push("/");
+
+      let sent = true;
+      try {
+        await sendRegistrationCode(normalizedEmail);
+      } catch (sendError) {
+        sent = false;
+        console.warn("Failed to send registration verification code", sendError);
+      }
+
+      router.push(`/register/confirm?email=${encodeURIComponent(normalizedEmail)}&sent=${sent}`);
     } catch (err: unknown) {
       setServerError("Registration failed. Please try again.");
       console.error(err);

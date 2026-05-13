@@ -24,6 +24,9 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
 
 - **Full Marketplace Flow**: Browse videogames by categories with an eBay-inspired design.
 - **User Authentication**: Secure registration and login with JWT and BCrypt hashing.
+- **Progressive Registration Email Verification**:
+   - New optional verification step after signup: send 6-digit code by email and confirm on a dedicated page.
+   - Implemented in baby-step mode to avoid breaking current flow: account creation/login still works even if email verification is pending.
 - **Inventory Management**: Sell and list items with detailed forms (pricing, condition, categories).
 - **Image Upload System**: 
   - Multiple cover images with drag-and-drop reordering
@@ -199,7 +202,9 @@ make docker-deploy-down
 - [x] **Image Upload System**: MinIO/S3 integration with multi-image support and drag-to-reorder
 - [x] **Cover Fallback System**: `VideogameCover` component + RAWG API auto-fetch + text placeholder
 - [x] **Social Login Scaffolding**: Google & Apple OAuth flow wired; buttons gated behind `FEATURE-PENDING`
+- [x] **Registration Verification Baby Step 1**: Send 6-digit code on signup + confirmation page (`/register/confirm`) without blocking the existing auth flow.
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [ ] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
 - [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.
@@ -286,6 +291,23 @@ Outputs:
 - **Validation Status**:
    - Backend targeted tests (ImageService + ImagesController) passing.
    - Playwright fallback/refresh suite passing for the updated spec.
+
+### 2026-05-13: Registration Email Verification (Baby Step 1)
+- **Goal**: Introduce email verification during signup without breaking the current login/register behavior.
+- **Backend Additions**:
+   - Added `POST /api/Auth/register-email/send-code` to issue and send a 6-digit verification code.
+   - Added `POST /api/Auth/register-email/confirm` to validate submitted code.
+   - Verification codes are short-lived and kept in memory cache (10-minute TTL) for this first rollout.
+   - SMTP-based sender added with safe fallback: if SMTP is not configured, API logs a warning and keeps the flow non-blocking.
+- **Frontend Additions**:
+   - Registration now triggers code send (best effort) and redirects to `/register/confirm?email=...`.
+   - New confirmation page supports code entry, verification, and resend.
+   - Existing auth flow remains functional; users are not hard-blocked in this step.
+- **Baby Step Rollout Plan**:
+   - Step 1 (current): issue/confirm codes with non-blocking UX.
+   - Step 2: persist `email verified` status in DB and expose it in auth payload.
+   - Step 3: progressively enforce verification in guarded actions/routes.
+   - Step 4: harden operations (rate limiting, retries, observability, and provider-backed transactional email).
 
 ### 2026-04-21: Presigned Upload Rollout (Phase 1) + API Coverage
 - **Presigned Upload Endpoint**: Added `POST /api/Images/presigned-upload` for private, short-lived upload URLs in the Images API flow.
