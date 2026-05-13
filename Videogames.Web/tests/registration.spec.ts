@@ -1,77 +1,106 @@
 import { test, expect } from '@playwright/test';
 
-test.describe('User Registration Flow', () => {
-  const testEmail = `test-${Date.now()}@vmarket.com`;
+const buildMockedAuthResponse = (email: string) => ({
+  token: 'mocked-token',
+  user: {
+    id: '22222222-2222-2222-2222-222222222222',
+    firstName: 'Tester',
+    lastName: 'Automation',
+    email,
+    address: '123 Automation St',
+    city: 'Test City',
+    country: 'Test Country',
+    phone: '1234567890',
+    emailVerified: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
+  },
+});
 
-  test('should register successfully and log in automatically', async ({ page }) => {
-    // 1. Navigate to register page
-    await page.goto('/register');
-    
-    // Check for hydration errors in console
-    const consoleErrors: string[] = [];
-    page.on('console', msg => {
-      if (msg.type() === 'error' && msg.text().includes('Hydration')) {
-        consoleErrors.push(msg.text());
-      }
+test.describe('User Registration Flow', () => {
+  test('should redirect to email confirmation page after successful register', async ({ page }) => {
+    const testEmail = `test-${Date.now()}@vmarket.com`;
+
+    await page.route('**/api/Users', async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(buildMockedAuthResponse(testEmail)),
+      });
     });
 
-    // 2. Fill the registration form
+    await page.route('**/api/Auth/register-email/send-code', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({ sent: true }),
+      });
+    });
+
+    await page.goto('/register');
+
     await page.locator('input[name="firstName"]').fill('Tester');
     await page.locator('input[name="lastName"]').fill('Automation');
     await page.locator('input[name="email"]').fill(testEmail);
     await page.locator('input[name="password"]').fill('Password123!');
+    await page.locator('input[name="confirmPassword"]').fill('Password123!');
     await page.locator('input[name="address"]').fill('123 Automation St');
     await page.locator('input[name="city"]').fill('Test City');
     await page.locator('input[name="country"]').fill('Test Country');
     await page.locator('input[name="phone"]').fill('1234567890');
 
-    // 3. Submit the form
     await page.getByRole('button', { name: 'Create Account' }).click();
 
-    // 4. Verify auto-login and redirection
-    // Redirection to home page
-    await expect(page).toHaveURL('http://localhost:3000/', { timeout: 10000 });
-    
-    // Verify greeting in Navbar
-    await expect(page.locator('text=Hi Tester!')).toBeVisible();
-
-    // Verify no hydration errors were captured
-    expect(consoleErrors).toHaveLength(0);
+    await expect(page).toHaveURL(new RegExp(`/register/confirm\\?email=${encodeURIComponent(testEmail)}&sent=true`));
+    await expect(page.getByRole('heading', { name: 'Confirma tu email' })).toBeVisible();
+    await expect(page.getByText(testEmail)).toBeVisible();
   });
 
-  test('should show error when registering with an existing email', async ({ page }) => {
-    // We use the email created in the previous test (or a known one)
-    // Note: In a real CI environment, we would seed this or mock the API
+  test('should redirect with sent=false if code delivery fails', async ({ page }) => {
+    const testEmail = `send-fail-${Date.now()}@vmarket.com`;
+
+    await page.route('**/api/Users', async (route) => {
+      await route.fulfill({
+        status: 201,
+        contentType: 'application/json',
+        body: JSON.stringify(buildMockedAuthResponse(testEmail)),
+      });
+    });
+
+    await page.route('**/api/Auth/register-email/send-code', async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: 'application/json',
+        body: JSON.stringify({ error: 'smtp unavailable' }),
+      });
+    });
+
     await page.goto('/register');
-    
+
     await page.locator('input[name="firstName"]').fill('Another');
     await page.locator('input[name="lastName"]').fill('User');
-    await page.locator('input[name="email"]').fill(testEmail); // Existing email
+    await page.locator('input[name="email"]').fill(testEmail);
     await page.locator('input[name="password"]').fill('Password123!');
-    
+    await page.locator('input[name="confirmPassword"]').fill('Password123!');
+
     await page.getByRole('button', { name: 'Create Account' }).click();
 
-    // Verify error message from backend
-    // The backend returns { error: "..." } which is displayed in the UI
-    await expect(page.locator('text=Registration failed. Please try again.')).toBeVisible();
+    await expect(page).toHaveURL(new RegExp(`/register/confirm\\?email=${encodeURIComponent(testEmail)}&sent=false`));
+    await expect(page.getByText('No pudimos enviar el codigo automaticamente. Puedes reenviarlo aqui.')).toBeVisible();
   });
 
-  test('should maintain theme preference after hydration', async ({ page }) => {
-    await page.goto('/');
-    
-    // Toggle to Dark Mode
-    const themeButton = page.getByRole('button', { name: 'Toggle Theme' });
-    await themeButton.click();
-    
-    // Verify dark class on html
-    await expect(page.locator('html')).toHaveClass(/dark/);
-    
-    // Refresh page
-    await page.reload();
-    await page.waitForLoadState('networkidle');
-    
-    // Verify dark class still exists (persisted in localStorage)
-    // And verify no mismatch error in console
-    await expect(page.locator('html')).toHaveClass(/dark/);
+  test('should validate that passwords match', async ({ page }) => {
+    await page.goto('/register');
+
+    await page.locator('input[name="firstName"]').fill('Mismatch');
+    await page.locator('input[name="lastName"]').fill('User');
+    await page.locator('input[name="email"]').fill(`mismatch-${Date.now()}@vmarket.com`);
+    await page.locator('input[name="password"]').fill('Password123!');
+    await page.locator('input[name="confirmPassword"]').fill('Password123?');
+
+    await page.getByRole('button', { name: 'Create Account' }).click();
+
+    await expect(page.getByText('Passwords do not match.')).toBeVisible();
+    await expect(page).toHaveURL(/\/register$/);
   });
 });

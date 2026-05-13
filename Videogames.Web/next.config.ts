@@ -19,12 +19,14 @@ const parseHostname = (value?: string): string | null => {
 };
 
 const minioOrigin = "https://s3.androemda-surf.uk";
+const rawgApiOrigin = "https://api.rawg.io";
+const rawgMediaOrigin = "https://media.rawg.io";
 const apiOrigin = parseOrigin(process.env.NEXT_PUBLIC_API_URL);
 const minioHostname = parseHostname(minioOrigin);
 const apiHostname = parseHostname(process.env.NEXT_PUBLIC_API_URL);
 
-const connectSrc = ["'self'", apiOrigin, minioOrigin].filter(Boolean).join(" ");
-const imgSrc = ["'self'", "data:", "blob:", apiOrigin, minioOrigin].filter(Boolean).join(" ");
+const connectSrc = ["'self'", apiOrigin, minioOrigin, rawgApiOrigin].filter(Boolean).join(" ");
+const imgSrc = ["'self'", "data:", "blob:", apiOrigin, minioOrigin, rawgMediaOrigin].filter(Boolean).join(" ");
 
 const nextConfig: NextConfig = {
   output: "standalone",

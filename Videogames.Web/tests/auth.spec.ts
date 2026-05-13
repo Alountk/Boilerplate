@@ -7,6 +7,13 @@ const mockedAuthResponse = {
     firstName: 'Auth',
     lastName: 'Tester',
     email: 'auth-e2e@example.com',
+    address: '123 Test St',
+    city: 'Test City',
+    country: 'Test Country',
+    phone: '+1234567890',
+    emailVerified: false,
+    createdAt: new Date().toISOString(),
+    updatedAt: new Date().toISOString(),
   },
 };
 
@@ -30,30 +37,20 @@ test.describe('Authentication Flow', () => {
     await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
   });
 
-  test('should logout successfully', async ({ page, request }) => {
-    const timestamp = Date.now();
-    const registerResponse = await request.post('http://localhost:5017/api/Users', {
-      data: {
-        firstName: 'Logout',
-        lastName: 'Tester',
-        email: `logout_${timestamp}@test.com`,
-        password: 'StrongPassword123!',
-        address: '123 Test St',
-        city: 'Test City',
-        country: 'TestLand',
-        phone: '+1234567890',
-      },
+  test('should logout successfully', async ({ page }) => {
+    await page.route('**/api/Auth/login', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify(mockedAuthResponse),
+      });
     });
 
-    expect(registerResponse.status()).toBe(201);
-    const registerPayload = (await registerResponse.json()) as { token: string; user: unknown };
-
-    await page.addInitScript((auth) => {
-      localStorage.setItem('token', auth.token);
-      localStorage.setItem('user', JSON.stringify(auth.user));
-    }, registerPayload);
-
-    await page.goto('/');
+    await page.goto('/login');
+    await page.locator('input[name="email"]').fill(mockedAuthResponse.user.email);
+    await page.locator('input[name="password"]').fill('StrongPassword123!');
+    await page.getByRole('button', { name: /Sign In/i }).click();
+    await expect(page).toHaveURL('http://localhost:3000/');
     await expect(page.getByRole('button', { name: 'Sign out' })).toBeVisible();
 
     await page.getByRole('button', { name: 'Sign out' }).click();

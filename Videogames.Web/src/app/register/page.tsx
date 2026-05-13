@@ -5,6 +5,8 @@ import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import {
+  EyeIcon,
+  EyeSlashIcon,
   EnvelopeIcon,
   HomeIcon,
   IdentificationIcon,
@@ -20,6 +22,7 @@ type RegisterForm = {
   lastName: string;
   email: string;
   password: string;
+  confirmPassword: string;
   address: string;
   city: string;
   country: string;
@@ -33,6 +36,7 @@ const initialValues: RegisterForm = {
   lastName: "",
   email: "",
   password: "",
+  confirmPassword: "",
   address: "",
   city: "",
   country: "",
@@ -61,6 +65,10 @@ function validateRegisterForm(values: RegisterForm): Partial<Record<FieldKey, st
   else if (pwd.length < 8) next.password = "Use at least 8 characters.";
   else if (pwd.length > 100) next.password = "Must be at most 100 characters.";
 
+  const confirmPwd = values.confirmPassword;
+  if (!confirmPwd) next.confirmPassword = "Please confirm your password.";
+  else if (pwd !== confirmPwd) next.confirmPassword = "Passwords do not match.";
+
   if (values.address.trim().length > 200) next.address = "Must be at most 200 characters.";
   if (values.city.trim().length > 100) next.city = "Must be at most 100 characters.";
   if (values.country.trim().length > 100) next.country = "Must be at most 100 characters.";
@@ -73,6 +81,8 @@ export default function RegisterPage() {
   const { register, sendRegistrationCode } = useAuth();
   const router = useRouter();
   const [serverError, setServerError] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
   const validate = useCallback((form: RegisterForm) => validateRegisterForm(form), []);
 
@@ -98,7 +108,7 @@ export default function RegisterPage() {
 
   const missingRequiredCount = useMemo(() => {
     const v = runValidation(values);
-    const keys: FieldKey[] = ["firstName", "lastName", "email", "password"];
+    const keys: FieldKey[] = ["firstName", "lastName", "email", "password", "confirmPassword"];
     return keys.filter((k) => v[k]).length;
   }, [runValidation, values]);
 
@@ -107,7 +117,7 @@ export default function RegisterPage() {
     setSubmitAttempted(true);
     const fieldErrors = runValidation();
     setErrors(fieldErrors);
-    const blocking: FieldKey[] = ["firstName", "lastName", "email", "password"];
+    const blocking: FieldKey[] = ["firstName", "lastName", "email", "password", "confirmPassword"];
     if (blocking.some((k) => fieldErrors[k]) || Object.keys(fieldErrors).length > 0) {
       scrollToFirstError();
       return;
@@ -117,10 +127,10 @@ export default function RegisterPage() {
       const normalizedEmail = values.email.trim();
 
       await register({
-        ...values,
         firstName: values.firstName.trim(),
         lastName: values.lastName.trim(),
         email: normalizedEmail,
+        password: values.password,
         address: values.address.trim(),
         city: values.city.trim(),
         country: values.country.trim(),
@@ -245,9 +255,57 @@ export default function RegisterPage() {
               </div>
               <div className="relative group">
                 <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                <input id="password" name="password" type="password" value={values.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-required="true" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
+                <input id="password" name="password" type={showPassword ? "text" : "password"} value={values.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-required="true" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-outline hover:text-primary transition-colors"
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? (
+                    <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
               </div>
               <FieldFeedback id="err-password" message={showFieldError("password")} />
+            </div>
+
+            <div className="space-y-1">
+              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="confirmPassword">
+                Confirm Password <span className="text-error" aria-hidden="true">*</span>
+              </label>
+              <div className="relative group">
+                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <input
+                  id="confirmPassword"
+                  name="confirmPassword"
+                  type={showConfirmPassword ? "text" : "password"}
+                  value={values.confirmPassword}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  autoComplete="new-password"
+                  aria-required="true"
+                  aria-invalid={!!showFieldError("confirmPassword")}
+                  aria-describedby={showFieldError("confirmPassword") ? "err-confirmPassword" : undefined}
+                  className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none"
+                  placeholder="••••••••••••"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword((prev) => !prev)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-outline hover:text-primary transition-colors"
+                  aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
+                >
+                  {showConfirmPassword ? (
+                    <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
+                  ) : (
+                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
+                  )}
+                </button>
+              </div>
+              <FieldFeedback id="err-confirmPassword" message={showFieldError("confirmPassword")} />
             </div>
 
             {/* — Contact details (optional) — */}
