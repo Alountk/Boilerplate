@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Videogames.Application.DTOs;
 using Videogames.Application.Services;
+using Videogames.API.Attributes;
 using System.Security.Claims;
 
 namespace Videogames.API.Controllers;
@@ -21,6 +22,7 @@ public class VideogamesController : ControllerBase
     }
 
     [HttpPost]
+    [RequireEmailVerified]
     public async Task<ActionResult<VideogameDto>> Create(CreateVideogameDto createDto)
     {
         var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;

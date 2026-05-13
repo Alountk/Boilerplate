@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Videogames.Application.Services;
 using Videogames.Application.DTOs;
+using Videogames.API.Attributes;
 using System.Security.Claims;
 
 namespace Videogames.API.Controllers;
@@ -19,6 +20,7 @@ public class ChatController : ControllerBase
     }
 
     [HttpPost("conversations/{videogameId}")]
+    [RequireEmailVerified]
     public async Task<ActionResult<ConversationDto>> StartConversation(Guid videogameId)
     {
         var userId = Guid.Parse(User.FindFirst(ClaimTypes.NameIdentifier)!.Value);

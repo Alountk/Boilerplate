@@ -127,7 +127,20 @@ function MessagesPageContent() {
   const activeConv = conversations.find(c => c.id === activeConversationId);
 
   return (
-    <div className="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900 overflow-hidden pt-1">
+    <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
+      {user && !user.emailVerified && (
+        <div className="bg-warning-container/20 border-b border-warning/40 px-4 py-3 flex items-start gap-3">
+          <div className="w-5 h-5 rounded-full bg-warning flex items-center justify-center flex-shrink-0 mt-0.5">
+            <span className="text-warning-container text-xs font-bold">!</span>
+          </div>
+          <div className="flex-1">
+            <p className="text-sm font-semibold text-warning">Email verification required</p>
+            <p className="text-xs text-on-surface-variant">Verify your email before sending messages. Go to your profile to complete verification.</p>
+          </div>
+        </div>
+      )}
+
+      <div className="flex h-[calc(100vh-64px)] bg-gray-100 dark:bg-gray-900 overflow-hidden pt-1">
       {/* Sidebar: Conversations List */}
       <aside className={`w-full md:w-80 lg:w-96 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 flex flex-col ${activeConversationId ? 'hidden md:flex' : 'flex'}`}>
         <div className="p-4 border-b border-gray-100 dark:border-gray-700">
@@ -201,6 +214,7 @@ function MessagesPageContent() {
           </div>
         )}
       </main>
+      </div>
     </div>
   );
 }
