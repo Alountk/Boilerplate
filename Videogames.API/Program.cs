@@ -23,7 +23,8 @@ var allowedCorsOrigins = new[]
 {
     "http://localhost:3000",
     "http://127.0.0.1:3000",
-    "http://[::1]:3000"
+    "http://[::1]:3000",
+    "https://vmarket.marchan.dev" // Agregar este dominio
 };
 
 // Add CORS
@@ -35,7 +36,7 @@ builder.Services.AddCors(options =>
             builder.WithOrigins(allowedCorsOrigins)
                    .AllowAnyMethod()
                    .AllowAnyHeader()
-                   .AllowCredentials();
+                   .AllowCredentials(); // Necesario para SignalR
         });
 });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
