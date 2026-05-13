@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { ImageService } from "../infrastructure/services/ImageService";
 import {
   extractStoredImageFileName,
@@ -27,42 +27,59 @@ export default function RefreshableImage({
   fallbackSrc = DEFAULT_FALLBACK_IMAGE,
 }: RefreshableImageProps) {
   const imageService = useMemo(() => new ImageService(), []);
-  const [resolvedSrc, setResolvedSrc] = useState(() =>
-    resolveVideogameImageSrc(imageValue, type) ?? fallbackSrc
-  );
-  const [hasTriedRefresh, setHasTriedRefresh] = useState(false);
+  const sourceKey = `${type}:${imageValue ?? ""}:${fallbackSrc}`;
+  const baseResolvedSrc = resolveVideogameImageSrc(imageValue, type) ?? fallbackSrc;
 
-  useEffect(() => {
-    setResolvedSrc(resolveVideogameImageSrc(imageValue, type) ?? fallbackSrc);
-    setHasTriedRefresh(false);
-  }, [imageValue, type, fallbackSrc]);
+  const [refreshState, setRefreshState] = useState(() => ({
+    sourceKey,
+    resolvedSrc: baseResolvedSrc,
+    hasTriedRefresh: false,
+  }));
+
+  const viewState =
+    refreshState.sourceKey === sourceKey
+      ? refreshState
+      : {
+          sourceKey,
+          resolvedSrc: baseResolvedSrc,
+          hasTriedRefresh: false,
+        };
 
   return (
     // eslint-disable-next-line @next/next/no-img-element
     <img
-      src={resolvedSrc}
+      src={viewState.resolvedSrc}
       alt={alt}
       className={className}
       onError={() => {
-        if (hasTriedRefresh) {
-          setResolvedSrc(fallbackSrc);
+        if (viewState.hasTriedRefresh) {
+          setRefreshState((prev) =>
+            prev.sourceKey === sourceKey ? { ...prev, resolvedSrc: fallbackSrc } : prev
+          );
           return;
         }
 
         const fileName = extractStoredImageFileName(imageValue, type);
         if (!fileName) {
-          setResolvedSrc(fallbackSrc);
-          setHasTriedRefresh(true);
+          setRefreshState((prev) =>
+            prev.sourceKey === sourceKey
+              ? { ...prev, resolvedSrc: fallbackSrc, hasTriedRefresh: true }
+              : prev
+          );
           return;
         }
 
-        setHasTriedRefresh(true);
+        setRefreshState((prev) =>
+          prev.sourceKey === sourceKey ? { ...prev, hasTriedRefresh: true } : prev
+        );
         void imageService.refreshImageAccessUrl(fileName).then((refreshedUrl) => {
-          if (refreshedUrl) {
-            setResolvedSrc(refreshedUrl);
-            return;
-          }
-          setResolvedSrc(fallbackSrc);
+          setRefreshState((prev) => {
+            if (prev.sourceKey !== sourceKey) return prev;
+            return {
+              ...prev,
+              resolvedSrc: refreshedUrl ?? fallbackSrc,
+            };
+          });
         });
       }}
     />
