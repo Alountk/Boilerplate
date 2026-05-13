@@ -79,6 +79,25 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       .withAutomaticReconnect()
       .build();
 
+    let shouldAttemptRestart = true;
+
+    const restartConnection = async () => {
+      if (!shouldAttemptRestart) return;
+      if (!TokenService.getToken()) return;
+      if (newConnection.state !== signalR.HubConnectionState.Disconnected) return;
+
+      setRealtimeStatus("connecting");
+      try {
+        await newConnection.start();
+        setRealtimeStatus("connected");
+      } catch {
+        setRealtimeStatus("disconnected");
+        if (shouldAttemptRestart) {
+          setTimeout(restartConnection, 2000);
+        }
+      }
+    };
+
     newConnection.onreconnecting(() => {
       setRealtimeStatus("reconnecting");
     });
@@ -89,7 +108,22 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
 
     newConnection.onclose(() => {
       setRealtimeStatus("disconnected");
+
+      if (shouldAttemptRestart) {
+        setTimeout(restartConnection, 1000);
+      }
     });
+
+    const handleOnline = () => {
+      restartConnection();
+    };
+
+    const handleOffline = () => {
+      setRealtimeStatus("disconnected");
+    };
+
+    window.addEventListener("online", handleOnline);
+    window.addEventListener("offline", handleOffline);
 
     setRealtimeStatus("connecting");
 
@@ -102,6 +136,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
       })
       .catch((err) => {
         setRealtimeStatus("disconnected");
+        if (shouldAttemptRestart) {
+          setTimeout(restartConnection, 2000);
+        }
         console.error("SignalR Connection Error: ", err);
       });
 
@@ -133,6 +170,9 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return () => {
+      shouldAttemptRestart = false;
+      window.removeEventListener("online", handleOnline);
+      window.removeEventListener("offline", handleOffline);
       newConnection.stop();
       setRealtimeStatus("disconnected");
     };

@@ -200,6 +200,7 @@ make docker-deploy-down
 - [x] **Cover Fallback System**: `VideogameCover` component + RAWG API auto-fetch + text placeholder
 - [x] **Social Login Scaffolding**: Google & Apple OAuth flow wired; buttons gated behind `FEATURE-PENDING`
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.
 - [ ] **Payment Integration**: Stripe or PayPal checkout.
@@ -213,6 +214,24 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 This project is licensed under the MIT License.
 
 ## 📝 Postmortem & Improvements
+
+### Production Image Recovery Plan
+- **Audit Scope**:
+   - Enumerate all image file names currently referenced by videogames in production data.
+   - Compare referenced file names against objects that still exist in the production bucket.
+   - Produce three buckets: `healthy`, `missing-but-recoverable`, `missing-without-source`.
+- **Recovery Actions**:
+   - Restore recoverable objects from backups, bucket versioning, or deployment artifacts.
+   - Rehydrate missing derived URLs/metadata after object restore so read access works again.
+   - Mark unrecoverable images for manual remediation and expose a controlled admin/export report.
+- **Hardening Actions**:
+   - Enable or verify bucket versioning and retention/lifecycle settings for upload paths.
+   - Add periodic integrity checks that detect DB references pointing to missing objects.
+   - Add an operational backup/restore runbook for images separate from database restore steps.
+- **Validation Exit Criteria**:
+   - Zero production videogames referencing missing image objects.
+   - Verified restore drill for at least one deleted object.
+   - Monitoring/alerting in place for future object-reference drift.
 
 ### 2026-05-09: Presigned Read URL Refresh, Naming Cleanup & E2E Expansion
 - **Backend Metadata Endpoint**: Added `GET /api/Images/{fileName}/metadata` to return a short-lived read access URL plus expiration metadata. This enables frontend refresh-on-failure without relying on a full redirect request cycle.

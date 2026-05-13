@@ -1,9 +1,11 @@
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.AspNetCore.Authorization;
 using Videogames.Application.Services;
 using System.Security.Claims;
 
 namespace Videogames.Infrastructure.RealTime;
 
+[Authorize]
 public class ChatHub : Hub
 {
     private readonly IChatService _chatService;
