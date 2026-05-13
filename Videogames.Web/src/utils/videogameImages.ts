@@ -10,7 +10,7 @@ interface CachedPresignedUploadEntry {
   cachedAtUtc: string;
 }
 
-export type VideogameImageValueType = 'filename' | 'presigned';
+export type VideogameImageValueType = "filename" | "presigned";
 
 export function isExternalImageUrl(value: string): boolean {
   return HTTP_URL_REGEX.test(value);
@@ -18,7 +18,7 @@ export function isExternalImageUrl(value: string): boolean {
 
 export function extractStoredImageFileName(
   value?: string | null,
-  type: VideogameImageValueType = "filename"
+  type: VideogameImageValueType = "filename",
 ): string | null {
   if (!value || type !== "filename") return null;
 
@@ -30,14 +30,20 @@ export function extractStoredImageFileName(
   return trimmed;
 }
 
-function readPresignedAccessCache(): Record<string, CachedPresignedUploadEntry> {
+function readPresignedAccessCache(): Record<
+  string,
+  CachedPresignedUploadEntry
+> {
   if (typeof window === "undefined") return {};
 
   const raw = sessionStorage.getItem(PRESIGNED_UPLOAD_CACHE_KEY);
   if (!raw) return {};
 
   try {
-    const parsed = JSON.parse(raw) as Record<string, CachedPresignedUploadEntry>;
+    const parsed = JSON.parse(raw) as Record<
+      string,
+      CachedPresignedUploadEntry
+    >;
     return parsed ?? {};
   } catch {
     return {};
@@ -59,13 +65,13 @@ function getCachedAccessUrl(fileName: string): string | null {
 
 export function resolveVideogameImageSrc(
   value?: string | null,
-  type: VideogameImageValueType = 'filename'
+  type: VideogameImageValueType = "filename",
 ): string | null {
   if (!value) return null;
   const trimmed = value.trim();
   if (!trimmed) return null;
 
-  if (type === 'presigned') {
+  if (type === "presigned") {
     return trimmed;
   }
 
@@ -90,12 +96,15 @@ export function getVideogameImageCandidates(input: {
   urlImg?: string;
   urlImgType?: VideogameImageValueType;
 }): string[] {
-  const firstUploaded = input.images && input.images.length > 0 ? input.images[0] : null;
+  const firstUploaded =
+    input.images && input.images.length > 0 ? input.images[0] : null;
   const ordered = [
-    resolveVideogameImageSrc(firstUploaded ?? "", 'filename'),
-    resolveVideogameImageSrc(input.urlImg ?? "", input.urlImgType ?? 'filename'),
-  ]
-    .filter((value): value is string => Boolean(value));
+    resolveVideogameImageSrc(firstUploaded ?? "", "filename"),
+    resolveVideogameImageSrc(
+      input.urlImg ?? "",
+      input.urlImgType ?? "filename",
+    ),
+  ].filter((value): value is string => Boolean(value));
 
   return [...new Set(ordered)];
 }
