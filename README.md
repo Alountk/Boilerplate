@@ -234,19 +234,28 @@ This project is licensed under the MIT License.
    - Monitoring/alerting in place for future object-reference drift.
 
 ### Image Recovery Audit Script
-Use the CLI tool in `tools/ImageRecoveryAudit` to compare referenced image keys in PostgreSQL against the objects currently stored in MinIO/S3.
+Use the CLI tool in `tools/ImageRecoveryAudit` to run one or both audits:
+- `storage`: compare referenced image keys in PostgreSQL against objects currently stored in MinIO/S3.
+- `frontend-assets`: compare static `/assets/...` references in frontend source code against files present under `Videogames.Web/public/assets`.
+- `all` (default): run both audits.
+
+Audit mode:
+- `AUDIT_MODE` (`all`, `storage`, `frontend-assets`; default: `all`)
 
 Required environment variables:
-- `AUDIT_DB_CONNECTION_STRING`
-- `AUDIT_MINIO_ENDPOINT`
-- `AUDIT_MINIO_USER`
-- `AUDIT_MINIO_SECRET`
-- `AUDIT_MINIO_BUCKET`
+- For `storage` / `all`:
+   - `AUDIT_DB_CONNECTION_STRING`
+   - `AUDIT_MINIO_ENDPOINT`
+   - `AUDIT_MINIO_USER`
+   - `AUDIT_MINIO_SECRET`
+   - `AUDIT_MINIO_BUCKET`
 
 Optional environment variables:
-- `AUDIT_MINIO_REGION` (default: `us-east-1`)
-- `AUDIT_MINIO_USE_SSL` (default: `false`)
+- `AUDIT_MINIO_REGION` (default: `us-east-1`; `storage` / `all` only)
+- `AUDIT_MINIO_USE_SSL` (default: `false`; `storage` / `all` only)
 - `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
+- `AUDIT_FRONTEND_PUBLIC_DIR` (default: `./Videogames.Web/public`; `frontend-assets` / `all` only)
+- `AUDIT_FRONTEND_SOURCE_DIR` (default: `./Videogames.Web/src`; `frontend-assets` / `all` only)
 
 Run:
 ```bash
@@ -254,8 +263,11 @@ make audit-images
 ```
 
 Outputs:
-- `image-recovery-audit.json` (summary + missing references + impacted videogames/fields)
-- `missing-image-references.csv` (flat report for operations/manual remediation)
+- `image-recovery-audit.json` (storage summary + missing references + impacted videogames/fields)
+- `missing-image-references.csv` (storage flat report for operations/manual remediation)
+- `frontend-assets-audit.json` (frontend summary + missing/unused assets)
+- `missing-frontend-assets.csv` (frontend missing assets with file and line usage)
+- `unused-frontend-assets.csv` (frontend assets present on disk but not referenced in source)
 
 ### 2026-05-09: Presigned Read URL Refresh, Naming Cleanup & E2E Expansion
 - **Backend Metadata Endpoint**: Added `GET /api/Images/{fileName}/metadata` to return a short-lived read access URL plus expiration metadata. This enables frontend refresh-on-failure without relying on a full redirect request cycle.
