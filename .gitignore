@@ -87,7 +87,6 @@ Desktop.ini
 
 # User-specific configuration
 **/appsettings*.json
-!**/appsettings.json
 
 # Playwright
 **/test-results/
