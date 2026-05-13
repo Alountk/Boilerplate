@@ -203,8 +203,9 @@ make docker-deploy-down
 - [x] **Cover Fallback System**: `VideogameCover` component + RAWG API auto-fetch + text placeholder
 - [x] **Social Login Scaffolding**: Google & Apple OAuth flow wired; buttons gated behind `FEATURE-PENDING`
 - [x] **Registration Verification Baby Step 1**: Send 6-digit code on signup + confirmation page (`/register/confirm`) without blocking the existing auth flow.
+- [x] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
+- [x] **Registration Verification Baby Step 3**: Enforce email verification on sensitive actions (create listing, initiate chat).
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
-- [ ] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
 - [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.
@@ -326,6 +327,29 @@ Outputs:
    - Both backend and frontend build successfully.
    - No breaking changes; existing flows unaffected.
 - **Next Step (Baby Step 3)**: Enforce email verification gating on sensitive actions (sell item, send message, etc.).
+
+### 2026-05-13 (continued): Registration Email Verification (Baby Step 3)
+- **Goal**: Enforce email verification on sensitive user actions (create listing, initiate messages) while maintaining progressive UX.
+- **Backend Enforcement**:
+   - Updated `TokenService.GenerateToken()` to include `email_verified` claim in JWT tokens with user's current verification status.
+   - Created `RequireEmailVerifiedAttribute`: custom IAsyncAuthorizationFilter that returns 403 Forbidden if `email_verified` claim is false/missing.
+   - Applied `[RequireEmailVerified]` to:
+     - `VideogamesController.Create`: Prevents unverified users from publishing new listings.
+     - `ChatController.StartConversation`: Prevents unverified users from initiating buyer-seller conversations.
+   - Enforcement is non-blocking at submission level: users see UI warnings and backend returns 403 if they bypass frontend checks.
+- **Frontend UX Improvements**:
+   - Added warning banner on `/create` page (non-blocking): alerts unverified users that email verification is required to publish.
+   - Added warning banner on `/messages` page (non-blocking): alerts unverified users that email verification is required to send messages.
+   - Banners only show when `user.emailVerified === false`.
+   - Users can still complete forms; backend enforces the gate on submission.
+- **Rollout & Progressive Enhancement**:
+   - Users who have already verified their email are unaffected (claim always reflects current status).
+   - New users see warnings but can proceed to fill forms; backend gracefully rejects unverified submissions with 403.
+   - Error handling on frontend can later be added to show modal/redirect to verification on 403 responses.
+- **Status**:
+   - ✅ Both API and Web build cleanly.
+   - ✅ All three baby steps (send code → persist status → enforce on actions) successfully shipped.
+   - Next Phase: Additional protected endpoints, rate limiting, transactional email hardening, and observability.
 
 ### 2026-04-21: Presigned Upload Rollout (Phase 1) + API Coverage
 - **Presigned Upload Endpoint**: Added `POST /api/Images/presigned-upload` for private, short-lived upload URLs in the Images API flow.
