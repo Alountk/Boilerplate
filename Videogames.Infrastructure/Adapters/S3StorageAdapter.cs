@@ -7,12 +7,12 @@ using Videogames.Infrastructure.Configuration;
 
 namespace Videogames.Infrastructure.Adapters;
 
-public class MinioStorageAdapter : IStoragePort
+public class S3StorageAdapter : IStoragePort
 {
     private readonly MinioSettings _settings;
     private readonly IAmazonS3 _s3Client;
 
-    public MinioStorageAdapter(IOptions<MinioSettings> settings)
+    public S3StorageAdapter(IOptions<MinioSettings> settings)
     {
         _settings = settings.Value;
         var endpoint = string.IsNullOrWhiteSpace(_settings.Endpoint)
@@ -31,7 +31,7 @@ public class MinioStorageAdapter : IStoragePort
             AuthenticationRegion = string.IsNullOrWhiteSpace(_settings.Region)
                 ? "us-east-1"
                 : _settings.Region,
-            ForcePathStyle = true, // Required for MinIO
+            ForcePathStyle = true, // Required for MinIO and other S3-compatible providers
             UseHttp = !_settings.UseSSL,
         };
 
@@ -52,8 +52,7 @@ public class MinioStorageAdapter : IStoragePort
 
         await fileTransferUtility.UploadAsync(uploadRequest);
 
-        // For MinIO, we return the constructed URL or just the fileName depending on how the frontend should access it.
-        // Usually, in Hexagonal, we return the identifier/path.
+        // Return the storage key so application and API stay provider-agnostic.
         return fileName;
     }
 

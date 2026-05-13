@@ -54,7 +54,7 @@ public static class DependencyInjection
         services.AddScoped<IEmailSender, SmtpEmailSender>();
 
         // Adapters
-        services.AddScoped<IStoragePort, MinioStorageAdapter>();
+        services.AddScoped<IStoragePort, S3StorageAdapter>();
         
         return services;
     }

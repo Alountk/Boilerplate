@@ -2,6 +2,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Authorization;
 using Videogames.Application.DTOs;
 using Videogames.Application.Services;
+using Microsoft.AspNetCore.Http;
+using System;
+using System.IO;
+using System.Threading.Tasks;
 
 namespace Videogames.API.Controllers;
 
@@ -121,6 +125,34 @@ public class ImagesController : ControllerBase
         {
             _logger.LogError(ex, "Error retrieving image url {FileName}", fileName);
             return NotFound();
+        }
+    }
+
+    [HttpPost("upload-minio")]
+    public async Task<IActionResult> UploadImage(IFormFile file)
+    {
+        if (file == null || file.Length == 0)
+        {
+            return BadRequest("No file uploaded.");
+        }
+
+        try
+        {
+            _logger.LogWarning(
+                "Legacy endpoint /api/Images/upload-minio is deprecated and was used for file {FileName}. Prefer /api/Images/presigned-upload.",
+                file.FileName
+            );
+
+            using var stream = file.OpenReadStream();
+            var fileName = await _imageService.UploadImageAsync(stream, file.ContentType);
+            var fileUrl = await _imageService.GetImageUrlAsync(fileName);
+
+            return Ok(new { Url = fileUrl, fileName });
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error uploading image in legacy /upload-minio endpoint");
+            return StatusCode(500, new { Error = ex.Message });
         }
     }
 }

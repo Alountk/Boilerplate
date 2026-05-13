@@ -258,6 +258,130 @@ Required environment variables:
 
 Optional environment variables:
 - `AUDIT_MINIO_REGION` (default: `us-east-1`; `storage` / `all` only)
+
+### Recover Missing Images To MinIO/S3
+Use the same CLI tool in `tools/ImageRecoveryAudit` with mode `recover` to upload missing object keys from a local source directory.
+
+Required environment variables:
+- `AUDIT_MODE=recover`
+- `AUDIT_MINIO_ENDPOINT`
+- `AUDIT_MINIO_USER`
+- `AUDIT_MINIO_SECRET`
+- `AUDIT_MINIO_BUCKET`
+- `AUDIT_RECOVERY_SOURCE_DIR` (base folder where source images exist)
+
+Optional environment variables:
+- `AUDIT_MINIO_REGION` (default: `us-east-1`)
+- `AUDIT_MINIO_USE_SSL` (`true`/`false`)
+- `AUDIT_RECOVERY_MISSING_CSV` (default: `./audit-output/missing-image-references.csv`)
+- `AUDIT_RECOVERY_APPLY=true` to perform uploads. If omitted, it runs as dry-run.
+- `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
+
+Example:
+```bash
+# 1) Run storage audit and generate missing-image-references.csv
+AUDIT_MODE=storage dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+
+# 2) Dry-run recovery (no uploads)
+AUDIT_MODE=recover \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+AUDIT_RECOVERY_SOURCE_DIR=/path/to/recovered-images \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+
+# 3) Apply recovery uploads
+AUDIT_MODE=recover \
+AUDIT_RECOVERY_APPLY=true \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+AUDIT_RECOVERY_SOURCE_DIR=/path/to/recovered-images \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+```
+
+### Migrate External Image URLs To MinIO/S3
+Use mode `migrate-external` to migrate image references that currently store full external URLs (for example RAWG) into internal object keys stored in MinIO/S3, and update database references.
+
+Required environment variables:
+- `AUDIT_MODE=migrate-external`
+- `AUDIT_DB_CONNECTION_STRING`
+- `AUDIT_MINIO_ENDPOINT`
+- `AUDIT_MINIO_USER`
+- `AUDIT_MINIO_SECRET`
+- `AUDIT_MINIO_BUCKET`
+
+Optional environment variables:
+- `AUDIT_MINIO_REGION` (default: `us-east-1`)
+- `AUDIT_MINIO_USE_SSL` (`true`/`false`)
+- `AUDIT_EXTERNAL_KEY_PREFIX` (default: `external`)
+- `AUDIT_EXTERNAL_ALLOWED_HOSTS` (comma-separated host allow-list; empty means all hosts)
+- `AUDIT_EXTERNAL_MIGRATION_APPLY=true` to execute uploads and DB updates. If omitted, it runs as dry-run.
+- `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
+
+Example:
+```bash
+# Dry-run (plan only, no upload, no DB update)
+AUDIT_MODE=migrate-external \
+AUDIT_DB_CONNECTION_STRING='Server=localhost;Port=5432;Database=videogamesdb;User Id=videogames;Password=secret;' \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+AUDIT_EXTERNAL_ALLOWED_HOSTS=media.rawg.io \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+
+# Apply (upload + DB update)
+AUDIT_MODE=migrate-external \
+AUDIT_EXTERNAL_MIGRATION_APPLY=true \
+AUDIT_DB_CONNECTION_STRING='Server=localhost;Port=5432;Database=videogamesdb;User Id=videogames;Password=secret;' \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+AUDIT_EXTERNAL_ALLOWED_HOSTS=media.rawg.io \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+```
+
+### Sync Frontend Assets Folder To MinIO/S3
+Use mode `sync-frontend-assets` to upload files from `Videogames.Web/public/assets` to MinIO/S3.
+
+Required environment variables:
+- `AUDIT_MODE=sync-frontend-assets`
+- `AUDIT_MINIO_ENDPOINT`
+- `AUDIT_MINIO_USER`
+- `AUDIT_MINIO_SECRET`
+- `AUDIT_MINIO_BUCKET`
+
+Optional environment variables:
+- `AUDIT_MINIO_REGION` (default: `us-east-1`)
+- `AUDIT_MINIO_USE_SSL` (`true`/`false`)
+- `AUDIT_FRONTEND_PUBLIC_DIR` (default: `./Videogames.Web/public`)
+- `AUDIT_ASSETS_SYNC_PREFIX` (example: `static`, empty by default)
+- `AUDIT_ASSETS_SYNC_APPLY=true` to execute uploads. If omitted, it runs as dry-run.
+- `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
+
+Example:
+```bash
+# Dry-run
+AUDIT_MODE=sync-frontend-assets \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+
+# Apply
+AUDIT_MODE=sync-frontend-assets \
+AUDIT_ASSETS_SYNC_APPLY=true \
+AUDIT_MINIO_ENDPOINT=localhost:9000 \
+AUDIT_MINIO_USER=minioadmin \
+AUDIT_MINIO_SECRET=minioadmin \
+AUDIT_MINIO_BUCKET=videogames \
+dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+```
 - `AUDIT_MINIO_USE_SSL` (default: `false`; `storage` / `all` only)
 - `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
 - `AUDIT_FRONTEND_PUBLIC_DIR` (default: `./Videogames.Web/public`; `frontend-assets` / `all` only)
