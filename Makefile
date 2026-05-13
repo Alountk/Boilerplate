@@ -1,4 +1,4 @@
-.PHONY: docker-up run-api docker-down migrate docker-deploy-up docker-deploy-down
+.PHONY: docker-up run-api docker-down migrate docker-deploy-up docker-deploy-down audit-images
 
 migrate:
 	ASPNETCORE_ENVIRONMENT=Development dotnet ef database update --project Videogames.Infrastructure --startup-project Videogames.API
@@ -22,3 +22,6 @@ docker-deploy-up:
 
 docker-deploy-down:
 	docker compose -f docker-compose.deploy.yml down
+
+audit-images:
+	dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj

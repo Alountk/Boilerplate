@@ -233,6 +233,30 @@ This project is licensed under the MIT License.
    - Verified restore drill for at least one deleted object.
    - Monitoring/alerting in place for future object-reference drift.
 
+### Image Recovery Audit Script
+Use the CLI tool in `tools/ImageRecoveryAudit` to compare referenced image keys in PostgreSQL against the objects currently stored in MinIO/S3.
+
+Required environment variables:
+- `AUDIT_DB_CONNECTION_STRING`
+- `AUDIT_MINIO_ENDPOINT`
+- `AUDIT_MINIO_USER`
+- `AUDIT_MINIO_SECRET`
+- `AUDIT_MINIO_BUCKET`
+
+Optional environment variables:
+- `AUDIT_MINIO_REGION` (default: `us-east-1`)
+- `AUDIT_MINIO_USE_SSL` (default: `false`)
+- `AUDIT_OUTPUT_DIR` (default: `./audit-output`)
+
+Run:
+```bash
+make audit-images
+```
+
+Outputs:
+- `image-recovery-audit.json` (summary + missing references + impacted videogames/fields)
+- `missing-image-references.csv` (flat report for operations/manual remediation)
+
 ### 2026-05-09: Presigned Read URL Refresh, Naming Cleanup & E2E Expansion
 - **Backend Metadata Endpoint**: Added `GET /api/Images/{fileName}/metadata` to return a short-lived read access URL plus expiration metadata. This enables frontend refresh-on-failure without relying on a full redirect request cycle.
 - **Legacy Upload Deprecation Signal**: Added explicit warning logs whenever `POST /api/Images/upload` (legacy multipart) is used, making rollout telemetry visible while preserving backward compatibility.
