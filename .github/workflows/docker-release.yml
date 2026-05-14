@@ -3,9 +3,12 @@ name: Docker Release (Main)
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - deploy/arcane-stack.yml
+      - deploy/release.json
 
 permissions:
-  contents: read
+  contents: write
   packages: write
 
 env:
@@ -80,3 +83,83 @@ jobs:
           echo "Published version: ${{ steps.version.outputs.app_version }}"
           echo "API: ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:${{ steps.version.outputs.app_version }}"
           echo "WEB: ${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:${{ steps.version.outputs.app_version }}"
+
+      - name: Render Arcane release files
+        shell: bash
+        run: |
+          mkdir -p deploy
+
+          cat > deploy/arcane-stack.yml <<EOF
+          # Managed by .github/workflows/docker-release.yml.
+          # Arcane/Portainer should deploy this file instead of docker-compose.deploy.yml
+          # when you want the environment to follow the exact image version published by CI.
+
+          services:
+            api:
+              image: ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:${{ steps.version.outputs.app_version }}
+              pull_policy: always
+              restart: unless-stopped
+              ports:
+                - "\${API_PORT:-5017}:8080"
+              environment:
+                - ASPNETCORE_ENVIRONMENT=Production
+                - ASPNETCORE_URLS=http://+:8080
+                - ConnectionStrings__DefaultConnection=\${CONNECTION_STRING}
+                - JwtSettings__Secret=\${JWT_SECRET}
+                - JwtSettings__Issuer=\${JWT_ISSUER:-VideogamesAPI}
+                - JwtSettings__Audience=\${JWT_AUDIENCE:-VideogamesClient}
+                - JwtSettings__ExpiryMinutes=\${JWT_EXPIRY_MINUTES:-60}
+                - Minio__Endpoint=\${MINIO_ENDPOINT}
+                - Minio__User=\${MINIO_USER}
+                - Minio__Secret=\${MINIO_SECRET}
+                - Minio__BucketName=\${MINIO_BUCKET:-videogames}
+                - Minio__UseSSL=\${MINIO_USE_SSL:-false}
+                - Smtp__Host=\${SMTP_HOST:-}
+                - Smtp__Port=\${SMTP_PORT:-587}
+                - Smtp__From=\${SMTP_FROM:-}
+                - Smtp__User=\${SMTP_USER:-}
+                - Smtp__Password=\${SMTP_PASSWORD:-}
+                - Smtp__EnableSsl=\${SMTP_ENABLE_SSL:-true}
+              networks:
+                - app-network
+
+            web:
+              image: ${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:${{ steps.version.outputs.app_version }}
+              pull_policy: always
+              restart: unless-stopped
+              ports:
+                - "\${WEB_PORT:-3000}:3000"
+              environment:
+                - NODE_ENV=production
+              networks:
+                - app-network
+              depends_on:
+                - api
+
+          networks:
+            app-network:
+              driver: bridge
+          EOF
+
+          cat > deploy/release.json <<EOF
+          {
+            "appVersion": "${{ steps.version.outputs.app_version }}",
+            "gitSha": "${{ github.sha }}",
+            "apiImage": "${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:${{ steps.version.outputs.app_version }}",
+            "webImage": "${{ env.REGISTRY }}/${{ steps.image.outputs.web_image }}:${{ steps.version.outputs.app_version }}"
+          }
+          EOF
+
+      - name: Commit Arcane release files
+        shell: bash
+        run: |
+          if [ -z "$(git status --porcelain -- deploy/arcane-stack.yml deploy/release.json)" ]; then
+            echo "No Arcane release file changes to commit."
+            exit 0
+          fi
+
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add deploy/arcane-stack.yml deploy/release.json
+          git commit -m "chore: update Arcane release manifest for ${{ steps.version.outputs.app_version }}"
+          git push origin HEAD:main

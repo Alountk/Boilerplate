@@ -137,14 +137,16 @@ Deployments can be pinned to an immutable image version generated in CI on every
 
 Important: use `docker-compose.deploy.yml` in Portainer or remote deployments. The root `docker-compose.yml` is for local builds and uses local image names, so a remote engine may try to inspect `docker.io/library/...` and fail.
 
+If you use Arcane or any GitOps-style stack sync that reacts immediately to git changes, prefer the CI-managed stack file `deploy/arcane-stack.yml`. It is rewritten only after the Docker release workflow has already pushed the immutable image tags to GHCR.
+
 1. Set deployment variables (based on `.env.portainer.example`):
 ```bash
-APP_VERSION=main-latest
+APP_VERSION=main-<runNumber>-<shortSha>
 API_IMAGE_REPO=ghcr.io/<owner>/vmarket-api
 WEB_IMAGE_REPO=ghcr.io/<owner>/vmarket-web
 ```
 
-2. For a fixed rollback-friendly release, replace `APP_VERSION` with the exact CI tag:
+2. Use the exact CI tag published by the `Docker Release (Main)` workflow:
 ```bash
 APP_VERSION=main-<runNumber>-<shortSha>
 ```
@@ -154,15 +156,35 @@ APP_VERSION=main-<runNumber>-<shortSha>
 docker compose -f docker-compose.deploy.yml up -d
 ```
 
-4. If the GHCR packages are private, configure Portainer with registry credentials for `ghcr.io` before deploying.
+4. `docker-compose.deploy.yml` now sets `pull_policy: always`, so remote stacks re-check GHCR even if a tag already exists locally.
 
-5. Rollback to a previous release by changing only `APP_VERSION` and re-running deploy.
+5. If the GHCR packages are private, configure Portainer/Arcane with registry credentials for `ghcr.io` before deploying.
+
+6. Rollback to a previous release by changing only `APP_VERSION` and re-running deploy.
+
+7. Avoid `APP_VERSION=main-latest` in GitOps-style auto-deploy flows. If the stack update is triggered by the git push itself, the deploy can happen before CI finishes publishing the new image, which leaves the environment one release behind.
 
 Helper make targets:
 ```bash
 make docker-deploy-up
 make docker-deploy-down
 ```
+
+### Arcane / GitOps Exact Version Flow
+
+For Arcane, point the stack to `deploy/arcane-stack.yml` instead of `docker-compose.deploy.yml`.
+
+How it works:
+- A push to `main` triggers `.github/workflows/docker-release.yml`.
+- CI builds and pushes the API and Web images with an immutable tag `main-<runNumber>-<shortSha>`.
+- After the push succeeds, CI rewrites `deploy/arcane-stack.yml` and `deploy/release.json` with those exact tags.
+- CI commits those release files back to `main`.
+- Arcane then deploys the commit that already contains the pinned image tags, avoiding the race where a stack update happens before `main-latest` is refreshed.
+
+Notes:
+- `deploy/arcane-stack.yml` still keeps runtime secrets and ports as environment variables, so you can continue configuring them in Arcane/Portainer.
+- The workflow ignores commits that only update `deploy/arcane-stack.yml` and `deploy/release.json`, so this release-manifest commit does not loop forever.
+- `deploy/release.json` is only a small observable manifest for humans/tools; Arcane should deploy `deploy/arcane-stack.yml`.
 
 ## 📂 Project Structure
 

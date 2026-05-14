@@ -1,0 +1,6 @@
+{
+  "appVersion": "main-latest",
+  "gitSha": "pending-ci",
+  "apiImage": "ghcr.io/alountk/vmarket-api:main-latest",
+  "webImage": "ghcr.io/alountk/vmarket-web:main-latest"
+}
