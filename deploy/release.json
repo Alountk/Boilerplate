@@ -1,6 +1,6 @@
 {
-  "appVersion": "main-latest",
-  "gitSha": "pending-ci",
-  "apiImage": "ghcr.io/alountk/vmarket-api:main-latest",
-  "webImage": "ghcr.io/alountk/vmarket-web:main-latest"
+  "appVersion": "main-36-e253afb",
+  "gitSha": "e253afb3a0794212d4accff0c6cb5fbe3dc19232",
+  "apiImage": "ghcr.io/alountk/vmarket-api:main-36-e253afb",
+  "webImage": "ghcr.io/alountk/vmarket-web:main-36-e253afb"
 }

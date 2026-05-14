@@ -1,13 +1,10 @@
 # Managed by .github/workflows/docker-release.yml.
 # Arcane/Portainer should deploy this file instead of docker-compose.deploy.yml
 # when you want the environment to follow the exact image version published by CI.
-#
-# Until the next Docker Release workflow rewrites this file, it falls back to
-# `main-latest`. After the workflow runs, CI pins exact immutable tags here.
 
 services:
   api:
-    image: ghcr.io/alountk/vmarket-api:main-latest
+    image: ghcr.io/alountk/vmarket-api:main-36-e253afb
     pull_policy: always
     restart: unless-stopped
     ports:
@@ -35,7 +32,7 @@ services:
       - app-network
 
   web:
-    image: ghcr.io/alountk/vmarket-web:main-latest
+    image: ghcr.io/alountk/vmarket-web:main-36-e253afb
     pull_policy: always
     restart: unless-stopped
     ports:
