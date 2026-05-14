@@ -41,8 +41,8 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
   - Utility helpers `resolveVideogameImageSrc` and `getVideogameImageCandidates` for reuse across the app
 - **Frontend Asset Hardening**:
    - Critical UI icons migrated from Material Symbols font ligatures to bundled Heroicons SVGs
-   - Marketplace category cards now use local images served from `Videogames.Web/public/assets/categories`
-   - Removes runtime dependence on external font/CDN availability for core navigation and homepage visuals
+   - Homepage and login marketing assets now resolve through `NEXT_PUBLIC_IMAGE_BASE_URL` when configured, with automatic fallback to local files under `Videogames.Web/public/assets`
+   - Removes runtime dependence on external font/CDN availability while still allowing S3-hosted frontend assets in deployed environments
 - **Social Login Scaffolding** (Google & Apple): OAuth flow wired end-to-end; UI buttons disabled until provider credentials are configured (`FEATURE-PENDING`)
 - **Dual-Hexagonal Pattern**: Decoupled layers for maximum testability.
 - **Responsive Design**: Premium UI with Dark Mode support and micro-animations.
@@ -258,6 +258,22 @@ Required environment variables:
 
 Optional environment variables:
 - `AUDIT_MINIO_REGION` (default: `us-east-1`; `storage` / `all` only)
+
+### Frontend Asset Base URL Postmortem
+- **Incident**:
+   - The homepage hero and homepage category cards were using hardcoded `/assets/...` paths instead of the same environment-driven resolution used by uploaded product images.
+   - In environments where frontend assets are expected to load from S3 via `NEXT_PUBLIC_IMAGE_BASE_URL`, those homepage assets stayed on local paths and never switched to the remote origin.
+- **Root Cause**:
+   - Asset URL resolution logic existed for uploaded videogame images in `Videogames.Web/src/utils/videogameImages.ts`, but static marketing assets were bypassing that path entirely.
+   - The regression was architectural rather than infrastructural: the app had two separate conventions for image URLs.
+- **Fix Applied**:
+   - Added a shared `resolveFrontendAssetSrc()` helper alongside the existing videogame image resolver.
+   - Updated homepage hero, homepage category cards, and login background to use the shared resolver.
+   - Preserved local `/assets/...` fallback behavior when `NEXT_PUBLIC_IMAGE_BASE_URL` is unset so local development and non-S3 deployments continue to work.
+- **Prevention**:
+   - Treat frontend marketing assets and uploaded images as separate categories, but require both to go through explicit URL resolvers.
+   - Avoid introducing new hardcoded `/assets/...` paths directly inside page components when the deployment model supports remote asset hosting.
+   - Keep the `frontend-assets` audit as a guardrail for missing files, but not as a substitute for runtime URL resolution review.
 
 ### Recover Missing Images To MinIO/S3
 Use the same CLI tool in `tools/ImageRecoveryAudit` with mode `recover` to upload missing object keys from a local source directory.

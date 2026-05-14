@@ -9,8 +9,10 @@ import VideogameCard from "../components/VideogameCard";
 import { ArchiveBoxIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
 
 import { CATEGORIES } from "../constants/categories";
+import { resolveFrontendAssetSrc } from "../utils/videogameImages";
 
 const PAGE_SIZE = 12;
+const HOME_HERO_IMAGE = resolveFrontendAssetSrc("assets/backgrounds/home-hero-gaming.jpg");
 
 export default function Home() {
   const [videogames, setVideogames] = useState<Videogame[]>([]);
@@ -93,7 +95,7 @@ export default function Home() {
         <div className="absolute inset-0 z-0">
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src="/assets/backgrounds/home-hero-gaming.jpg"
+            src={HOME_HERO_IMAGE}
             alt="Neon gaming setup with monitors and controller"
             className="w-full h-full object-cover opacity-30 grayscale"
           />

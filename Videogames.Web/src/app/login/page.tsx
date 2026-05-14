@@ -8,9 +8,11 @@ import { EnvelopeIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from "@heroicons/
 import { scrollToFirstError } from "../../utils/formUtils";
 import { useFormState } from "../../hooks/useFormState";
 import { FieldFeedback } from "../../components/FieldFeedback";
+import { resolveFrontendAssetSrc } from "../../utils/videogameImages";
 
 type LoginForm = { email: string; password: string };
 const initialValues: LoginForm = { email: "", password: "" };
+const LOGIN_BACKGROUND_IMAGE = resolveFrontendAssetSrc("assets/backgrounds/login-gaming-desk.jpg");
 
 function validateLoginForm(values: LoginForm): Partial<Record<keyof LoginForm, string>> {
   const next: Partial<Record<keyof LoginForm, string>> = {};
@@ -209,7 +211,7 @@ export default function LoginPage() {
             <img
               alt=""
               className="w-full h-full object-cover mix-blend-overlay opacity-30"
-              src="/assets/backgrounds/login-gaming-desk.jpg"
+              src={LOGIN_BACKGROUND_IMAGE}
             />
           </div>
         </div>

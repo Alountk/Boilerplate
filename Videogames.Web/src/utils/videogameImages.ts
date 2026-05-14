@@ -91,6 +91,22 @@ export function resolveVideogameImageSrc(
   return `${API_BASE_URL}/Images/${trimmed}`;
 }
 
+export function resolveFrontendAssetSrc(value?: string | null): string {
+  if (!value) return "";
+
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+  if (isExternalImageUrl(trimmed)) return trimmed;
+
+  const normalizedPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
+  if (!IMAGE_BASE_URL) return `/${normalizedPath}`;
+
+  const normalizedBaseUrl = IMAGE_BASE_URL.endsWith("/")
+    ? IMAGE_BASE_URL.slice(0, -1)
+    : IMAGE_BASE_URL;
+  return `${normalizedBaseUrl}/${normalizedPath}`;
+}
+
 export function getVideogameImageCandidates(input: {
   images?: string[];
   urlImg?: string;
