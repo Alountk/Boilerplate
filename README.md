@@ -185,7 +185,7 @@ Notes:
 - `deploy/arcane-stack.yml` still keeps runtime secrets and ports as environment variables, so you can continue configuring them in Arcane/Portainer.
 - The workflow ignores commits that only update `deploy/arcane-stack.yml` and `deploy/release.json`, so this release-manifest commit does not loop forever.
 - `deploy/release.json` is only a small observable manifest for humans/tools; Arcane should deploy `deploy/arcane-stack.yml`.
-- For frontend marketing assets (hero/categories/login background) rendered from MinIO/S3, define repository variable `NEXT_PUBLIC_IMAGE_BASE_URL` in GitHub Actions settings. This value is injected at web image build-time.
+- For frontend API and marketing assets in production builds, define repository variables `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_IMAGE_BASE_URL` in GitHub Actions settings. These values are injected at web image build-time.
 
 ## 📂 Project Structure
 

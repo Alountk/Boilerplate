@@ -71,6 +71,7 @@ jobs:
           file: ./Videogames.Web/Dockerfile
           push: true
           build-args: |
+            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_APP_VERSION=${{ steps.version.outputs.app_version }}
             NEXT_PUBLIC_IMAGE_BASE_URL=${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL }}
             APP_VERSION=${{ steps.version.outputs.app_version }}
