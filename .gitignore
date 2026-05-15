@@ -27,6 +27,10 @@ bld/
 [Ll]og/
 [Ll]ogs/
 
+# Allow Next.js debug route folder (otherwise blocked by [Dd]ebug/)
+!Videogames.Web/src/app/debug/
+!Videogames.Web/src/app/debug/**
+
 # Visual Studio 2015/2017 cache/options directory
 .vs/
 # Visual Studio 2017 auto generated files
