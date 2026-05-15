@@ -113,7 +113,7 @@ export default function DebugPage() {
         </div>
 
         <div className="mt-8 text-center text-gray-500">
-          <p className="text-sm">Remember to delete this page in production once you've debugged the issue.</p>
+          <p className="text-sm">Remember to delete this page in production once you`&#39;`ve debugged the issue.</p>
         </div>
       </div>
     </div>
