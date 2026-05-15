@@ -1,4 +1,4 @@
-export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5017/api";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "";
 export const IMAGE_BASE_URL = process.env.NEXT_PUBLIC_IMAGE_BASE_URL || "";
 
 export const HUB_URL = API_BASE_URL.endsWith('/api') 
