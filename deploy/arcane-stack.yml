@@ -28,6 +28,7 @@ services:
       - Smtp__User=${SMTP_USER:-}
       - Smtp__Password=${SMTP_PASSWORD:-}
       - Smtp__EnableSsl=${SMTP_ENABLE_SSL:-true}
+      - CORS_ALLOWED_ORIGINS=${CORS_ALLOWED_ORIGINS:-}
     networks:
       - app-network
 

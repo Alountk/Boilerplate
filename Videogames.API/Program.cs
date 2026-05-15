@@ -27,6 +27,23 @@ var allowedCorsOrigins = new[]
     "https://vmarket.marchan.dev" // Agregar este dominio
 };
 
+var corsOriginsFromEnv = builder.Configuration["Cors:AllowedOrigins"]
+    ?? builder.Configuration["CORS_ALLOWED_ORIGINS"];
+
+if (!string.IsNullOrWhiteSpace(corsOriginsFromEnv))
+{
+    var parsedOrigins = corsOriginsFromEnv
+        .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+        .Where(origin => Uri.TryCreate(origin, UriKind.Absolute, out _))
+        .Distinct(StringComparer.OrdinalIgnoreCase)
+        .ToArray();
+
+    if (parsedOrigins.Length > 0)
+    {
+        allowedCorsOrigins = parsedOrigins;
+    }
+}
+
 // Add CORS
 builder.Services.AddCors(options =>
 {
