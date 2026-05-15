@@ -97,14 +97,33 @@ export function resolveFrontendAssetSrc(value?: string | null): string {
   const trimmed = value.trim();
   if (!trimmed) return "";
   if (isExternalImageUrl(trimmed)) return trimmed;
-
+  
   const normalizedPath = trimmed.startsWith("/") ? trimmed.slice(1) : trimmed;
-  if (!IMAGE_BASE_URL) return `/${normalizedPath}`;
-
+  
+  if (!IMAGE_BASE_URL) {
+    const fallbackUrl = `/${normalizedPath}`;
+    if (typeof window !== 'undefined') {
+      console.warn(
+        `[vMarket] NEXT_PUBLIC_IMAGE_BASE_URL not set. Using local fallback: ${fallbackUrl}`,
+        { value, IMAGE_BASE_URL }
+      );
+    }
+    return fallbackUrl;
+  }
+  
   const normalizedBaseUrl = IMAGE_BASE_URL.endsWith("/")
     ? IMAGE_BASE_URL.slice(0, -1)
     : IMAGE_BASE_URL;
-  return `${normalizedBaseUrl}/${normalizedPath}`;
+  
+  const resolvedUrl = `${normalizedBaseUrl}/${normalizedPath}`;
+  if (typeof window !== 'undefined') {
+    console.log(
+      `[vMarket] Resolved frontend asset: ${value} → ${resolvedUrl}`,
+      { IMAGE_BASE_URL, normalizedBaseUrl, normalizedPath }
+    );
+  }
+  
+  return resolvedUrl;
 }
 
 export function getVideogameImageCandidates(input: {
