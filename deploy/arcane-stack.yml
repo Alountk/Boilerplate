@@ -4,7 +4,7 @@
 
 services:
   api:
-    image: ghcr.io/alountk/vmarket-api:main-40-9883f59
+    image: ghcr.io/alountk/vmarket-api:main-41-c20ae97
     pull_policy: always
     restart: unless-stopped
     ports:
@@ -32,7 +32,7 @@ services:
       - app-network
 
   web:
-    image: ghcr.io/alountk/vmarket-web:main-40-9883f59
+    image: ghcr.io/alountk/vmarket-web:main-41-c20ae97
     pull_policy: always
     restart: unless-stopped
     ports:
