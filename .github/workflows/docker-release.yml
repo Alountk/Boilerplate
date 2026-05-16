@@ -62,6 +62,11 @@ jobs:
             echo "Set it in GitHub Settings -> Secrets and variables -> Actions as Variable or Secret" >&2
             exit 1
           fi
+          if [[ "$NEXT_PUBLIC_API_URL" == *"localhost"* ]] || [[ "$NEXT_PUBLIC_API_URL" == *"127.0.0.1"* ]]; then
+            echo "ERROR: NEXT_PUBLIC_API_URL cannot point to localhost/127.0.0.1 for Docker release" >&2
+            echo "Current value points to local host. Set a public API URL, e.g. https://api.yourdomain.com/api" >&2
+            exit 1
+          fi
           if [ -z "$NEXT_PUBLIC_IMAGE_BASE_URL" ]; then
             echo "ERROR: Missing NEXT_PUBLIC_IMAGE_BASE_URL" >&2
             echo "Set it in GitHub Settings -> Secrets and variables -> Actions as Variable or Secret" >&2
