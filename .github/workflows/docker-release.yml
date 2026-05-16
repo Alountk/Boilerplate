@@ -52,20 +52,22 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Validate web build variables
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_IMAGE_BASE_URL: ${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL || secrets.NEXT_PUBLIC_IMAGE_BASE_URL }}
         shell: bash
         run: |
-          echo "NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}"
-          if [ -z "${{ vars.NEXT_PUBLIC_API_URL }}" ]; then
-            echo "ERROR: Missing repository variable NEXT_PUBLIC_API_URL" >&2
-            echo "Set it in GitHub Settings -> Secrets and variables -> Actions -> Variables" >&2
+          if [ -z "$NEXT_PUBLIC_API_URL" ]; then
+            echo "ERROR: Missing NEXT_PUBLIC_API_URL" >&2
+            echo "Set it in GitHub Settings -> Secrets and variables -> Actions as Variable or Secret" >&2
             exit 1
           fi
-          echo "NEXT_PUBLIC_IMAGE_BASE_URL=${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL }}"
-          if [ -z "${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL }}" ]; then
-            echo "ERROR: Missing repository variable NEXT_PUBLIC_IMAGE_BASE_URL" >&2
-            echo "Set it in GitHub Settings -> Secrets and variables -> Actions -> Variables" >&2
+          if [ -z "$NEXT_PUBLIC_IMAGE_BASE_URL" ]; then
+            echo "ERROR: Missing NEXT_PUBLIC_IMAGE_BASE_URL" >&2
+            echo "Set it in GitHub Settings -> Secrets and variables -> Actions as Variable or Secret" >&2
             exit 1
           fi
+          echo "Web build variables validated (values hidden)."
 
       - name: Build and push API image
         uses: docker/build-push-action@v6
@@ -81,15 +83,18 @@ jobs:
             ${{ env.REGISTRY }}/${{ steps.image.outputs.api_image }}:main-latest
 
       - name: Build and push Web image
+        env:
+          NEXT_PUBLIC_API_URL: ${{ vars.NEXT_PUBLIC_API_URL || secrets.NEXT_PUBLIC_API_URL }}
+          NEXT_PUBLIC_IMAGE_BASE_URL: ${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL || secrets.NEXT_PUBLIC_IMAGE_BASE_URL }}
         uses: docker/build-push-action@v6
         with:
           context: ./Videogames.Web
           file: ./Videogames.Web/Dockerfile
           push: true
           build-args: |
-            NEXT_PUBLIC_API_URL=${{ vars.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_API_URL=${{ env.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_APP_VERSION=${{ steps.version.outputs.app_version }}
-            NEXT_PUBLIC_IMAGE_BASE_URL=${{ vars.NEXT_PUBLIC_IMAGE_BASE_URL }}
+            NEXT_PUBLIC_IMAGE_BASE_URL=${{ env.NEXT_PUBLIC_IMAGE_BASE_URL }}
             APP_VERSION=${{ steps.version.outputs.app_version }}
             GIT_SHA=${{ github.sha }}
           tags: |
