@@ -39,9 +39,9 @@ public class AuthController : ControllerBase
         }
         catch (Exception ex)
         {
-            _logger.LogError(ex, "Error during login for user: {Email} | Exception Type: {ExceptionType} | Message: {Message}", 
+            _logger.LogError(ex, "Error during login for user: {Email} | Exception Type: {ExceptionType} | Message: {Message}",
                 loginDto.Email, ex.GetType().Name, ex.Message);
-            
+
             // Return different error messages based on exception type
             var errorMessage = ex switch
             {
@@ -49,7 +49,7 @@ public class AuthController : ControllerBase
                 InvalidOperationException => ex.Message.Contains("JWT") ? "Token generation error" : "Login error",
                 _ => "An error occurred during login"
             };
-            
+
             return StatusCode(500, new { error = errorMessage, details = ex.Message });
         }
     }
