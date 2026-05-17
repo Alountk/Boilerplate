@@ -63,7 +63,21 @@ builder.Services.AddInfrastructure(builder.Configuration);
 
 // Configure JWT Authentication
 var jwtSettings = builder.Configuration.GetSection("JwtSettings").Get<Videogames.Application.Settings.JwtSettings>();
-var key = System.Text.Encoding.ASCII.GetBytes(jwtSettings!.Secret);
+if (jwtSettings is null)
+{
+    throw new InvalidOperationException("Missing JwtSettings configuration.");
+}
+
+var minimumJwtSecretBytes = 32;
+var jwtSecret = jwtSettings.Secret ?? string.Empty;
+var secretLengthInBytes = System.Text.Encoding.ASCII.GetByteCount(jwtSecret);
+if (secretLengthInBytes < minimumJwtSecretBytes)
+{
+    throw new InvalidOperationException(
+        $"JwtSettings:Secret must be at least {minimumJwtSecretBytes} ASCII bytes for HS256. Current length: {secretLengthInBytes} bytes.");
+}
+
+var key = System.Text.Encoding.ASCII.GetBytes(jwtSecret);
 
 builder.Services.AddAuthentication(x =>
 {
