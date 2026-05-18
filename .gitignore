@@ -81,6 +81,7 @@ Desktop.ini
 *.m4a
 
 # Visual Studio Code
+.vscode/
 
 
 # Rider

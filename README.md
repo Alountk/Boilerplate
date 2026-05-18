@@ -51,14 +51,69 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
 
 ## 🛠 Tech Stack
 
+### Technologies Used Across The Project
+
+| Technology | What it is used for | Where it appears |
+| --- | --- | --- |
+| .NET 10 / ASP.NET Core | REST API, controllers, auth, DI and HTTP pipeline | `Videogames.API`, `Videogames.Application`, `Videogames.Infrastructure`, `Videogames.Domain` |
+| Hexagonal Architecture | Separation of domain, use cases, adapters and delivery layers | Entire backend and frontend project structure |
+| Entity Framework Core + Npgsql | Database access, migrations and repository persistence | `Videogames.Infrastructure/Persistence`, `Videogames.Infrastructure/Migrations` |
+| PostgreSQL | Main relational database | Infrastructure configuration and EF Core provider |
+| In-memory repositories | Local fallback when DB connection is missing | `Videogames.Infrastructure/DependencyInjection.cs` |
+| JWT Bearer | API authentication and protected endpoints | `Videogames.API/Program.cs`, auth flow |
+| BCrypt | Password hashing | `Videogames.Application` |
+| Google OAuth | Social login integration | `Videogames.Web/src/components/Providers.tsx`, auth services |
+| Apple Sign In | Social login scaffolding on frontend | `Videogames.Web/src/app/layout.tsx` |
+| SignalR | Real-time chat between users | `Videogames.Infrastructure/RealTime`, web chat client |
+| AWSSDK.S3 + MinIO/S3 | Image storage and object access | storage adapter, image services, audit/recovery tooling |
+| SMTP | Registration email verification and notifications | `Videogames.Infrastructure/Services/SmtpEmailSender.cs` |
+| Next.js 16 | Frontend framework and App Router | `Videogames.Web` |
+| React 19 | UI rendering and client components | `Videogames.Web/src` |
+| TypeScript 5 | Frontend typing and app code | `Videogames.Web/src`, `tsconfig.json` |
+| Tailwind CSS 4 + PostCSS | Styling and design system utilities | `Videogames.Web`, `postcss.config.mjs` |
+| Axios | HTTP client for API and external requests | `Videogames.Web/src/infrastructure/api`, service layer |
+| React Context | Auth and chat state management | `Videogames.Web/src/context` |
+| Heroicons + Iconoir | UI iconography | `Videogames.Web/package.json`, components |
+| RAWG API | Videogame metadata search and autofill | `Videogames.Web/src/infrastructure/services/RAWGService.ts` |
+| Tesseract.js | OCR-based title detection from cover images | `Videogames.Web/src/hooks/useOcrAutofill.ts` |
+| xUnit + Moq + Coverlet | Backend automated tests and coverage | `Videogames.Tests` |
+| Playwright | End-to-end tests for auth, chat and marketplace flows | `Videogames.Web/tests`, `playwright.config.ts` |
+| Docker + Docker Compose | Local and deploy container orchestration | root Dockerfiles and compose files |
+| Node.js 20 + npm | Frontend build and runtime toolchain | `Videogames.Web/Dockerfile`, package scripts |
+| GitHub Actions + GHCR | CI/CD and versioned image publishing | `.github/workflows/docker-release.yml` |
+| Arcane / Portainer manifests | Remote deployment consumption | `deploy/arcane-stack.yml`, `docker-compose.deploy.yml` |
+
+- **Backend platform**: ASP.NET Core Web API on .NET 10 with layered projects (`Domain`, `Application`, `Infrastructure`, `API`)
+- **Backend architecture**: Hexagonal Architecture / Ports and Adapters
+- **Persistence**: Entity Framework Core 10 + Npgsql + PostgreSQL
+- **Fallback persistence for local/dev scenarios**: In-memory repositories when `DefaultConnection` is not configured
+- **Authentication and security**: JWT Bearer, BCrypt password hashing, Google OAuth integration, Apple Sign In scaffolding
+- **Real-time communication**: SignalR for chat
+- **Storage**: MinIO / S3-compatible object storage through `AWSSDK.S3`
+- **Email delivery**: SMTP via `System.Net.Mail`
+- **Frontend framework**: Next.js 16 App Router + React 19
+- **Frontend language**: TypeScript 5
+- **Frontend styling**: Tailwind CSS 4 + PostCSS
+- **HTTP client**: Axios with auth and presigned-URL aware interceptors
+- **State management**: React Context providers for auth and chat
+- **Icons and UI assets**: Heroicons, Iconoir, Google Fonts via `next/font`, and Material Symbols stylesheet
+- **External product integrations**: RAWG API for videogame metadata and `tesseract.js` for OCR-based autofill
+- **Backend testing**: xUnit, Moq, Coverlet, SQLite provider for tests
+- **Frontend testing**: Playwright end-to-end tests
+- **Containerization**: Docker + Docker Compose
+- **Build/runtime environments**: Node.js 20 for web, .NET 10 for API
+- **Automation and CI/CD**: Makefile tasks + GitHub Actions + GHCR image publishing + Arcane/Portainer release manifests
+
 ### Backend
 - **Framework**: .NET 10.0
-- **Database**: PostgreSQL 17
+- **Database**: PostgreSQL
 - **ORM**: Entity Framework Core 10.0
 - **Security**: 
   - JWT Authentication (Microsoft.AspNetCore.Authentication.JwtBearer 10.0.0)
   - BCrypt.Net-Next 4.0.3
-- **Storage**: MinIO (S3-compatible) via AWSSDK.S3 3.7.407
+- **Realtime**: SignalR chat hub
+- **Storage**: MinIO / S3-compatible object storage via AWSSDK.S3
+- **Email**: SMTP verification and notification flow
 - **Logging**: Serilog.AspNetCore 9.0.0
 - **Testing**: xUnit 2.9.2, Moq 4.20.72
 - **API Documentation**: Swashbuckle.AspNetCore 6.6.2
@@ -69,12 +124,18 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
 - **Language**: TypeScript 5.x
 - **Styling**: Tailwind CSS 4.x (Vanilla CSS with modern patterns)
 - **Icons**: Heroicons 2.2.0, Iconoir React 7.11.0
-- **API Client**: Axios 1.13.2 with interceptors
+- **Authentication UI**: Google OAuth provider integration and Apple Sign In client bootstrap
+- **Realtime Client**: Microsoft SignalR client
+- **API Client**: Axios with interceptors
+- **OCR**: Tesseract.js 7
+- **External API**: RAWG videogame metadata API
 - **E2E Testing**: Playwright 1.57.0
 
 ### Infrastructure
 - **Containerization**: Docker & Docker Compose
+- **Image Registry**: GitHub Container Registry (GHCR)
 - **CI/CD**: GitHub Actions
+- **Deployment target**: Arcane / Portainer compatible manifests
 - **Node.js**: 20.x
 - **Package Manager**: npm
 
