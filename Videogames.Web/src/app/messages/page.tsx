@@ -130,7 +130,7 @@ function MessagesPageContent() {
     <div className="flex flex-col min-h-screen bg-gray-100 dark:bg-gray-900">
       {user && !user.emailVerified && (
         <div className="bg-warning-container/20 border-b border-warning/40 px-4 py-3 flex items-start gap-3">
-          <div className="w-5 h-5 rounded-full bg-warning flex items-center justify-center flex-shrink-0 mt-0.5">
+          <div className="w-5 h-5 rounded-full bg-warning flex items-center justify-center shrink-0 mt-0.5">
             <span className="text-warning-container text-xs font-bold">!</span>
           </div>
           <div className="flex-1">
@@ -148,7 +148,10 @@ function MessagesPageContent() {
             <ChatBubbleLeftRightIcon className="h-6 w-6 text-blue-600" />
             Messages
           </h2>
-          <div className={`inline-flex items-center gap-2 text-xs font-semibold ${realtimeBadge.tone}`}>
+          <div
+            data-testid="chat-connection-status"
+            className={`inline-flex items-center gap-2 text-xs font-semibold ${realtimeBadge.tone}`}
+          >
             <span className={`h-2.5 w-2.5 rounded-full ${realtimeBadge.dot}`} />
             {realtimeBadge.text}
           </div>

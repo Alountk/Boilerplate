@@ -28,6 +28,7 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
    - New optional verification step after signup: send 6-digit code by email and confirm on a dedicated page.
    - Implemented in baby-step mode to avoid breaking current flow: account creation/login still works even if email verification is pending.
 - **Inventory Management**: Sell and list items with detailed forms (pricing, condition, categories).
+- **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, items in progress, and completed purchase/exchange history.
 - **Image Upload System**: 
   - Multiple cover images with drag-and-drop reordering
   - Individual uploads for 6 product sides (Front, Back, Right, Left, Top, Bottom)
@@ -131,6 +132,12 @@ npx playwright install
 npm run test:e2e
 ```
 
+### Chat Smoke (Auth + Chat)
+```bash
+cd Videogames.Web
+npx playwright test --config playwright.config.ts tests/auth.spec.ts tests/chat.spec.ts --project=chromium --reporter=line
+```
+
 ## 🚀 Versioned Docker Deploy
 
 Deployments can be pinned to an immutable image version generated in CI on every push to `main`.
@@ -231,6 +238,7 @@ Notes:
 - [x] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
 - [x] **Registration Verification Baby Step 3**: Enforce email verification on sensitive actions (create listing, initiate chat).
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [ ] **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, and purchase/exchange history, including items in progress and completed transactions.
 - [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
 - [ ] **Advanced Filtering**: Full-text search and faceted navigation.

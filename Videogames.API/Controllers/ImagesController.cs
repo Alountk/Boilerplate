@@ -4,7 +4,6 @@ using Videogames.Application.DTOs;
 using Videogames.Application.Services;
 using Microsoft.AspNetCore.Http;
 using System;
-using System.IO;
 using System.Threading.Tasks;
 
 namespace Videogames.API.Controllers;
@@ -136,6 +135,11 @@ public class ImagesController : ControllerBase
             return BadRequest("No file uploaded.");
         }
 
+        if (file.Length > MaxUploadSizeBytes)
+        {
+            return BadRequest($"File size exceeds allowed limit of {MaxUploadSizeBytes} bytes.");
+        }
+
         try
         {
             _logger.LogWarning(
@@ -148,6 +152,10 @@ public class ImagesController : ControllerBase
             var fileUrl = await _imageService.GetImageUrlAsync(fileName);
 
             return Ok(new { Url = fileUrl, fileName });
+        }
+        catch (ArgumentException ex)
+        {
+            return BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
