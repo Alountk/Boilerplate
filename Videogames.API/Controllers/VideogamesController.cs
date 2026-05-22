@@ -48,6 +48,20 @@ public class VideogamesController : ControllerBase
         return Ok(videogame);
     }
 
+    [HttpGet("seller/my-items")]
+    public async Task<ActionResult> GetMyItems([FromQuery] int page = 1, [FromQuery] int pageSize = 20)
+    {
+        var userIdString = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+        if (string.IsNullOrEmpty(userIdString) || !Guid.TryParse(userIdString, out var userId))
+        {
+            return Unauthorized();
+        }
+
+        _logger.LogInformation("Fetching items for seller: {SellerId}", userId);
+        var paged = await _service.GetBySellerIdAsync(userId, page, pageSize);
+        return Ok(paged);
+    }
+
     [HttpGet]
     [AllowAnonymous]
     public async Task<ActionResult> GetAll([FromQuery] int? page, [FromQuery] int pageSize = 12)

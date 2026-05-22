@@ -64,6 +64,14 @@ public class VideogameService : IVideogameService
         return new PagedResultDto<VideogameDto>(dtos, totalCount, page, pageSize, hasMore);
     }
 
+    public async Task<PagedResultDto<VideogameDto>> GetBySellerIdAsync(Guid sellerId, int page, int pageSize)
+    {
+        var (items, totalCount) = await _repository.GetBySellerIdAsync(sellerId, page, pageSize);
+        var dtos = items.Select(MapToDto);
+        var hasMore = page * pageSize < totalCount;
+        return new PagedResultDto<VideogameDto>(dtos, totalCount, page, pageSize, hasMore);
+    }
+
     public async Task UpdateAsync(Guid id, UpdateVideogameDto updateDto)
     {
         var existing = await _repository.GetByIdAsync(id);
