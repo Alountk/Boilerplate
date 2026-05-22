@@ -40,6 +40,7 @@ export interface IVideogameService {
   create(data: CreateVideogameRequest): Promise<Videogame>;
   update(id: string, data: UpdateVideogameRequest): Promise<Videogame>;
   delete(id: string): Promise<void>;
+  getMyItems(page: number, pageSize: number): Promise<PagedResult<Videogame>>;
 }
 
 export interface PagedResult<T> {

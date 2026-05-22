@@ -33,4 +33,11 @@ export class VideogameService implements IVideogameService {
   async delete(id: string): Promise<void> {
     await axiosInstance.delete(`/Videogames/${id}`);
   }
+
+  async getMyItems(page: number, pageSize: number): Promise<PagedResult<Videogame>> {
+    const response = await axiosInstance.get<PagedResult<Videogame>>('/Videogames/seller/my-items', {
+      params: { page, pageSize },
+    });
+    return response.data;
+  }
 }
