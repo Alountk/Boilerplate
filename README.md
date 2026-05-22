@@ -29,6 +29,10 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
    - Implemented in baby-step mode to avoid breaking current flow: account creation/login still works even if email verification is pending.
 - **Inventory Management**: Sell and list items with detailed forms (pricing, condition, categories).
 - **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, items in progress, and completed purchase/exchange history.
+- **My Created Items Dashboard**:
+   - New protected route `/dashboard` to view and manage items published by the authenticated seller
+   - Table view with search, condition filters, sorting, pagination, and quick actions (view, edit, delete)
+   - Seller-scoped API endpoint `GET /api/Videogames/seller/my-items` with authentication
 - **Image Upload System**: 
   - Multiple cover images with drag-and-drop reordering
   - Individual uploads for 6 product sides (Front, Back, Right, Left, Top, Bottom)
@@ -299,6 +303,7 @@ Notes:
 - [x] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
 - [x] **Registration Verification Baby Step 3**: Enforce email verification on sensitive actions (create listing, initiate chat).
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [x] **Dashboard (My Created Items)**: Seller-only dashboard at `/dashboard` with table, filters, sorting, pagination, and item actions.
 - [ ] **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, and purchase/exchange history, including items in progress and completed transactions.
 - [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console
