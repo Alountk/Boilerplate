@@ -116,7 +116,7 @@ export function resolveFrontendAssetSrc(value?: string | null): string {
     : IMAGE_BASE_URL;
   
   const resolvedUrl = `${normalizedBaseUrl}/${normalizedPath}`;
-  if (typeof window !== 'undefined') {
+  if (typeof window !== 'undefined' && process.env.NODE_ENV === "development") {
     console.log(
       `[vMarket] Resolved frontend asset: ${value} → ${resolvedUrl}`,
       { IMAGE_BASE_URL, normalizedBaseUrl, normalizedPath }

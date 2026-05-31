@@ -258,6 +258,8 @@ Notes:
 - The workflow ignores commits that only update `deploy/arcane-stack.yml` and `deploy/release.json`, so this release-manifest commit does not loop forever.
 - `deploy/release.json` is only a small observable manifest for humans/tools; Arcane should deploy `deploy/arcane-stack.yml`.
 - For frontend API and marketing assets in production builds, define repository variables `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_IMAGE_BASE_URL` in GitHub Actions settings. These values are injected at web image build-time.
+- If social login is enabled, also define `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_APPLE_CLIENT_ID`, and `NEXT_PUBLIC_APPLE_REDIRECT_URI` at build-time. The frontend CSP is emitted during build and depends on these public origins being configured correctly.
+- CSP rollout strategy: keep `CSP_STRICT_ENFORCE=false` first (strict policy sent in `Content-Security-Policy-Report-Only`), monitor violations, then switch to `CSP_STRICT_ENFORCE=true` to enforce strict mode without `unsafe-inline`.
 - Setting `NEXT_PUBLIC_*` only in Arcane/Portainer stack runtime variables will not change an already-built Next.js image.
 - Configure API CORS origins with `CORS_ALLOWED_ORIGINS` (comma-separated absolute URLs) in Arcane/Portainer stack variables.
 
