@@ -1,18 +1,19 @@
 'use client';
 
 import { Videogame } from '@/domain/models/Videogame';
-import { TrashIcon, PencilIcon, EyeIcon, ChevronUpDownIcon } from '@heroicons/react/24/outline';
+import { TrashIcon, PencilIcon, EyeIcon } from '@heroicons/react/24/outline';
 import Link from 'next/link';
 import VideogameCover from './VideogameCover';
+import MyItemsSortHeader, { MyItemsSortColumn, MyItemsSortOrder } from './MyItemsSortHeader';
 
 interface MyItemsTableProps {
   items: Videogame[];
   isLoading: boolean;
   onDelete: (id: string) => void;
-  sortBy: 'name' | 'price' | 'date' | 'state';
-  setSortBy: (sort: 'name' | 'price' | 'date' | 'state') => void;
-  sortOrder: 'asc' | 'desc';
-  setSortOrder: (order: 'asc' | 'desc') => void;
+  sortBy: MyItemsSortColumn;
+  setSortBy: (sort: MyItemsSortColumn) => void;
+  sortOrder: MyItemsSortOrder;
+  setSortOrder: (order: MyItemsSortOrder) => void;
 }
 
 export default function MyItemsTable({
@@ -24,7 +25,7 @@ export default function MyItemsTable({
   sortOrder,
   setSortOrder,
 }: MyItemsTableProps) {
-  const handleSort = (column: 'name' | 'price' | 'date' | 'state') => {
+  const handleSort = (column: MyItemsSortColumn) => {
     if (sortBy === column) {
       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
     } else {
@@ -32,18 +33,6 @@ export default function MyItemsTable({
       setSortOrder('asc');
     }
   };
-
-  const SortHeader = ({ column, label }: { column: 'name' | 'price' | 'date' | 'state'; label: string }) => (
-    <button
-      onClick={() => handleSort(column)}
-      className="flex items-center gap-2 font-semibold text-on-surface hover:text-primary transition-colors"
-    >
-      {label}
-      {sortBy === column && (
-        <ChevronUpDownIcon className={`h-4 w-4 transition-transform ${sortOrder === 'desc' ? 'rotate-180' : ''}`} />
-      )}
-    </button>
-  );
 
   if (isLoading) {
     return (
@@ -73,16 +62,16 @@ export default function MyItemsTable({
         <thead className="bg-surface-container border-b border-outline-variant/20">
           <tr>
             <th className="px-6 py-4 text-left">
-              <SortHeader column="name" label="Nombre" />
+              <MyItemsSortHeader column="name" label="Nombre" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
             </th>
             <th className="px-6 py-4 text-left">
-              <SortHeader column="price" label="Precio" />
+              <MyItemsSortHeader column="price" label="Precio" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
             </th>
             <th className="px-6 py-4 text-left">
-              <SortHeader column="state" label="Estado" />
+              <MyItemsSortHeader column="state" label="Estado" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
             </th>
             <th className="px-6 py-4 text-left">
-              <SortHeader column="date" label="Fecha Creación" />
+              <MyItemsSortHeader column="date" label="Fecha Creación" sortBy={sortBy} sortOrder={sortOrder} onSort={handleSort} />
             </th>
             <th className="px-6 py-4 text-center">Acciones</th>
           </tr>
