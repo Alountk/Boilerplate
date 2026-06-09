@@ -89,6 +89,23 @@ export async function createItem(
 
 export async function uploadCoverImage(page: Page, imagePath: string, expectedCount = 1): Promise<void> {
   await page.locator('#imageUpload').setInputFiles(Array(expectedCount).fill(imagePath));
-  await expect(page.locator('img[alt^="Preview "]').first()).toBeVisible({ timeout: 10000 });
-  await expect(page.locator('img[alt^="Preview "]')).toHaveCount(expectedCount);
+
+  await expect
+    .poll(async () => {
+      return page
+        .locator('img[alt^="Game image "], img[alt^="Preview "]')
+        .count();
+    }, { timeout: 10000 })
+    .toBe(expectedCount);
+
+  const currentPreviewImages = page.locator('img[alt^="Game image "]');
+  if ((await currentPreviewImages.count()) > 0) {
+    await expect(currentPreviewImages.first()).toBeVisible({ timeout: 10000 });
+    await expect(currentPreviewImages).toHaveCount(expectedCount);
+    return;
+  }
+
+  const legacyPreviewImages = page.locator('img[alt^="Preview "]');
+  await expect(legacyPreviewImages.first()).toBeVisible({ timeout: 10000 });
+  await expect(legacyPreviewImages).toHaveCount(expectedCount);
 }
