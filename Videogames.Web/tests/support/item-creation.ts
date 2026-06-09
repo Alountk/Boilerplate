@@ -19,14 +19,72 @@ export async function mockImageUpload(page: Page, fileName: string): Promise<voi
 }
 
 export async function fillRequiredItemFields(page: Page, itemName: string): Promise<void> {
-  await page.getByLabel('English Name').fill(itemName);
-  await page.getByLabel('Console').fill('Test Console');
-  await page.getByLabel('Release Date').fill('2023-01-01');
-  await page.getByLabel('Version').fill('v1.0-Test');
-  await page.getByLabel('Category', { exact: true }).selectOption('2');
-  await page.getByLabel('Average Market Price').fill('50');
-  await page.getByLabel('Your Asking Price').fill('45');
-  await page.getByLabel('Detailed Description').fill('This is a test game created by Playwright E2E.');
+  await page.getByLabel('Game Title').fill(itemName);
+  await page.getByLabel('Asking Price').fill('45');
+  await page.getByLabel('Game Description').fill('This is a test game created by Playwright E2E.');
+
+  await page.locator('details summary', { hasText: 'Advanced Options' }).click();
+  await page.locator('input[name="console"]').fill('Test Console');
+  await page.locator('input[name="releaseDate"]').fill('2023-01-01');
+}
+
+export async function createItem(
+  page: Page,
+  itemName: string,
+  consoleName: string,
+  ownPrice: string,
+  generalState = '8',
+): Promise<boolean> {
+  const token = await page.evaluate(() => localStorage.getItem('token'));
+  expect(token).toBeTruthy();
+
+  const response = await page.request.post('http://localhost:5017/api/Videogames', {
+    headers: {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    },
+    data: {
+      englishName: itemName,
+      names: [],
+      qr: '',
+      codebar: '',
+      console: consoleName,
+      assets: [],
+      images: [],
+      state: 0,
+      releaseDate: new Date('2023-01-01').toISOString(),
+      versionGame: 'E2E-1.0',
+      description: `Auto-created item: ${itemName}`,
+      urlImg: '',
+      generalState: Number(generalState),
+      averagePrice: Number(ownPrice),
+      ownPrice: Number(ownPrice),
+      acceptOffersRange: 0,
+      score: 0,
+      category: 2,
+      contents: [
+        {
+          frontalUrl: '',
+          backUrl: '',
+          rightSideUrl: '',
+          leftSideUrl: '',
+          topSideUrl: '',
+          bottomSideUrl: '',
+        },
+      ],
+    },
+  });
+
+  if ([200, 201].includes(response.status())) {
+    return true;
+  }
+
+  if (response.status() === 403) {
+    return false;
+  }
+
+  expect([200, 201]).toContain(response.status());
+  return false;
 }
 
 export async function uploadCoverImage(page: Page, imagePath: string, expectedCount = 1): Promise<void> {
