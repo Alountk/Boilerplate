@@ -49,9 +49,16 @@ jobs:
           cache: "npm"
           cache-dependency-path: Videogames.Web/package-lock.json
 
-      - name: Install dependencies
+      # - name: Install dependencies
+      #   working-directory: Videogames.Web
+      #   run: npm ci
+      - name: Install dependencies VERBOSE
         working-directory: Videogames.Web
-        run: npm ci
+        run: |
+          node -v
+          npm -v
+          npm config get registry
+          npm ci --verbose
 
       - name: Lint
         working-directory: Videogames.Web
