@@ -1,4 +1,4 @@
-.PHONY: docker-up run-api docker-down migrate docker-deploy-up docker-deploy-down audit-images recover-images migrate-external-images sync-frontend-assets
+.PHONY: docker-up run-api docker-down migrate docker-deploy-up docker-deploy-down audit-images recover-images migrate-external-images sync-frontend-assets seed-demo
 
 migrate:
 	ASPNETCORE_ENVIRONMENT=Development dotnet ef database update --project Videogames.Infrastructure --startup-project Videogames.API
@@ -34,3 +34,6 @@ migrate-external-images:
 
 sync-frontend-assets:
 	AUDIT_MODE=sync-frontend-assets dotnet run --project tools/ImageRecoveryAudit/ImageRecoveryAudit.csproj
+
+seed-demo:
+	bash tools/seed-demo.sh
