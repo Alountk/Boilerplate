@@ -29,6 +29,10 @@ This project implements **Hexagonal Architecture** (Ports and Adapters) on both 
    - Implemented in baby-step mode to avoid breaking current flow: account creation/login still works even if email verification is pending.
 - **Inventory Management**: Sell and list items with detailed forms (pricing, condition, categories).
 - **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, items in progress, and completed purchase/exchange history.
+- **My Created Items Dashboard**:
+   - New protected route `/dashboard` to view and manage items published by the authenticated seller
+   - Table view with search, condition filters, sorting, pagination, and quick actions (view, edit, delete)
+   - Seller-scoped API endpoint `GET /api/Videogames/seller/my-items` with authentication
 - **Image Upload System**: 
   - Multiple cover images with drag-and-drop reordering
   - Individual uploads for 6 product sides (Front, Back, Right, Left, Top, Bottom)
@@ -254,6 +258,8 @@ Notes:
 - The workflow ignores commits that only update `deploy/arcane-stack.yml` and `deploy/release.json`, so this release-manifest commit does not loop forever.
 - `deploy/release.json` is only a small observable manifest for humans/tools; Arcane should deploy `deploy/arcane-stack.yml`.
 - For frontend API and marketing assets in production builds, define repository variables `NEXT_PUBLIC_API_URL` and `NEXT_PUBLIC_IMAGE_BASE_URL` in GitHub Actions settings. These values are injected at web image build-time.
+- If social login is enabled, also define `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_APPLE_CLIENT_ID`, and `NEXT_PUBLIC_APPLE_REDIRECT_URI` at build-time. The frontend CSP is emitted during build and depends on these public origins being configured correctly.
+- CSP rollout strategy: keep `CSP_STRICT_ENFORCE=false` first (strict policy sent in `Content-Security-Policy-Report-Only`), monitor violations, then switch to `CSP_STRICT_ENFORCE=true` to enforce strict mode without `unsafe-inline`.
 - Setting `NEXT_PUBLIC_*` only in Arcane/Portainer stack runtime variables will not change an already-built Next.js image.
 - Configure API CORS origins with `CORS_ALLOWED_ORIGINS` (comma-separated absolute URLs) in Arcane/Portainer stack variables.
 
@@ -299,6 +305,7 @@ Notes:
 - [x] **Registration Verification Baby Step 2**: Persist verification status and enforce confirmation on sensitive actions.
 - [x] **Registration Verification Baby Step 3**: Enforce email verification on sensitive actions (create listing, initiate chat).
 - [ ] **Messaging System (Next)**: Real-time chat between buyers and sellers.
+- [x] **Dashboard (My Created Items)**: Seller-only dashboard at `/dashboard` with table, filters, sorting, pagination, and item actions.
 - [ ] **User Dashboard & Activity Hub**: Post-login area to manage active listings, favorites, and purchase/exchange history, including items in progress and completed transactions.
 - [ ] **Production Image Recovery**: Recover lost uploaded images in production and harden storage retention/backup safeguards.
 - [ ] **Social Login Activation (Deferred)**: Enable Google / Apple providers once credentials are registered in each OAuth console

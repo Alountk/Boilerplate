@@ -40,3 +40,17 @@ export async function loginAsUser(page: Page, user: E2ECredentials = DEFAULT_E2E
   await page.locator('input[name="password"]').fill(user.password);
   await page.getByRole('button', { name: /Sign In/i }).click();
 }
+
+export async function loginUser(page: Page, email: string, password: string): Promise<void> {
+  const user: E2ECredentials = {
+    ...DEFAULT_E2E_USER,
+    email,
+    password,
+    firstName: 'E2E',
+    lastName: `User${Date.now()}`,
+  };
+
+  await ensureE2EUser(page.request, user);
+  await loginAsUser(page, user);
+  await page.waitForLoadState('networkidle');
+}

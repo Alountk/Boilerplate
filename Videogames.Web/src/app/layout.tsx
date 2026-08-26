@@ -1,9 +1,22 @@
 import type { Metadata } from "next";
-import { Manrope } from "next/font/google";
+import { Space_Grotesk, JetBrains_Mono } from "next/font/google";
+import Script from "next/script";
 import Providers from "../components/Providers";
 import "./globals.css";
 
-const manrope = Manrope({ subsets: ["latin"], variable: "--font-manrope" });
+const spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
+const jetBrainsMono = JetBrains_Mono({
+  subsets: ["latin"],
+  variable: "--font-jetbrains-mono",
+});
+
+const appleClientId = process.env.NEXT_PUBLIC_APPLE_CLIENT_ID ?? "";
+const appleRedirectUri = process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI ?? "";
+const shouldLoadAppleScript = Boolean(appleClientId && appleRedirectUri);
 
 export const metadata: Metadata = {
   title: "vMarket — The Curator's Marketplace",
@@ -11,32 +24,55 @@ export const metadata: Metadata = {
     "Buy, sell, and trade videogames, accessories, and collectibles.",
 };
 
+/**
+ * Anti-FOUC pre-paint script. Runs synchronously in the document head, before
+ * React hydration or first paint, and sets `<html data-theme="…">` from
+ * `localStorage["vmarket-theme"]`. Invalid stored values fall back to the
+ * default `blueprint`. The known id set MUST stay in sync with
+ * `src/components/theme/registry.ts` (`THEME_IDS`).
+ */
+const prePaintScript = `(function () {
+  var DEFAULT = 'blueprint';
+  var KNOWN = ['blueprint', 'neon-arcade', 'indigo-v2'];
+  var KEY = 'vmarket-theme';
+  var theme = DEFAULT;
+  try {
+    var stored = window.localStorage.getItem(KEY);
+    if (stored && KNOWN.indexOf(stored) !== -1) {
+      theme = stored;
+    } else if (stored) {
+      window.localStorage.removeItem(KEY);
+    }
+  } catch (e) {
+    theme = DEFAULT;
+  }
+  document.documentElement.setAttribute('data-theme', theme);
+})();`;
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <head>
-        {/* Material Symbols icon font — not available via next/font/google */}
-        {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link
-          rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap"
-        />
         {/* Apple Sign In JS SDK */}
-        {/* eslint-disable-next-line @next/next/no-sync-scripts */}
-        <script
-          type="text/javascript"
-          src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
-        />
-        <meta name="appleid-signin-client-id" content={process.env.NEXT_PUBLIC_APPLE_CLIENT_ID ?? ""} />
+        {shouldLoadAppleScript ? (
+          <Script
+            src="https://appleid.cdn-apple.com/appleauth/static/jsapi/appleid/1/en_US/appleid.auth.js"
+            strategy="beforeInteractive"
+          />
+        ) : null}
+        <meta name="appleid-signin-client-id" content={appleClientId} />
         <meta name="appleid-signin-scope" content="name email" />
-        <meta name="appleid-signin-redirect-uri" content={process.env.NEXT_PUBLIC_APPLE_REDIRECT_URI ?? "https://localhost"} />
+        <meta name="appleid-signin-redirect-uri" content={appleRedirectUri} />
         <meta name="appleid-signin-use-popup" content="true" />
       </head>
-      <body className={`${manrope.variable} font-[family-name:var(--font-manrope)] bg-surface text-on-surface min-h-screen`}>
+      <body
+        className={`${spaceGrotesk.variable} ${jetBrainsMono.variable} bg-surface text-on-surface font-[family-name:var(--font-space-grotesk)] min-h-screen`}
+      >
+        <script dangerouslySetInnerHTML={{ __html: prePaintScript }} />
         <Providers>{children}</Providers>
       </body>
     </html>

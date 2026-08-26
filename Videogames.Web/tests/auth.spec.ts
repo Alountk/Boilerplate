@@ -27,7 +27,7 @@ test.describe('Authentication Flow', () => {
       });
     });
 
-    await page.goto('/login');
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await page.locator('input[name="email"]').fill(mockedAuthResponse.user.email);
     await page.locator('input[name="password"]').fill('StrongPassword123!');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -46,7 +46,7 @@ test.describe('Authentication Flow', () => {
       });
     });
 
-    await page.goto('/login');
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await page.locator('input[name="email"]').fill(mockedAuthResponse.user.email);
     await page.locator('input[name="password"]').fill('StrongPassword123!');
     await page.getByRole('button', { name: /Sign In/i }).click();
@@ -68,7 +68,7 @@ test.describe('Authentication Flow', () => {
       });
     });
 
-    await page.goto('/login');
+    await page.goto('/login', { waitUntil: 'domcontentloaded' });
     await page.locator('input[name="email"]').fill('wrong@example.com');
     await page.locator('input[name="password"]').fill('WrongPassword123!');
     await page.getByRole('button', { name: /Sign In/i }).click();

@@ -8,6 +8,7 @@ public interface IVideogameService
     Task<VideogameDto?> GetByIdAsync(Guid id);
     Task<IEnumerable<VideogameDto>> GetAllAsync();
     Task<PagedResultDto<VideogameDto>> GetPagedAsync(int page, int pageSize);
+    Task<PagedResultDto<VideogameDto>> GetBySellerIdAsync(Guid sellerId, int page, int pageSize);
     Task UpdateAsync(Guid id, UpdateVideogameDto updateDto);
     Task DeleteAsync(Guid id);
 }

@@ -72,6 +72,12 @@ export default function Navbar() {
                     Sign out
                   </button>
                   <Link
+                    href="/dashboard"
+                    className="text-on-surface-variant hover:text-on-surface transition-colors hidden md:block"
+                  >
+                    Dashboard
+                  </Link>
+                  <Link
                     href="/messages"
                     className="text-on-surface-variant hover:text-on-surface transition-colors hidden md:block"
                   >
@@ -120,9 +126,14 @@ export default function Navbar() {
           {loading ? (
             <div className="h-4 w-24 bg-surface-container animate-pulse rounded" />
           ) : isAuthenticated ? (
-            <Link href="/messages" className="text-on-surface-variant hover:text-on-surface transition-colors">
-              Messages
-            </Link>
+            <>
+              <Link href="/dashboard" className="text-on-surface-variant hover:text-on-surface transition-colors">
+                Dashboard
+              </Link>
+              <Link href="/messages" className="text-on-surface-variant hover:text-on-surface transition-colors">
+                Messages
+              </Link>
+            </>
           ) : (
             <Link href="/login" className="text-on-surface-variant hover:text-on-surface transition-colors">
               Sign in
