@@ -40,8 +40,13 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
 
   useEffect(() => {
     const authService = new AuthService();
-    setUser(authService.getCurrentUser());
-    setLoading(false);
+    // Diferido para no setState síncrono en el efecto (regla de lint) y
+    // para que el primer render cliente hidrate idéntico al server.
+    const id = window.setTimeout(() => {
+      setUser(authService.getCurrentUser());
+      setLoading(false);
+    }, 0);
+    return () => window.clearTimeout(id);
   }, []);
 
   const login = async (credentials: LoginRequest) => {
