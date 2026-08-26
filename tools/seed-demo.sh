@@ -43,7 +43,7 @@ fi
 # ── Dependency check ─────────────────────────────────────────────────────────
 for cmd in curl jq psql; do
   command -v "$cmd" &>/dev/null || {
-    echo "ERROR: '$cmd' es necesario pero no está instalado." >&2
+    echo "ERROR: '$cmd' is required but not installed." >&2
     exit 1
   }
 done
@@ -74,24 +74,24 @@ create_game() {
 
 # ── 1. API health check ───────────────────────────────────────────────────────
 echo ""
-echo "=== 1. Verificando que la API está activa en $API_URL ==="
+echo "=== 1. Checking the API is up at $API_URL ==="
 if ! curl -sf "${API_URL}/api/Health" &>/dev/null; then
   echo ""
   echo "ERROR: La API no responde en $API_URL." >&2
-  echo "Asegúrate de que esté corriendo antes de ejecutar este script (make run-api)." >&2
+  echo "Make sure it is running before executing this script (make run-api)." >&2
   exit 1
 fi
-echo "✓ API activa"
+echo "✓ API is up"
 
-# ── 2. Limpiar videojuegos existentes ────────────────────────────────────────
+# ── 2. Clear existing videogames ────────────────────────────────────────
 echo ""
-echo "=== 2. Limpiando videojuegos existentes ==="
+echo "=== 2. Clearing existing videogames ==="
 pg -c 'TRUNCATE "Videogames" CASCADE;'
-echo "✓ Videojuegos eliminados"
+echo "✓ Videogames cleared"
 
-# ── 3. Registrar usuario demo ─────────────────────────────────────────────────
+# ── 3. Register demo user ─────────────────────────────────────────────────
 echo ""
-echo "=== 3. Registrando usuario demo ($DEMO_EMAIL) ==="
+echo "=== 3. Registering demo user ($DEMO_EMAIL) ==="
 REG_BODY=$(jq -n \
   --arg fn "Demo" --arg ln "User" \
   --arg email "$DEMO_EMAIL" --arg pwd "$DEMO_PASSWORD" \
@@ -101,23 +101,23 @@ REG_HTTP=$(curl -s -o /dev/null -w "%{http_code}" -X POST "${API_URL}/api/Users"
   -H "Content-Type: application/json" -d "$REG_BODY")
 
 if [[ "$REG_HTTP" == "201" ]]; then
-  echo "✓ Usuario demo creado"
+  echo "✓ Demo user created"
 elif [[ "$REG_HTTP" == "400" ]]; then
-  echo "~ El usuario ya existía, continuando..."
+  echo "~ Demo user already exists, continuing..."
 else
-  echo "ERROR: No se pudo registrar el usuario (HTTP $REG_HTTP)" >&2
+  echo "ERROR: Could not register the user (HTTP $REG_HTTP)" >&2
   exit 1
 fi
 
-# ── 4. Verificar email en BD ──────────────────────────────────────────────────
+# ── 4. Verify email in DB ──────────────────────────────────────────────────
 echo ""
 echo "=== 4. Activando verificación de email en BD ==="
 pg -c "UPDATE \"Users\" SET \"EmailVerified\" = true WHERE \"Email\" = '$DEMO_EMAIL';"
-echo "✓ Email verificado"
+echo "✓ Email verified"
 
 # ── 5. Login → JWT ────────────────────────────────────────────────────────────
 echo ""
-echo "=== 5. Obteniendo JWT ==="
+echo "=== 5. Getting JWT ==="
 LOGIN_BODY=$(jq -n --arg e "$DEMO_EMAIL" --arg p "$DEMO_PASSWORD" '{email:$e,password:$p}')
 LOGIN_RESP=$(curl -sf -X POST "${API_URL}/api/Auth/login" \
   -H "Content-Type: application/json" \
@@ -126,14 +126,14 @@ LOGIN_RESP=$(curl -sf -X POST "${API_URL}/api/Auth/login" \
 TOKEN=$(echo "$LOGIN_RESP" | jq -r '.token')
 
 if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
-  echo "ERROR: No se obtuvo token JWT. Respuesta: $LOGIN_RESP" >&2
+  echo "ERROR: Could not obtain JWT token. Response: $LOGIN_RESP" >&2
   exit 1
 fi
-echo "✓ JWT obtenido"
+echo "✓ JWT obtained"
 
-# ── 6. Crear 10 videojuegos ───────────────────────────────────────────────────
+# ── 6. Create 10 demo videogames ───────────────────────────────────────────────────
 echo ""
-echo "=== 6. Creando 10 videojuegos demo ==="
+echo "=== 6. Creating 10 demo videogames ==="
 
 # 1 — The Legend of Zelda: Breath of the Wild (Nintendo Switch)
 create_game "The Legend of Zelda: Breath of the Wild — Nintendo Switch" \
@@ -304,9 +304,9 @@ create_game "Marvels Spider-Man — PlayStation 4" \
 
 # ── Done ─────────────────────────────────────────────────────────────────────
 echo ""
-echo "=== Seed completado ==="
+echo "=== Seed completed ==="
 echo ""
-echo "Credenciales del usuario demo:"
+echo "Demo user credentials:"
 echo "  Email:      $DEMO_EMAIL"
-echo "  Contraseña: $DEMO_PASSWORD"
+echo "  Password: $DEMO_PASSWORD"
 echo ""
