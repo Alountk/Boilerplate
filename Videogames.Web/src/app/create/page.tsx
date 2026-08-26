@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { VideogameService } from "../../infrastructure/services/VideogameService";
-import { GameState } from "../../domain/models/Videogame";
+import { GameState, Videogame } from "../../domain/models/Videogame";
 import {
   ArrowLeftIcon,
   MagnifyingGlassIcon,
@@ -19,6 +19,7 @@ import { ImageUploadZone } from "../../components/create/ImageUploadZone";
 import { AdvancedOptions } from "../../components/create/AdvancedOptions";
 import { useImageUpload, SideKey } from "../../hooks/useImageUpload";
 import { useOcrAutofill } from "../../hooks/useOcrAutofill";
+import TitleBlock from "../../components/theme/TitleBlock";
 
 // ── Form shape ─────────────────────────────────────────────────────────────
 type FormData = {
@@ -85,10 +86,32 @@ function validate(data: FormData): Record<string, string> {
   return err;
 }
 
-// ── Component ───────────────────────────────────────────────────────────────
-export default function CreateVideogamePage() {
+function mapItemToForm(item: Videogame): FormData {
+  return {
+    englishName: item.englishName,
+    qr: item.qr,
+    codebar: item.codebar,
+    console: item.console,
+    state: item.state,
+    releaseDate: item.releaseDate ? item.releaseDate.slice(0, 10) : "",
+    versionGame: item.versionGame,
+    description: item.description,
+    urlImg: item.urlImg,
+    generalState: item.generalState,
+    averagePrice: item.averagePrice,
+    ownPrice: item.ownPrice,
+    acceptOffersRange: item.acceptOffersRange,
+    score: item.score,
+    category: item.category,
+  };
+}
+
+// ── Component (inner — needs useSearchParams under Suspense) ───────────────
+function CreateVideogameContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const editId = searchParams.get("id");
 
   const videogameService = useMemo(() => new VideogameService(), []);
   const rawgService = useMemo(() => new RAWGService(), []);
@@ -99,6 +122,7 @@ export default function CreateVideogamePage() {
   const [touched, setTouched] = useState<Record<string, boolean>>({});
   const [submitAttempted, setSubmitAttempted] = useState(false);
   const [loading, setLoading] = useState(false);
+  const [editLoading, setEditLoading] = useState(false);
 
   // Localized names & box art
   const [names, setNames] = useState([{ language: "", name: "" }]);
@@ -127,8 +151,39 @@ export default function CreateVideogamePage() {
 
   // ── Guard: redirect to /login if unauthenticated ──────────────────────────
   useEffect(() => {
-    if (!authLoading && !user) router.push("/login");
+    if (!authLoading && !user) router.replace("/login");
   }, [user, authLoading, router]);
+
+  // ── Edit flow: load existing listing and pre-fill the form ────────────────
+  useEffect(() => {
+    if (!editId || !user) return;
+    let cancelled = false;
+    setEditLoading(true);
+    videogameService
+      .getById(editId)
+      .then((item) => {
+        if (cancelled) return;
+        setFormData(mapItemToForm(item));
+        setNames(item.names.length > 0 ? item.names : [{ language: "", name: "" }]);
+        if (item.contents && item.contents[0]) {
+          setBoxArt({
+            frontalUrl: item.contents[0].frontalUrl,
+            backUrl: item.contents[0].backUrl,
+            rightSideUrl: item.contents[0].rightSideUrl,
+            leftSideUrl: item.contents[0].leftSideUrl,
+            topSideUrl: item.contents[0].topSideUrl,
+            bottomSideUrl: item.contents[0].bottomSideUrl,
+          });
+        }
+      })
+      .catch((err) => console.error("Failed to load listing for edit", err))
+      .finally(() => {
+        if (!cancelled) setEditLoading(false);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [editId, videogameService, user]);
 
   // ── RAWG debounced search ─────────────────────────────────────────────────
   useEffect(() => {
@@ -345,11 +400,16 @@ export default function CreateVideogamePage() {
         ],
       };
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      await videogameService.create(payload as any);
+      if (editId) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await videogameService.update(editId, { ...payload, id: editId } as any);
+      } else {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        await videogameService.create(payload as any);
+      }
       router.push("/");
     } catch (err) {
-      console.error("Failed to create videogame", err);
+      console.error("Failed to save videogame", err);
     } finally {
       setLoading(false);
     }
@@ -357,73 +417,84 @@ export default function CreateVideogamePage() {
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen bg-surface text-on-surface flex flex-col">
-      <div className="max-w-7xl w-full mx-auto px-6 md:px-12 py-12">
+    <div className="min-h-screen bg-surface text-on-surface">
+      <div className="mx-auto max-w-7xl px-4 pt-4">
+        <TitleBlock code={editId ? `EDIT-${editId.slice(0, 4).toUpperCase()}` : "CREATE"} rev="C" date={new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })} />
+      </div>
+
+      <div className="mx-auto max-w-7xl w-full px-4 py-8">
         {user && !user.emailVerified && (
-          <div className="mb-8 rounded-xl bg-warning-container/20 border border-warning/40 px-4 py-3 flex items-start gap-3">
+          <div className="mb-8 border border-warning/40 bg-warning/10 px-4 py-3 flex items-start gap-3">
             <div className="w-5 h-5 rounded-full bg-warning flex items-center justify-center flex-shrink-0 mt-0.5">
               <span className="text-warning-container text-xs font-bold">!</span>
             </div>
             <div className="flex-1">
               <p className="text-sm font-semibold text-warning mb-1">Email verification required</p>
-              <p className="text-xs text-on-surface-variant">Verify your email before publishing listings. Go to your profile to complete verification.</p>
+              <p className="text-xs text-on-surface-muted">Verify your email before publishing listings. Go to your profile to complete verification.</p>
             </div>
           </div>
         )}
 
+        {/* Progress bar */}
+        <div data-testid="create-progress" className="mb-8" aria-label="Progresso de publicación">
+          <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.2em] text-on-surface-muted">
+            <span>{editId ? "EDITAR COMPONENTE" : "NUEVO COMPONENTE"}</span>
+            <span>PASO 1/3</span>
+          </div>
+          <div className="mt-2 h-2 w-full border border-outline bg-surface-1/40">
+            <div className="h-full w-[33%] bg-secondary" />
+          </div>
+        </div>
+
         <Link
           href="/"
-          className="inline-flex items-center gap-2 text-primary hover:text-on-surface transition-colors group mb-8"
+          className="mb-8 inline-flex items-center gap-2 font-mono text-[11px] uppercase tracking-widest text-secondary transition-colors group"
         >
           <ArrowLeftIcon className="h-5 w-5 group-hover:-translate-x-1 transition-transform" aria-hidden="true" />
-          <span className="text-sm font-bold tracking-widest uppercase">Back to Marketplace</span>
+          Back to Marketplace
         </Link>
 
-        {/* Main Grid: Left Hero + Upload | Right Form */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 md:gap-16">
-          {/* LEFT: Hero + Upload Zone */}
+          {/* LEFT: Upload Zone */}
           <div className="lg:col-span-5">
-            <h1 className="text-5xl md:text-6xl font-extrabold tracking-tighter text-on-surface mb-8 leading-[1.1]">
-              List your <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-br from-primary-container to-primary">
-                next favorite
-              </span>
-              <br />
-              <span className="text-transparent bg-clip-text bg-linear-to-br from-primary-container to-primary">
-                game.
-              </span>
-            </h1>
-            <p className="text-on-surface-variant text-lg leading-relaxed mb-12 max-w-md">
-              Share detailed information and high-quality images of your
-              videogame. Help collectors and gamers find their next treasure.
-            </p>
-
-            <ImageUploadZone
-              images={images}
-              uploading={uploading}
-              ocrLoading={ocrLoading}
-              ocrMessage={ocrMessage}
-              onFilesChange={handleFilesChange}
-              onRemove={handleRemoveImage}
-              onDragStart={handleDragStart}
-              onDragOver={handleDragOver}
-              onDrop={handleDropImage}
-              onDropZoneDrop={handleDropZoneDrop}
-            />
+            <TitleBlock code="ASSET-BAY" rev="B" className="mb-4" />
+            {editLoading ? (
+              <div className="flex justify-center py-16">
+                <div className="animate-spin h-12 w-12 rounded-full border-t-2 border-secondary" />
+              </div>
+            ) : (
+              <>
+                <p className="mb-6 font-mono text-xs uppercase tracking-widest text-on-surface-muted">
+                  {editId ? "EDITANDO LISTING EXISTENTE" : "GALERÍA DE IMÁGENES"}
+                </p>
+                <div data-testid="create-zone">
+                  <ImageUploadZone
+                    images={images}
+                    uploading={uploading}
+                    ocrLoading={ocrLoading}
+                    ocrMessage={ocrMessage}
+                    onFilesChange={handleFilesChange}
+                    onRemove={handleRemoveImage}
+                    onDragStart={handleDragStart}
+                    onDragOver={handleDragOver}
+                    onDrop={handleDropImage}
+                    onDropZoneDrop={handleDropZoneDrop}
+                  />
+                </div>
+              </>
+            )}
           </div>
 
           {/* RIGHT: Form */}
-          <div className="lg:col-span-7 glass-card border border-outline-variant/20 p-8 md:p-12 rounded-3xl shadow-2xl relative overflow-hidden">
-            <div className="absolute top-0 right-0 w-96 h-96 bg-primary-container/5 blur-[120px] -z-10" aria-hidden="true" />
-
+          <div className="lg:col-span-7 border border-outline bg-surface-1/40 p-6 md:p-10 relative">
             <form onSubmit={handleSubmit} className="space-y-8" noValidate>
               {/* Game Title + RAWG Search */}
               <div className="space-y-2">
                 <label
-                  className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1"
+                  className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block ml-1"
                   htmlFor="englishName"
                 >
-                  Game Title
+                  Game Title <span className="text-error" aria-hidden="true">*</span>
                 </label>
                 <div className="relative">
                   <input
@@ -436,17 +507,17 @@ export default function CreateVideogamePage() {
                     aria-describedby={
                       showFieldError("englishName") ? "err-englishName" : undefined
                     }
-                    className="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface placeholder:text-outline/50 transition-all font-medium"
+                    className="w-full border border-outline bg-surface-2/60 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors focus:border-secondary"
                     placeholder="e.g. The Legend of Zelda"
                   />
                   {searching && (
                     <div className="absolute right-4 top-1/2 -translate-y-1/2" aria-hidden="true">
-                      <div className="animate-spin h-4 w-4 border-2 border-primary border-t-transparent rounded-full" />
+                      <div className="animate-spin h-4 w-4 border-2 border-secondary border-t-transparent rounded-full" />
                     </div>
                   )}
                   {!searching && (
                     <MagnifyingGlassIcon
-                      className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-outline pointer-events-none"
+                      className="absolute right-4 top-1/2 -translate-y-1/2 h-4 w-4 text-on-surface-muted pointer-events-none"
                       aria-hidden="true"
                     />
                   )}
@@ -465,17 +536,17 @@ export default function CreateVideogamePage() {
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="space-y-2">
                   <label
-                    className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1"
+                    className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block ml-1"
                     htmlFor="category"
                   >
-                    Platform
+                    Platform <span className="text-error" aria-hidden="true">*</span>
                   </label>
                   <select
                     id="category"
                     name="category"
                     value={formData.category}
                     onChange={handleChange}
-                    className="w-full appearance-none bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface transition-all font-medium cursor-pointer"
+                    className="w-full appearance-none border border-outline bg-surface-2/60 px-4 py-3 font-mono text-sm text-on-surface outline-none transition-colors focus:border-secondary cursor-pointer"
                   >
                     <option value={0}>PlayStation</option>
                     <option value={1}>Xbox</option>
@@ -487,17 +558,17 @@ export default function CreateVideogamePage() {
                 </div>
                 <div className="space-y-2">
                   <label
-                    className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1"
+                    className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block ml-1"
                     htmlFor="state"
                   >
-                    Condition
+                    Condition <span className="text-error" aria-hidden="true">*</span>
                   </label>
                   <select
                     id="state"
                     name="state"
                     value={formData.state}
                     onChange={handleChange}
-                    className="w-full appearance-none bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl px-6 py-4 text-on-surface transition-all font-medium cursor-pointer"
+                    className="w-full appearance-none border border-outline bg-surface-2/60 px-4 py-3 font-mono text-sm text-on-surface outline-none transition-colors focus:border-secondary cursor-pointer"
                   >
                     <option value={GameState.Sealed}>Sealed</option>
                     <option value={GameState.Opened}>Like New</option>
@@ -509,14 +580,14 @@ export default function CreateVideogamePage() {
               {/* Asking Price */}
               <div className="space-y-2">
                 <label
-                  className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1"
+                  className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block ml-1"
                   htmlFor="ownPrice"
                 >
-                  Asking Price
+                  Asking Price <span className="text-error" aria-hidden="true">*</span>
                 </label>
                 <div className="relative">
                   <span
-                    className="absolute left-6 top-1/2 -translate-y-1/2 text-primary font-bold text-lg"
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-secondary font-bold text-lg"
                     aria-hidden="true"
                   >
                     $
@@ -533,7 +604,7 @@ export default function CreateVideogamePage() {
                     aria-describedby={
                       showFieldError("ownPrice") ? "err-ownPrice" : undefined
                     }
-                    className="w-full bg-surface-container-highest border-none focus:ring-1 focus:ring-primary rounded-xl pl-14 pr-6 py-4 text-on-surface placeholder:text-outline/50 transition-all font-medium [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                    className="w-full border border-outline bg-surface-2/60 pl-10 pr-4 py-3 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors focus:border-secondary [appearance:textfield]"
                     placeholder="0.00"
                   />
                 </div>
@@ -543,7 +614,7 @@ export default function CreateVideogamePage() {
               {/* Description */}
               <div className="space-y-2">
                 <label
-                  className="text-xs font-bold tracking-widest uppercase text-on-surface-variant ml-1"
+                  className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block ml-1"
                   htmlFor="description"
                 >
                   Game Description
@@ -553,7 +624,7 @@ export default function CreateVideogamePage() {
                   name="description"
                   value={formData.description}
                   onChange={handleChange}
-                  className={`${getInputClassNames(false)} resize-none`}
+                  className={`${getInputClassNames(false)} resize-none font-mono`}
                   placeholder="Describe the game, condition, and any notable details..."
                   rows={6}
                 />
@@ -563,17 +634,17 @@ export default function CreateVideogamePage() {
               <div className="pt-6 flex flex-col md:flex-row gap-4">
                 <button
                   type="submit"
-                  disabled={loading}
-                  className="flex-1 bg-linear-to-br from-primary-container to-[#6366F1] text-on-primary-container py-4 rounded-xl font-extrabold text-base tracking-tight hover:brightness-110 active:scale-[0.98] transition-all shadow-lg shadow-primary-container/20 disabled:opacity-50"
+                  disabled={loading || editLoading}
+                  className="flex-1 min-h-12 border border-secondary bg-secondary/10 px-4 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20 disabled:opacity-60"
                 >
-                  {loading ? "Publishing..." : "Publish Listing"}
+                  {loading ? "PUBLICANDO…" : editId ? "ACTUALIZAR LISTING" : "PUBLICAR COMPONENTE"}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.back()}
-                  className="px-8 py-4 rounded-xl font-bold text-on-surface-variant hover:bg-surface-container-highest transition-colors active:scale-[0.98]"
+                  className="px-8 min-h-12 border border-outline px-4 font-mono text-xs uppercase tracking-widest text-on-surface-muted transition-colors active:border-secondary active:text-secondary"
                 >
-                  Save Draft
+                  Cancelar
                 </button>
               </div>
             </form>
@@ -597,5 +668,13 @@ export default function CreateVideogamePage() {
         />
       </div>
     </div>
+  );
+}
+
+export default function CreateVideogamePage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-surface" />}>
+      <CreateVideogameContent />
+    </Suspense>
   );
 }
