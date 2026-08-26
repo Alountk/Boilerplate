@@ -32,16 +32,16 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  // user arranca null en server y cliente para hidratar idéntico.
-  // Se carga desde localStorage en un efecto post-montaje; loading=true
-  // mientras tanto evita flashes/redirecciones en guards.
+  // user starts null on both server and client so hydration matches.
+  // It is restored from localStorage in a post-mount effect; loading=true
+  // meanwhile prevents flashes/redirects in guards.
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const authService = new AuthService();
-    // Diferido para no setState síncrono en el efecto (regla de lint) y
-    // para que el primer render cliente hidrate idéntico al server.
+    // Deferred so the effect does not call setState synchronously (lint
+    // rule) and so the first client render hydrates identically to the server.
     const id = window.setTimeout(() => {
       setUser(authService.getCurrentUser());
       setLoading(false);
