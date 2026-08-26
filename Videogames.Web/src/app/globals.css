@@ -1,117 +1,236 @@
 @import "tailwindcss";
 
-/* ─── Indigo Archive Design System ─────────────────────────────────────── */
+/* ══════════════════════════════════════════════════════════════════════════
+ * LEGACY TOKENS — transient
+ * --------------------------------------------------------------------------
+ * Material-palette tokens retained so pages keep compiling until the Phase 3
+ * page migrations replace their utility classes with Blueprint systemic tokens.
+ * DO NOT extend these; they are removed as their last consumer migrates.
+ * Tokens duplicated by the Blueprint systemic set (surface, surface-dim,
+ * surface-bright, on-surface, primary, secondary, tertiary, error, outline)
+ * were moved to the Blueprint block below so theme swaps re-resolve at runtime.
+ * ══════════════════════════════════════════════════════════════════════════ */
 @theme inline {
-  /* Surface hierarchy */
-  --color-surface:                    #0b1326;
-  --color-surface-dim:                #0b1326;
-  --color-surface-container-lowest:   #060e20;
-  --color-surface-container-low:      #131b2e;
-  --color-surface-container:          #171f33;
-  --color-surface-container-high:     #222a3d;
-  --color-surface-container-highest:  #2d3449;
-  --color-surface-bright:             #31394d;
-  --color-surface-variant:            #2d3449;
-
-  /* Text / Icon */
-  --color-on-surface:                 #dae2fd;
-  --color-on-surface-variant:         #c7c4d8;
-  --color-on-background:              #dae2fd;
-  --color-inverse-on-surface:         #283044;
-  --color-inverse-surface:            #dae2fd;
-
-  /* Primary palette */
-  --color-primary:                    #c3c0ff;
-  --color-primary-container:          #4f46e5;
-  --color-on-primary:                 #1d00a5;
-  --color-on-primary-container:       #dad7ff;
-  --color-primary-fixed:              #e2dfff;
-  --color-primary-fixed-dim:          #c3c0ff;
-  --color-inverse-primary:            #4d44e3;
-  --color-on-primary-fixed:           #0f0069;
-  --color-on-primary-fixed-variant:   #3323cc;
-
-  /* Secondary palette */
-  --color-secondary:                  #bcc7de;
-  --color-secondary-container:        #3e495d;
-  --color-on-secondary:               #263143;
-  --color-on-secondary-container:     #aeb9d0;
-  --color-secondary-fixed:            #d8e3fb;
-  --color-secondary-fixed-dim:        #bcc7de;
-  --color-on-secondary-fixed:         #111c2d;
+  --color-surface-container-lowest: #060e20;
+  --color-surface-container-low: #131b2e;
+  --color-surface-container: #171f33;
+  --color-surface-container-high: #222a3d;
+  --color-surface-container-highest: #2d3449;
+  --color-surface-variant: #2d3449;
+  --color-on-surface-variant: #c7c4d8;
+  --color-on-background: #dae2fd;
+  --color-inverse-on-surface: #283044;
+  --color-inverse-surface: #dae2fd;
+  --color-primary-container: #4f46e5;
+  --color-on-primary: #1d00a5;
+  --color-on-primary-container: #dad7ff;
+  --color-primary-fixed: #e2dfff;
+  --color-primary-fixed-dim: #c3c0ff;
+  --color-inverse-primary: #4d44e3;
+  --color-on-primary-fixed: #0f0069;
+  --color-on-primary-fixed-variant: #3323cc;
+  --color-secondary-container: #3e495d;
+  --color-on-secondary: #263143;
+  --color-on-secondary-container: #aeb9d0;
+  --color-secondary-fixed: #d8e3fb;
+  --color-secondary-fixed-dim: #bcc7de;
+  --color-on-secondary-fixed: #111c2d;
   --color-on-secondary-fixed-variant: #3c475a;
-
-  /* Tertiary (accent warm) */
-  --color-tertiary:                   #ffb695;
-  --color-tertiary-container:         #a44100;
-  --color-on-tertiary:                #571f00;
-  --color-on-tertiary-container:      #ffd2be;
-  --color-tertiary-fixed:             #ffdbcc;
-  --color-tertiary-fixed-dim:         #ffb695;
-  --color-on-tertiary-fixed:          #351000;
-  --color-on-tertiary-fixed-variant:  #7b2f00;
-
-  /* Outline / Divider */
-  --color-outline:                    #918fa1;
-  --color-outline-variant:            #464555;
-
-  /* Error */
-  --color-error:                      #ffb4ab;
-  --color-error-container:            #93000a;
-  --color-on-error:                   #690005;
-  --color-on-error-container:         #ffdad6;
-
-  /* Surface tint */
-  --color-surface-tint:               #c3c0ff;
+  --color-tertiary-container: #a44100;
+  --color-on-tertiary: #571f00;
+  --color-on-tertiary-container: #ffd2be;
+  --color-tertiary-fixed: #ffdbcc;
+  --color-tertiary-fixed-dim: #ffb695;
+  --color-on-tertiary-fixed: #351000;
+  --color-on-tertiary-fixed-variant: #7b2f00;
+  --color-outline-variant: #464555;
+  --color-error-container: #93000a;
+  --color-on-error: #690005;
+  --color-on-error-container: #ffdad6;
+  --color-surface-tint: #c3c0ff;
 }
 
+/* ══════════════════════════════════════════════════════════════════════════
+ * BLUEPRINT SYSTEMIC TOKENS
+ * --------------------------------------------------------------------------
+ * `@theme inline` aliases resolve to runtime CSS variables (`--t-*`) defined
+ * per theme under `:root[data-theme="…"]`. Swapping the attribute re-resolves
+ * every token-driven utility with zero recompile (design D1). This is the
+ * single source of semantic tokens for the Blueprint design system.
+ * ══════════════════════════════════════════════════════════════════════════ */
+@theme inline {
+  /* Surfaces — "papel de plano" */
+  --color-surface: var(--t-surface);
+  --color-surface-dim: var(--t-surface-dim);
+  --color-surface-bright: var(--t-surface-bright);
+  --color-surface-1: var(--t-surface-1);
+  --color-surface-2: var(--t-surface-2);
+
+  /* Text — "tinta de plano" */
+  --color-on-surface: var(--t-on-surface);
+  --color-on-surface-muted: var(--t-on-surface-muted);
+
+  /* Drawing lines */
+  --color-primary: var(--t-primary);
+  --color-secondary: var(--t-secondary);
+  --color-tertiary: var(--t-tertiary);
+
+  /* Feedback */
+  --color-success: var(--t-success);
+  --color-warning: var(--t-warning);
+  --color-error: var(--t-error);
+
+  /* Outlines — "trazo de plano" */
+  --color-outline: var(--t-outline);
+  --color-outline-strong: var(--t-outline-strong);
+
+  /* Background grid */
+  --color-grid-line: var(--t-grid-line);
+  --color-grid-line-strong: var(--t-grid-line-strong);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * THEME: default + blueprint
+ * `:root` keeps the app fully tokenized even before the anti-FOUC pre-paint
+ * script stamps `data-theme`, so the Blueprint palette is the built-in default.
+ * ══════════════════════════════════════════════════════════════════════════ */
+:root,
+:root[data-theme="blueprint"] {
+  color-scheme: dark;
+
+  /* Surfaces */
+  --t-surface: #0b2a55;
+  --t-surface-dim: #081d40;
+  --t-surface-bright: #123a6b;
+  --t-surface-1: #0e3160;
+  --t-surface-2: #143a6e;
+
+  /* Text */
+  --t-on-surface: #d6e6ff;
+  --t-on-surface-muted: #8fb3e8;
+
+  /* Drawing lines */
+  --t-primary: #e8f1ff;
+  --t-secondary: #4dc3ff;
+  --t-tertiary: #ffd166;
+
+  /* Feedback */
+  --t-success: #5be49b;
+  --t-warning: #ffd166;
+  --t-error: #ff6b6b;
+
+  /* Outlines */
+  --t-outline: rgba(160, 200, 255, 0.28);
+  --t-outline-strong: rgba(160, 200, 255, 0.55);
+
+  /* Grid */
+  --t-grid-line: rgba(122, 184, 255, 0.1);
+  --t-grid-line-strong: rgba(122, 184, 255, 0.16);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * THEME STUBS — structural only
+ * Future themes (not implemented in this slice). Blocks are intentionally
+ * empty; the per-theme `--t-*` values will be added when each theme ships.
+ * ══════════════════════════════════════════════════════════════════════════ */
+:root[data-theme="neon-arcade"] {
+  /* Futuro: tokens neon-arcade */
+}
+
+:root[data-theme="indigo-v2"] {
+  /* Futuro: tokens indigo-v2 */
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * BASE
+ * ══════════════════════════════════════════════════════════════════════════ */
 body {
-  background-color: #0b1326;
-  color: #dae2fd;
-  font-family: 'Manrope', 'Segoe UI', sans-serif;
+  background-color: var(--t-surface);
+  color: var(--t-on-surface);
+  font-family: var(--font-space-grotesk), "Space Grotesk", "Segoe UI", sans-serif;
   text-rendering: optimizeLegibility;
 }
 
 :focus-visible {
-  outline: 2px solid #c3c0ff;
+  outline: 2px solid var(--t-secondary);
   outline-offset: 2px;
 }
 
-/* Indigo gradient helper */
+/* ══════════════════════════════════════════════════════════════════════════
+ * LEGACY HELPERS — transient
+ * Retained until Phase 3 migrates the pages that consume them
+ * (glass-*, indigo-gradient, tonal-architecture-shift). Navbar.tsx still uses
+ * glass-surface/glass-border until BottomNav replaces it in a later slice.
+ * ══════════════════════════════════════════════════════════════════════════ */
 .indigo-gradient {
   background: linear-gradient(135deg, #4f46e5 0%, #c3c0ff 100%);
 }
 
-/* Tonal architecture background shift */
 .tonal-architecture-shift {
   background: linear-gradient(to bottom, #0b1326, #060e20);
 }
 
-/* ── Glassmorphism utilities ────────────────────────────────────────────── */
-/* Base glass surface — dark translucent panel with blur */
 .glass-surface {
   background: rgba(13, 20, 40, 0.55);
   backdrop-filter: blur(16px) saturate(180%);
   -webkit-backdrop-filter: blur(16px) saturate(180%);
 }
 
-/* Subtle glass border — thin luminous edge */
 .glass-border {
   border: 1px solid rgba(195, 192, 255, 0.12);
 }
 
-/* Card-weight glass — slightly more opaque for content cards */
 .glass-card {
   background: rgba(20, 28, 54, 0.65);
   backdrop-filter: blur(20px) saturate(160%);
   -webkit-backdrop-filter: blur(20px) saturate(160%);
-  border: 1px solid rgba(195, 192, 255, 0.10);
+  border: 1px solid rgba(195, 192, 255, 0.1);
 }
 
-/* Heavy blur glass — for modals, drawers */
 .glass-heavy {
   background: rgba(10, 16, 32, 0.75);
   backdrop-filter: blur(32px) saturate(200%);
   -webkit-backdrop-filter: blur(32px) saturate(200%);
   border: 1px solid rgba(195, 192, 255, 0.15);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+ * BLUEPRINT BASE UTILITIES
+ * CSS-grid background (24px) with crosshair corners — the "firma visual".
+ * Consumed by the BlueprintGrid / Corners components (Phase 2). Zero images.
+ * ══════════════════════════════════════════════════════════════════════════ */
+.bp-grid {
+  background-image: linear-gradient(var(--t-grid-line) 1px, transparent 1px),
+    linear-gradient(90deg, var(--t-grid-line) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+.bp-grid-strong {
+  background-image: linear-gradient(var(--t-grid-line-strong) 1px, transparent 1px),
+    linear-gradient(90deg, var(--t-grid-line-strong) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Crosshair registration mark (+) reusable as a base utility */
+.bp-crosshair {
+  position: relative;
+  width: 12px;
+  height: 12px;
+}
+.bp-crosshair::before,
+.bp-crosshair::after {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  background: var(--t-outline-strong);
+}
+.bp-crosshair::before {
+  width: 12px;
+  height: 1px;
+  transform: translate(-50%, -50%);
+}
+.bp-crosshair::after {
+  width: 1px;
+  height: 12px;
+  transform: translate(-50%, -50%);
 }

@@ -3,6 +3,7 @@
 import { GoogleOAuthProvider } from "@react-oauth/google";
 import { AuthProvider } from "../context/AuthContext";
 import { ChatProvider } from "../context/ChatContext";
+import ThemeProvider from "./ThemeProvider";
 import Navbar from "./Navbar";
 
 const googleClientId = process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID ?? "";
@@ -10,14 +11,14 @@ const hasGoogleClientId = Boolean(googleClientId);
 
 export default function Providers({ children }: { children: React.ReactNode }) {
   const content = (
-    <>
+    <ThemeProvider>
       <AuthProvider>
         <ChatProvider>
           <Navbar />
           <main className="min-h-[calc(100vh-68px)]">{children}</main>
         </ChatProvider>
       </AuthProvider>
-    </>
+    </ThemeProvider>
   );
 
   if (!hasGoogleClientId) {
