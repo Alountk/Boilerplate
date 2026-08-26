@@ -22,26 +22,26 @@ test.describe('Blueprint bottom navigation', () => {
     const nav = page.getByRole('navigation', { name: 'Blueprint bottom navigation' });
     await expect(nav).toBeVisible();
 
-    await expect(nav.getByRole('link', { name: 'HOME' })).toBeVisible();
-    await expect(nav.getByRole('button', { name: 'SEARCH' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'Sell Now' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'CHAT' })).toBeVisible();
-    await expect(nav.getByRole('link', { name: 'ME' })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'HOME', exact: true })).toBeVisible();
+    await expect(nav.getByRole('button', { name: 'SEARCH', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'Sell Now', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'CHAT', exact: true })).toBeVisible();
+    await expect(nav.getByRole('link', { name: 'ME', exact: true })).toBeVisible();
   });
 
   test('exposes the correct routing targets', async ({ page }) => {
     await page.goto('/');
 
     const nav = page.getByRole('navigation', { name: 'Blueprint bottom navigation' });
-    await expect(nav.getByRole('link', { name: 'HOME' })).toHaveAttribute('href', '/');
-    await expect(nav.getByRole('link', { name: 'Sell Now' })).toHaveAttribute('href', '/create');
-    await expect(nav.getByRole('link', { name: 'CHAT' })).toHaveAttribute('href', '/messages');
+    await expect(nav.getByRole('link', { name: 'HOME', exact: true })).toHaveAttribute('href', '/');
+    await expect(nav.getByRole('link', { name: 'Sell Now', exact: true })).toHaveAttribute('href', '/create');
+    await expect(nav.getByRole('link', { name: 'CHAT', exact: true })).toHaveAttribute('href', '/messages');
   });
 
   test('SEARCH is inert (restyled only — no search triggered)', async ({ page }) => {
     await page.goto('/');
 
-    const search = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('button', { name: 'SEARCH' });
+    const search = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('button', { name: 'SEARCH', exact: true });
     await expect(search).toBeVisible();
     await expect(search).toHaveAttribute('aria-disabled', 'true');
   });
@@ -49,14 +49,14 @@ test.describe('Blueprint bottom navigation', () => {
   test('ME links to /login when unauthenticated', async ({ page }) => {
     await page.goto('/');
 
-    const me = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('link', { name: 'ME' });
+    const me = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('link', { name: 'ME', exact: true });
     await expect(me).toHaveAttribute('href', '/login');
   });
 
   test('HOME carries active state when on the home route', async ({ page }) => {
     await page.goto('/');
 
-    const home = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('link', { name: 'HOME' });
+    const home = page.getByRole('navigation', { name: 'Blueprint bottom navigation' }).getByRole('link', { name: 'HOME', exact: true });
     await expect(home).toHaveAttribute('aria-current', 'page');
   });
 
