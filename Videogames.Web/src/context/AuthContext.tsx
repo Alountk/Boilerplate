@@ -4,6 +4,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  useEffect,
   ReactNode,
 } from "react";
 import { User } from "../domain/models/User";
@@ -31,12 +32,17 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") return null;
+  // user arranca null en server y cliente para hidratar idéntico.
+  // Se carga desde localStorage en un efecto post-montaje; loading=true
+  // mientras tanto evita flashes/redirecciones en guards.
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     const authService = new AuthService();
-    return authService.getCurrentUser();
-  });
-  const loading = false;
+    setUser(authService.getCurrentUser());
+    setLoading(false);
+  }, []);
 
   const login = async (credentials: LoginRequest) => {
     const authService = new AuthService();
