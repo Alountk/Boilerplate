@@ -4,6 +4,7 @@ import React, {
   createContext,
   useContext,
   useState,
+  useEffect,
   ReactNode,
 } from "react";
 import { User } from "../domain/models/User";
@@ -31,12 +32,22 @@ interface AuthContextType {
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider = ({ children }: { children: ReactNode }) => {
-  const [user, setUser] = useState<User | null>(() => {
-    if (typeof window === "undefined") return null;
+  // user starts null on both server and client so hydration matches.
+  // It is restored from localStorage in a post-mount effect; loading=true
+  // meanwhile prevents flashes/redirects in guards.
+  const [user, setUser] = useState<User | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
     const authService = new AuthService();
-    return authService.getCurrentUser();
-  });
-  const loading = false;
+    // Deferred so the effect does not call setState synchronously (lint
+    // rule) and so the first client render hydrates identically to the server.
+    const id = window.setTimeout(() => {
+      setUser(authService.getCurrentUser());
+      setLoading(false);
+    }, 0);
+    return () => window.clearTimeout(id);
+  }, []);
 
   const login = async (credentials: LoginRequest) => {
     const authService = new AuthService();

@@ -138,8 +138,10 @@ export const ChatProvider = ({ children }: { children: ReactNode }) => {
         setRealtimeStatus("disconnected");
         if (shouldAttemptRestart) {
           setTimeout(restartConnection, 2000);
+          // The connection is still live in the UI, so this is a real error.
+          // (If cleanup already aborted it — StrictMode/user change — it is not worth reporting.)
+          console.error("SignalR Connection Error: ", err);
         }
-        console.error("SignalR Connection Error: ", err);
       });
 
     newConnection.on("ReceiveMessage", (message: Message) => {
