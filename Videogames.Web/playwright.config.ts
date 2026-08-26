@@ -37,6 +37,14 @@ export default defineConfig({
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
     },
+    {
+      name: 'mobile-chrome',
+      use: {
+        ...devices['Pixel 7'],
+        viewport: { width: 375, height: 812 },
+        deviceScaleFactor: 3,
+      },
+    },
   ],
 
   /* Run your local dev server before starting the tests */
