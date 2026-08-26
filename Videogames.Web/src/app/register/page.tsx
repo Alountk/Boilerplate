@@ -16,6 +16,8 @@ import {
 import { scrollToFirstError } from "../../utils/formUtils";
 import { useFormState } from "../../hooks/useFormState";
 import { FieldFeedback } from "../../components/FieldFeedback";
+import BlueprintGrid from "../../components/theme/BlueprintGrid";
+import TitleBlock from "../../components/theme/TitleBlock";
 
 type RegisterForm = {
   firstName: string;
@@ -77,6 +79,9 @@ function validateRegisterForm(values: RegisterForm): Partial<Record<FieldKey, st
   return next;
 }
 
+const inputCls =
+  "w-full border border-outline bg-surface-2/60 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors focus:border-secondary";
+
 export default function RegisterPage() {
   const { register, sendRegistrationCode } = useAuth();
   const router = useRouter();
@@ -97,7 +102,6 @@ export default function RegisterPage() {
     runValidation,
   } = useFormState<RegisterForm>({ initialValues, validate });
 
-  // Wrapper: clear server error on any field change
   const handleChange = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       formHandleChange(e);
@@ -153,131 +157,96 @@ export default function RegisterPage() {
   };
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface flex flex-col md:flex-row">
-      {/* Left panel — immersive visual */}
-      <section className="hidden md:flex md:w-5/12 lg:w-1/2 bg-surface-container-lowest relative overflow-hidden flex-col justify-between p-12" aria-hidden="true">
-        <div className="absolute inset-0 z-0">
-          <div className="absolute inset-0 bg-linear-to-br from-primary-container/20 via-surface-container-lowest to-surface-container" />
-          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full bg-primary-container/15 blur-[120px]" />
-          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full bg-primary/10 blur-[80px]" />
-        </div>
-        <div className="relative z-10">
-          <h1 className="text-2xl font-extrabold tracking-tighter text-on-surface italic">vMarket</h1>
-        </div>
-        <div className="relative z-10 max-w-md">
-          <span className="text-xs font-bold tracking-[0.2em] uppercase text-primary mb-4 block">
-            Gamer Community
-          </span>
-          <h2 className="text-4xl lg:text-5xl font-extrabold leading-tight tracking-tight text-on-surface mb-6">
-            Build your{" "}
-            <span className="text-primary-container">gamer profile</span> and start trading.
-          </h2>
-          <p className="text-on-surface-variant text-lg leading-relaxed font-light">
-            Join players, collectors and sellers buying and listing videogames every day.
-          </p>
-        </div>
-        <div className="relative z-10">
-          <p className="text-sm text-outline font-medium tracking-wide">
-            © {new Date().getFullYear()} vMarket.
-          </p>
-        </div>
-      </section>
+    <BlueprintGrid className="min-h-screen bg-surface text-on-surface">
+      <div className="mx-auto w-full max-w-lg px-6 pt-6">
+        <TitleBlock code="VMKT-BP-REG" rev="C" date="REGISTER" />
+      </div>
 
-      {/* Right panel — form */}
-      <section className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 lg:p-16 bg-surface overflow-y-auto">
-        {/* Mobile brand */}
-        <div className="md:hidden w-full mb-10 flex justify-center">
-          <h1 className="text-xl font-black italic tracking-tighter text-on-surface">vMarket</h1>
-        </div>
-
-        <div className="w-full max-w-lg">
-          <header className="mb-10">
-            <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">
+      <section className="flex justify-center px-6 py-10">
+        <div data-testid="auth-shell" className="w-full max-w-lg">
+          <header className="mb-8">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">GAMER_COMMUNITY</p>
+            <h2 className="mt-2 font-[family-name:var(--font-space-grotesk)] text-2xl font-bold tracking-tight text-on-surface">
               Create your account
             </h2>
-            <p className="text-on-surface-variant text-sm">
+            <p className="mt-1 text-sm text-on-surface-muted">
               Create your profile to buy, sell and chat with other gamers.
             </p>
           </header>
 
           {serverError && (
-            <div className="mb-6 rounded-md bg-error-container/30 border border-error/30 px-4 py-3 text-sm text-error" role="alert">
+            <div className="mb-6 border border-error/30 bg-error/10 px-4 py-3 text-sm text-error" role="alert">
               {serverError}
             </div>
           )}
           {submitAttempted && missingRequiredCount > 0 && (
-            <div className="mb-6 rounded-md bg-surface-container-low border border-outline-variant/30 px-4 py-3 text-sm text-on-surface-variant" role="status">
+            <div className="mb-6 border border-outline bg-surface-1/40 px-4 py-3 text-sm text-on-surface-muted" role="status">
               {missingRequiredCount} required field{missingRequiredCount !== 1 ? "s" : ""} need{missingRequiredCount === 1 ? "s" : ""} attention.
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-5" noValidate>
-            {/* — Account fields — */}
-            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">Account</p>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-secondary">Account</p>
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-1">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="firstName">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="firstName">
                   First Name <span className="text-error" aria-hidden="true">*</span>
                 </label>
-                <div className="relative group">
-                  <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                  <input id="firstName" name="firstName" value={values.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-required="true" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="John" />
+                <div className="relative">
+                  <UserIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
+                  <input id="firstName" name="firstName" value={values.firstName} onChange={handleChange} onBlur={handleBlur} autoComplete="given-name" aria-required="true" aria-invalid={!!showFieldError("firstName")} aria-describedby={showFieldError("firstName") ? "err-firstName" : undefined} className={inputCls} placeholder="John" />
                 </div>
                 <FieldFeedback id="err-firstName" message={showFieldError("firstName")} />
               </div>
               <div className="space-y-1">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="lastName">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="lastName">
                   Last Name <span className="text-error" aria-hidden="true">*</span>
                 </label>
-                <div className="relative group">
-                  <IdentificationIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                  <input id="lastName" name="lastName" value={values.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-required="true" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Doe" />
+                <div className="relative">
+                  <IdentificationIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
+                  <input id="lastName" name="lastName" value={values.lastName} onChange={handleChange} onBlur={handleBlur} autoComplete="family-name" aria-required="true" aria-invalid={!!showFieldError("lastName")} aria-describedby={showFieldError("lastName") ? "err-lastName" : undefined} className={inputCls} placeholder="Doe" />
                 </div>
                 <FieldFeedback id="err-lastName" message={showFieldError("lastName")} />
               </div>
             </div>
             <div className="space-y-1">
-              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="email">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="email">
                 Email Address <span className="text-error" aria-hidden="true">*</span>
               </label>
-              <div className="relative group">
-                <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                <input id="email" name="email" type="email" inputMode="email" value={values.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-required="true" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="curator@nocturnalarchive.com" />
+              <div className="relative">
+                <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
+                <input id="email" name="email" type="email" inputMode="email" value={values.email} onChange={handleChange} onBlur={handleBlur} autoComplete="email" aria-required="true" aria-invalid={!!showFieldError("email")} aria-describedby={showFieldError("email") ? "err-email" : undefined} className={inputCls} placeholder="curator@nocturnalarchive.com" />
               </div>
               <FieldFeedback id="err-email" message={showFieldError("email")} />
             </div>
             <div className="space-y-1">
               <div className="flex justify-between items-end">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant" htmlFor="password">
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted" htmlFor="password">
                   Password <span className="text-error" aria-hidden="true">*</span>
                 </label>
-                <span className="text-[0.625rem] text-outline italic" id="password-hint">Min. 8 characters</span>
+                <span className="text-on-surface-muted italic text-[10px]" id="password-hint">Min. 8 characters</span>
               </div>
-              <div className="relative group">
-                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                <input id="password" name="password" type={showPassword ? "text" : "password"} value={values.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-required="true" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="••••••••••••" />
+              <div className="relative">
+                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
+                <input id="password" name="password" type={showPassword ? "text" : "password"} value={values.password} onChange={handleChange} onBlur={handleBlur} autoComplete="new-password" aria-required="true" aria-invalid={!!showFieldError("password")} aria-describedby={showFieldError("password") ? "err-password" : "password-hint"} className={inputCls} placeholder="••••••••••••" />
                 <button
                   type="button"
                   onClick={() => setShowPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-outline hover:text-primary transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-on-surface-muted transition-colors hover:text-on-surface"
                   aria-label={showPassword ? "Hide password" : "Show password"}
                 >
-                  {showPassword ? (
-                    <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
-                  )}
+                  {showPassword ? <EyeSlashIcon className="h-5 w-5" aria-hidden="true" /> : <EyeIcon className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
               <FieldFeedback id="err-password" message={showFieldError("password")} />
             </div>
 
             <div className="space-y-1">
-              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="confirmPassword">
+              <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="confirmPassword">
                 Confirm Password <span className="text-error" aria-hidden="true">*</span>
               </label>
-              <div className="relative group">
-                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+              <div className="relative">
+                <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
                 <input
                   id="confirmPassword"
                   name="confirmPassword"
@@ -289,72 +258,66 @@ export default function RegisterPage() {
                   aria-required="true"
                   aria-invalid={!!showFieldError("confirmPassword")}
                   aria-describedby={showFieldError("confirmPassword") ? "err-confirmPassword" : undefined}
-                  className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-12 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none"
+                  className={inputCls}
                   placeholder="••••••••••••"
                 />
                 <button
                   type="button"
                   onClick={() => setShowConfirmPassword((prev) => !prev)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-outline hover:text-primary transition-colors"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 p-1 text-on-surface-muted transition-colors hover:text-on-surface"
                   aria-label={showConfirmPassword ? "Hide confirm password" : "Show confirm password"}
                 >
-                  {showConfirmPassword ? (
-                    <EyeSlashIcon className="h-5 w-5" aria-hidden="true" />
-                  ) : (
-                    <EyeIcon className="h-5 w-5" aria-hidden="true" />
-                  )}
+                  {showConfirmPassword ? <EyeSlashIcon className="h-5 w-5" aria-hidden="true" /> : <EyeIcon className="h-5 w-5" aria-hidden="true" />}
                 </button>
               </div>
               <FieldFeedback id="err-confirmPassword" message={showFieldError("confirmPassword")} />
             </div>
 
-            {/* — Contact details (optional) — */}
-            <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant pt-2">
-              Contact Details <span className="font-normal normal-case text-outline">(optional)</span>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-secondary pt-2">
+              Contact Details <span className="normal-case text-on-surface-muted">(optional)</span>
             </p>
             <div className="space-y-1">
-              <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="address">Address</label>
-              <div className="relative group">
-                <HomeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
-                <input id="address" name="address" value={values.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Street, number" />
+              <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="address">Address</label>
+              <div className="relative">
+                <HomeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
+                <input id="address" name="address" value={values.address} onChange={handleChange} onBlur={handleBlur} autoComplete="street-address" aria-invalid={!!showFieldError("address")} aria-describedby={showFieldError("address") ? "err-address" : undefined} className={inputCls} placeholder="Street, number" />
               </div>
               <FieldFeedback id="err-address" message={showFieldError("address")} />
             </div>
             <div className="grid grid-cols-3 gap-4">
               <div className="space-y-1">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="city">City</label>
-                <input id="city" name="city" value={values.city} onChange={handleChange} onBlur={handleBlur} autoComplete="address-level2" aria-invalid={!!showFieldError("city")} aria-describedby={showFieldError("city") ? "err-city" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="City" />
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="city">City</label>
+                <input id="city" name="city" value={values.city} onChange={handleChange} onBlur={handleBlur} autoComplete="address-level2" aria-invalid={!!showFieldError("city")} aria-describedby={showFieldError("city") ? "err-city" : undefined} className={inputCls} placeholder="City" />
                 <FieldFeedback id="err-city" message={showFieldError("city")} />
               </div>
               <div className="space-y-1">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="country">Country</label>
-                <input id="country" name="country" value={values.country} onChange={handleChange} onBlur={handleBlur} autoComplete="country-name" aria-invalid={!!showFieldError("country")} aria-describedby={showFieldError("country") ? "err-country" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="Country" />
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="country">Country</label>
+                <input id="country" name="country" value={values.country} onChange={handleChange} onBlur={handleBlur} autoComplete="country-name" aria-invalid={!!showFieldError("country")} aria-describedby={showFieldError("country") ? "err-country" : undefined} className={inputCls} placeholder="Country" />
                 <FieldFeedback id="err-country" message={showFieldError("country")} />
               </div>
               <div className="space-y-1">
-                <label className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block" htmlFor="phone">Phone</label>
-                <input id="phone" name="phone" type="tel" inputMode="tel" value={values.phone} onChange={handleChange} onBlur={handleBlur} autoComplete="tel" aria-invalid={!!showFieldError("phone")} aria-describedby={showFieldError("phone") ? "err-phone" : undefined} className="w-full bg-surface-container-highest border-none rounded-md py-3.5 px-4 text-on-surface placeholder:text-outline/50 focus:ring-1 focus:ring-primary text-sm outline-none" placeholder="+1 …" />
+                <label className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block" htmlFor="phone">Phone</label>
+                <input id="phone" name="phone" type="tel" inputMode="tel" value={values.phone} onChange={handleChange} onBlur={handleBlur} autoComplete="tel" aria-invalid={!!showFieldError("phone")} aria-describedby={showFieldError("phone") ? "err-phone" : undefined} className={inputCls} placeholder="+1 …" />
                 <FieldFeedback id="err-phone" message={showFieldError("phone")} />
               </div>
             </div>
 
-            {/* CTA */}
-            <button type="submit" className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:opacity-90 active:scale-[0.98] transition-all mt-2">
-              Create Account
+            <button type="submit" className="mt-2 w-full min-h-12 border border-secondary bg-secondary/10 px-4 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20">
+              CREATE ACCOUNT
             </button>
 
-            {/* Social / alternative (FEATURE-PENDING) */}
+            {/* Social / alternative (FEATURE-PENDING — disabled) */}
             <div className="mt-8">
               <div className="flex items-center gap-4 mb-6" aria-hidden="true">
-                <div className="h-px flex-1 bg-surface-container-highest" />
-                <span className="text-[10px] uppercase tracking-widest font-bold text-outline">Alternative Entry</span>
-                <div className="h-px flex-1 bg-surface-container-highest" />
+                <div className="h-px flex-1 bg-outline" />
+                <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">Alternative Entry</span>
+                <div className="h-px flex-1 bg-outline" />
               </div>
               <div className="grid grid-cols-2 gap-4">
-                <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-40 cursor-not-allowed">
+                <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 border border-outline bg-surface-2/60 px-4 font-mono text-xs uppercase tracking-widest text-on-surface-muted opacity-60 cursor-not-allowed">
                   Google
                 </button>
-                <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-low rounded-md text-on-surface-variant text-xs font-bold opacity-30 cursor-not-allowed">
+                <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 border border-outline bg-surface-2/60 px-4 font-mono text-xs uppercase tracking-widest text-on-surface-muted opacity-60 cursor-not-allowed">
                   GitHub
                 </button>
               </div>
@@ -362,20 +325,15 @@ export default function RegisterPage() {
           </form>
 
           <div className="mt-10 text-center">
-            <p className="text-sm text-on-surface-variant">
+            <p className="text-sm text-on-surface-muted">
               Already a member?{" "}
-              <Link href="/login" className="text-primary font-bold ml-1 hover:text-primary-fixed transition-colors">
+              <Link href="/login" className="font-bold text-secondary ml-1 hover:underline">
                 Sign in here
               </Link>
             </p>
           </div>
         </div>
       </section>
-
-      {/* Mobile footer */}
-      <footer className="md:hidden w-full px-6 py-6 text-center bg-surface-container-lowest">
-        <p className="text-xs text-outline font-medium">© {new Date().getFullYear()} vMarket.</p>
-      </footer>
-    </div>
+    </BlueprintGrid>
   );
 }
