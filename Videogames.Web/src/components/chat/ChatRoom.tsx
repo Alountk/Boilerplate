@@ -1,8 +1,8 @@
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
-import { 
-  PaperAirplaneIcon, 
+import {
+  PaperAirplaneIcon,
   UserCircleIcon,
   ShoppingBagIcon,
   ChevronLeftIcon
@@ -18,9 +18,9 @@ interface ChatRoomProps {
   onBack: () => void;
 }
 
-export const ChatRoom: React.FC<ChatRoomProps> = ({ 
-  activeConv, 
-  messages, 
+export const ChatRoom: React.FC<ChatRoomProps> = ({
+  activeConv,
+  messages,
   currentUser,
   onSendMessage,
   onBack
@@ -39,7 +39,7 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({
   const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inputText.trim()) return;
-    
+
     await onSendMessage(inputText);
     setInputText("");
   };
@@ -47,42 +47,45 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({
   return (
     <>
       {/* Chat Header */}
-      <header className="bg-white dark:bg-gray-800 p-4 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+      <header className="flex items-center justify-between border-b border-outline bg-surface p-4">
         <div className="flex items-center gap-3">
-          <button 
+          <button
             onClick={onBack}
-            className="md:hidden p-1 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-full"
+            className="rounded-full p-1 text-on-surface-muted active:bg-surface-1/60 md:hidden"
+            aria-label="Volver a la lista"
           >
-            <ChevronLeftIcon className="h-6 w-6 dark:text-white" />
+            <ChevronLeftIcon className="h-6 w-6" />
           </button>
           <div className="flex items-center gap-3">
-            <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900/30 rounded-full flex items-center justify-center">
-              <UserCircleIcon className="h-8 w-8 text-blue-600" />
+            <div className="flex h-10 w-10 items-center justify-center border border-outline bg-surface-1/40">
+              <UserCircleIcon className="h-8 w-8 text-secondary" />
             </div>
             <div>
-              <h3 className="font-bold dark:text-white leading-tight">
+              <h3 className="leading-tight font-bold text-on-surface">
                 {currentUser?.id === activeConv.buyerId ? activeConv.sellerName : activeConv.buyerName}
               </h3>
-              <p className="text-xs text-gray-500 flex items-center gap-1">
-                In reference to <span className="font-medium text-blue-600">{activeConv.videogameName}</span>
+              <p className="flex items-center gap-1 text-xs text-on-surface-muted">
+                In reference to <span className="font-medium text-secondary">{activeConv.videogameName}</span>
               </p>
             </div>
           </div>
         </div>
-        <button className="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg text-gray-500 transition-colors">
+        <button className="rounded-lg p-2 text-on-surface-muted transition-colors active:bg-surface-1/60">
           <ShoppingBagIcon className="h-5 w-5" />
         </button>
       </header>
 
       {/* Messages Area */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div className="flex-1 space-y-4 overflow-y-auto p-4">
         {messages.map((m, idx) => {
           const isMine = m.senderId === currentUser?.id;
           return (
             <div key={m.id || idx} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] md:max-w-[70%] p-3 rounded-2xl shadow-sm ${isMine ? 'bg-blue-600 text-white rounded-tr-none' : 'bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-tl-none border border-gray-100 dark:border-gray-700'}`}>
-                <p className="text-sm leading-relaxed">{m.text}</p>
-                <div className={`text-[10px] mt-1 opacity-70 text-right ${isMine ? 'text-blue-100' : 'text-gray-400'}`}>
+              <div className={`max-w-[80%] p-3 md:max-w-[70%] ${isMine
+                ? 'border border-secondary bg-surface-2/40'
+                : 'border border-outline bg-surface-1/40'}`}>
+                <p className="text-sm leading-relaxed text-on-surface">{m.text}</p>
+                <div className={`mt-1 text-right font-mono text-[10px] uppercase opacity-70 ${isMine ? 'text-secondary' : 'text-on-surface-muted'}`}>
                   {new Date(m.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                 </div>
               </div>
@@ -93,18 +96,19 @@ export const ChatRoom: React.FC<ChatRoomProps> = ({
       </div>
 
       {/* Message Input */}
-      <footer className="p-4 bg-white dark:bg-gray-800 border-t border-gray-200 dark:border-gray-700">
+      <footer className="border-t border-outline bg-surface p-4">
         <form onSubmit={handleSend} className="flex gap-2">
           <input
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
-            placeholder="Type a message..."
-            className="flex-1 bg-gray-100 dark:bg-gray-900 dark:text-white rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all border-none"
+            placeholder="Escribí un mensaje..."
+            aria-label="Mensaje"
+            className="flex-1 border border-outline bg-surface-2/60 px-4 py-3 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors focus:border-secondary"
           />
           <button
             type="submit"
             disabled={!inputText.trim()}
-            className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white p-3 rounded-xl transition-all shadow-lg shadow-blue-500/20 active:scale-95"
+            className="flex h-12 w-12 items-center justify-center border border-secondary bg-secondary/10 text-secondary transition-colors active:bg-secondary/20 disabled:cursor-not-allowed disabled:opacity-50"
           >
             <PaperAirplaneIcon className="h-6 w-6" />
           </button>

@@ -5,8 +5,11 @@ import Link from "next/link";
 import { Videogame } from "../domain/models/Videogame";
 import { VideogameService } from "../infrastructure/services/VideogameService";
 import { useAuth } from "../context/AuthContext";
-import VideogameCard from "../components/VideogameCard";
-import { ArchiveBoxIcon, ArrowRightIcon } from "@heroicons/react/24/outline";
+import VideogameCover from "../components/VideogameCover";
+import BlueprintGrid from "../components/theme/BlueprintGrid";
+import TitleBlock from "../components/theme/TitleBlock";
+import DimensionLine from "../components/theme/DimensionLine";
+import TechCard from "../components/theme/TechCard";
 
 import { CATEGORIES } from "../constants/categories";
 import { resolveFrontendAssetSrc } from "../utils/videogameImages";
@@ -75,7 +78,6 @@ export default function Home() {
       if (confirm("Are you sure you want to delete this listing?")) {
         try {
           await videogameService.delete(id);
-          // Reload from page 1 to keep state consistent
           setLoading(true);
           setVideogames([]);
           setHasMore(true);
@@ -89,200 +91,159 @@ export default function Home() {
   );
 
   return (
-    <div className="min-h-screen bg-surface text-on-surface">
-      {/* ─── Hero ─────────────────────────────────────── */}
-      <section className="relative w-full h-[614px] flex items-center overflow-hidden">
-        <div className="absolute inset-0 z-0">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={HOME_HERO_IMAGE}
-            alt="Neon gaming setup with monitors and controller"
-            className="w-full h-full object-cover opacity-30 grayscale"
-          />
-          <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/60 to-transparent" />
+    <div className="relative bg-surface min-h-screen">
+      <BlueprintGrid showCrosshairs className="min-h-screen">
+        {/* ─── Title block (cajetín) ─────────────────── */}
+        <div className="mx-auto max-w-7xl px-4 pt-4">
+          <TitleBlock code="VMKT-BP-001" rev="C" date={new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })} />
         </div>
-        <div className="relative z-10 px-8 md:px-24 max-w-4xl w-full">
-          <span className="text-primary-fixed uppercase tracking-[0.3em] font-bold text-xs mb-4 block">
-            Gamer Marketplace
-          </span>
-          <h1 className="text-5xl md:text-7xl font-extrabold tracking-tighter text-on-surface leading-none mb-6">
-            Find your next{" "}
-            <br />
-            <span className="text-transparent bg-clip-text bg-linear-to-r from-primary-container to-primary">
-              Legendary Game.
-            </span>
-          </h1>
-          <p className="text-on-surface-variant text-lg max-w-xl mb-10 leading-relaxed">
-            Buy and sell retro titles, modern hits, limited editions, consoles, and gaming accessories in one trusted marketplace.
-          </p>
-          <div className="flex flex-wrap gap-4">
-            <Link
-              href="#recently-added"
-              className="bg-primary-container text-on-primary-container px-8 py-4 rounded-xl font-bold flex items-center gap-3 hover:opacity-90 transition-all"
-            >
-              Explore Collection
-              <ArrowRightIcon className="h-5 w-5" />
-            </Link>
-          </div>
-        </div>
-      </section>
 
-      {/* ─── Categories — Bento Grid ──────────────────── */}
-      <section className="px-8 md:px-12 py-20 max-w-[1440px] mx-auto">
-        <div className="flex justify-between items-end mb-10">
-          <div>
-            <h2 className="text-3xl font-bold tracking-tight text-on-surface">Browse Platforms</h2>
-            <p className="text-on-surface-variant mt-2">Find games by console</p>
+        {/* ─── Hero — plano de montaje compacto ─────── */}
+        <section aria-labelledby="sys01-home" className="relative mx-auto max-w-7xl px-4 py-10 md:py-16">
+          <div className="absolute inset-0 -z-10 overflow-hidden" aria-hidden="true">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              src={HOME_HERO_IMAGE}
+              alt=""
+              className="h-full w-full object-cover opacity-20 grayscale"
+            />
           </div>
-        </div>
-        {/*
-          Bento layout (lg+): 5 cols × 2 rows, fixed height
-          ┌────────────────┬────────┬────────────────┐
-          │  PlayStation   │  Xbox  │    Nintendo    │
-          │  (2col×2row)   │(1×2row)│  (2col×1row)  │
-          │                │        ├────────┬───────┤
-          │                │        │   PC   │ Retro │
-          └────────────────┴────────┴────────┴───────┘
-          Mobile/tablet: regular 2- or 3-column grid with aspect ratio.
-        */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 lg:grid-rows-2 gap-4 lg:h-[520px]">
-          {CATEGORIES.map((cat, idx) => {
-            const bentoSpan = [
-              "lg:col-span-2 lg:row-span-2",
-              "lg:col-span-1 lg:row-span-2",
-              "lg:col-span-2 lg:row-span-1",
-              "lg:col-span-1 lg:row-span-1",
-              "lg:col-span-1 lg:row-span-1",
-            ][idx] ?? "";
-            const isFeatured = idx === 0;
-            return (
+          <span id="sys01-home" className="font-mono text-[10px] uppercase tracking-[0.25em] text-secondary">
+            SYS.01 — HOME
+          </span>
+          <h1 className="mt-3 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold leading-tight tracking-tighter text-on-surface sm:text-5xl">
+            EL MERCADO,
+            <br />
+            DIBUJADO A ESCALA
+          </h1>
+          <div className="mt-6 max-w-md">
+            <DimensionLine measure="390px" />
+          </div>
+          <p className="mt-6 max-w-md text-sm leading-relaxed text-on-surface-muted md:text-base">
+            Compra y vende títulos retro, hits modernos, ediciones limitadas, consolas y accesorios en un solo marketplace de confianza.
+          </p>
+          <Link
+            href="#recently-added"
+            className="mt-8 inline-flex min-h-12 items-center justify-center border border-secondary px-6 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20"
+          >
+            EXPLORAR
+            <span className="ml-2" aria-hidden="true">▸</span>
+          </Link>
+        </section>
+
+        {/* ─── Categories — chips técnicos ──────────── */}
+        <section aria-labelledby="sys02-categories" className="mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-4 flex items-end justify-between gap-4">
+            <h2 id="sys02-categories" className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface">
+              Categorías
+            </h2>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => (
               <Link
                 key={cat.id}
                 href={`/category/${cat.id}`}
-                className={`group relative rounded-2xl overflow-hidden bg-surface-container block aspect-3/4 lg:aspect-auto ${bentoSpan}`}
+                className="inline-flex min-h-10 min-w-[88px] items-center justify-center border border-outline px-3 py-1 font-mono text-xs uppercase tracking-widest text-on-surface-muted transition-colors active:border-secondary active:text-secondary"
               >
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img
-                  src={cat.img}
-                  alt={cat.name}
-                  className="absolute inset-0 w-full h-full object-cover opacity-50 grayscale transition-all duration-500 group-hover:opacity-80 group-hover:grayscale-0 group-hover:scale-105"
-                />
-                <div className="absolute inset-0 bg-linear-to-t from-surface via-surface/40 to-transparent" />
-                {/* Glass border on hover */}
-                <div className="absolute inset-0 rounded-2xl ring-1 ring-inset ring-white/0 group-hover:ring-white/10 transition-all duration-300" aria-hidden="true" />
-                <div className={`absolute inset-x-0 bottom-0 ${isFeatured ? "p-8" : "p-5"}`}>
-                  <h3 className={`font-black uppercase tracking-widest text-on-surface leading-tight ${isFeatured ? "text-xl" : "text-base"}`}>
-                    {cat.name}
-                  </h3>
-                  <p className="text-xs text-primary font-bold mt-1.5 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                    Explore <ArrowRightIcon className="h-3 w-3" aria-hidden="true" />
-                  </p>
-                </div>
+                {cat.name.toUpperCase()}
               </Link>
-            );
-          })}
-        </div>
-      </section>
-
-      {/* ─── Recently Added ───────────────────────────── */}
-      <section id="recently-added" className="px-8 md:px-12 py-12 max-w-[1440px] mx-auto">
-        <h2 className="text-3xl font-bold tracking-tight text-on-surface mb-2">Recently Added</h2>
-        <p className="text-on-surface-variant mb-12">Fresh listings from the community right now.</p>
-
-        {/* Initial skeleton */}
-        {loading ? (
-          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-8">
-            {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-              <div key={i} className="aspect-3/4 bg-surface-container rounded-xl animate-pulse" />
             ))}
           </div>
-        ) : videogames.length === 0 ? (
-          <div className="py-20 text-center bg-surface-container-low rounded-2xl" role="status">
-            <ArchiveBoxIcon className="mx-auto mb-4 h-12 w-12 text-outline" />
-            <p className="text-on-surface-variant mb-4">No videogames listed yet. Be the first to publish one.</p>
-            <Link
-              href="/create"
-              className="bg-primary-container text-on-primary-container px-6 py-2.5 rounded-xl font-bold text-sm inline-block hover:opacity-90 transition-all"
-            >
-              List an item now
-            </Link>
+        </section>
+
+        {/* ─── Recently Added — TechCards ───────────── */}
+        <section id="recently-added" aria-labelledby="sys03-recent" className="mx-auto max-w-7xl px-4 py-8">
+          <div className="mb-6 flex items-end justify-between gap-4 border-b border-outline pb-2">
+            <h2 id="sys03-recent" className="font-mono text-xs uppercase tracking-[0.2em] text-on-surface">
+              Recién Llegados
+            </h2>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
+              Pulse — LIVE
+            </span>
           </div>
-        ) : (
-          <>
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12">
-              {videogames.map((game) => (
-                <VideogameCard
-                  key={game.id}
-                  videogame={game}
-                  isAuthenticated={isAuthenticated}
-                  onDelete={handleDelete}
-                />
+
+          {loading ? (
+            <div data-testid="recently-added-grid" className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+              {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                <div key={i} className="aspect-square animate-pulse border border-outline bg-surface-1/40" />
               ))}
             </div>
-
-            {/* Load-more skeleton — shown while fetching next page */}
-            {loadingMore && (
-              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-x-8 gap-y-12 mt-12">
-                {Array.from({ length: PAGE_SIZE }).map((_, i) => (
-                  <div key={i} className="aspect-3/4 bg-surface-container rounded-xl animate-pulse" />
+          ) : videogames.length === 0 ? (
+            <div className="border border-outline bg-surface-1/40 py-16 text-center" role="status">
+              <p className="mb-4 text-on-surface-muted">No hay videojuegos listados todavía. Sé el primero en publicar uno.</p>
+              <Link
+                href="/create"
+                className="inline-flex min-h-12 items-center justify-center border border-secondary px-6 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20"
+              >
+                Listar un ítem
+              </Link>
+            </div>
+          ) : (
+            <>
+              <div data-testid="recently-added-grid" className="grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+                {videogames.map((game) => (
+                  <TechCard
+                    key={game.id}
+                    code={`CMP-${String(game.id.slice(0, 2)).toUpperCase()}-${game.generalState}`}
+                    title={game.englishName}
+                    sub={game.console}
+                    price={game.ownPrice}
+                    cover={
+                      <VideogameCover
+                        title={game.englishName}
+                        images={game.images}
+                        urlImg={game.urlImg}
+                        imgClassName="aspect-square w-full object-cover"
+                        fallbackClassName="aspect-square w-full"
+                      />
+                    }
+                    actions={
+                      isAuthenticated ? (
+                        <button
+                          type="button"
+                          onClick={() => handleDelete(game.id)}
+                          className="min-w-11 min-h-11 px-2 text-error transition-colors hover:bg-error/10"
+                          aria-label={`Eliminar listing ${game.englishName}`}
+                        >
+                          ✕
+                        </button>
+                      ) : null
+                    }
+                  />
                 ))}
               </div>
-            )}
 
-            {/* Sentinel: IntersectionObserver target */}
-            {hasMore && (
-              <div ref={sentinelRef} className="h-1 mt-8" aria-hidden="true" />
-            )}
+              {loadingMore && (
+                <div className="mt-6 grid grid-cols-2 gap-3 sm:gap-4 md:grid-cols-4">
+                  {Array.from({ length: PAGE_SIZE }).map((_, i) => (
+                    <div key={i} className="aspect-square animate-pulse border border-outline bg-surface-1/40" />
+                  ))}
+                </div>
+              )}
 
-            {!hasMore && videogames.length > 0 && (
-              <p className="text-center text-on-surface-variant/50 text-sm mt-16">
-                You&apos;ve seen all listings.
-              </p>
-            )}
-          </>
-        )}
-      </section>
+              {hasMore && (
+                <div ref={sentinelRef} className="h-1 mt-8" aria-hidden="true" />
+              )}
 
-      {/* ─── Newsletter CTA ───────────────────────────── */}
-      <section className="my-16 mx-8 md:mx-12 p-12 md:p-16 rounded-3xl bg-linear-to-br from-surface-container-low to-surface relative overflow-hidden flex flex-col md:flex-row items-center gap-12">
-        <div className="absolute -right-20 -top-20 w-80 h-80 bg-primary-container/10 rounded-full blur-[100px]" />
-        <div className="relative z-10 flex-1">
-          <h2 className="text-4xl font-black tracking-tighter mb-4">Stay in the Loop.</h2>
-          <p className="text-on-surface-variant max-w-md">
-            Get weekly updates about hot listings, price drops, and newly published games.
-          </p>
-        </div>
-        <div className="relative z-10 w-full md:w-auto flex gap-4">
-          {/* FEATURE-PENDING: newsletter subscription */}
-          <input
-            className="bg-surface-container-highest border-none rounded-xl px-6 py-4 w-full md:w-72 focus:ring-1 focus:ring-primary outline-none text-on-surface placeholder:text-outline/50"
-            placeholder="Email address"
-            type="email"
-            disabled
-          />
-          <button disabled className="bg-on-surface text-surface font-bold px-6 py-4 rounded-xl opacity-60 cursor-not-allowed">
-            Join
-          </button>
-        </div>
-      </section>
+              {!hasMore && videogames.length > 0 && (
+                <p className="mt-12 text-center font-mono text-xs uppercase tracking-widest text-on-surface-muted/60">
+                  Has visto todos los listings.
+                </p>
+              )}
+            </>
+          )}
+        </section>
 
-      {/* ─── Footer ───────────────────────────────────── */}
-      <footer className="w-full mt-8 tonal-architecture-shift">
-        <div className="w-full px-8 md:px-12 py-12 flex flex-col md:flex-row justify-between items-center max-w-[1440px] mx-auto">
-          <div className="mb-8 md:mb-0">
-            <span className="text-on-surface font-black italic text-xl">vMarket</span>
-            <p className="text-on-surface-variant mt-2 text-xs opacity-80">
-              © {new Date().getFullYear()} vMarket. The gamer marketplace.
+        {/* ─── Footer mínimo ────────────────────────── */}
+        <footer className="mt-12 border-t border-outline">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-8 md:flex-row">
+            <span className="font-mono text-sm uppercase tracking-widest text-on-surface">vMarket</span>
+            <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
+              © {new Date().getFullYear()} vMarket. THE GAMER MARKETPLACE.
             </p>
           </div>
-          <div className="flex flex-wrap justify-center gap-8">
-            {/* FEATURE-PENDING: footer pages */}
-            <span className="text-on-surface-variant opacity-60 text-sm">Privacy Policy</span>
-            <span className="text-on-surface-variant opacity-60 text-sm">Terms</span>
-            <span className="text-on-surface-variant opacity-60 text-sm">Support</span>
-          </div>
-        </div>
-      </footer>
+        </footer>
+      </BlueprintGrid>
     </div>
   );
 }

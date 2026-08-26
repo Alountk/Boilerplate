@@ -8,11 +8,11 @@ import { EnvelopeIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from "@heroicons/
 import { scrollToFirstError } from "../../utils/formUtils";
 import { useFormState } from "../../hooks/useFormState";
 import { FieldFeedback } from "../../components/FieldFeedback";
-import { resolveFrontendAssetSrc } from "../../utils/videogameImages";
+import BlueprintGrid from "../../components/theme/BlueprintGrid";
+import TitleBlock from "../../components/theme/TitleBlock";
 
 type LoginForm = { email: string; password: string };
 const initialValues: LoginForm = { email: "", password: "" };
-const LOGIN_BACKGROUND_IMAGE = resolveFrontendAssetSrc("assets/backgrounds/login-gaming-desk.jpg");
 
 function validateLoginForm(values: LoginForm): Partial<Record<keyof LoginForm, string>> {
   const next: Partial<Record<keyof LoginForm, string>> = {};
@@ -50,44 +50,43 @@ export default function LoginPage() {
   };
 
   const inputCls = (hasError: boolean) =>
-    `w-full bg-surface-container-highest border-none rounded-md py-3.5 pl-12 pr-4 text-on-surface placeholder:text-outline/50 focus:ring-1 transition-all duration-200 text-sm outline-none ${
-      hasError ? "focus:ring-error ring-1 ring-error" : "focus:ring-primary"
+    `w-full border bg-surface-2/60 py-3.5 pl-12 pr-4 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors ${
+      hasError ? "border-error focus:ring-1 focus:ring-error" : "border-outline focus:border-secondary"
     }`;
 
   return (
-    <div className="fixed inset-0 bg-surface text-on-surface flex flex-col overflow-auto">
-      {/* Background orbs */}
-      <div className="fixed inset-0 z-0 overflow-hidden pointer-events-none" aria-hidden="true">
-        <div className="absolute -top-[10%] -left-[5%] w-[60%] h-[60%] rounded-full bg-primary-container/10 blur-[120px]" />
-        <div className="absolute -bottom-[10%] -right-[5%] w-[50%] h-[50%] rounded-full bg-surface-container-highest/20 blur-[100px]" />
+    <BlueprintGrid showCrosshairs className="min-h-screen bg-surface text-on-surface">
+      {/* Title block */}
+      <div className="mx-auto w-full max-w-md px-6 pt-6">
+        <TitleBlock code="VMKT-BP-AUTH" rev="C" date="LOGIN" />
       </div>
 
-      {/* Main content */}
-      <main className="relative z-10 grow flex items-center justify-center px-6 py-12">
-        <div className="w-full max-w-md">
+      <main className="grow flex items-center justify-center px-6 py-10">
+        <div data-testid="auth-shell" className="w-full max-w-md">
           {/* Brand */}
-          <div className="text-center mb-10">
-            <h1 className="text-3xl font-black italic tracking-tighter text-on-surface mb-2">
+          <div className="mb-8 text-center">
+            <p className="font-mono text-[10px] uppercase tracking-[0.3em] text-secondary">PLAYER_ACCESS</p>
+            <h1 className="mt-2 font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tighter text-on-surface">
               vMarket
             </h1>
-            <p className="text-on-surface-variant font-medium tracking-tight">
+            <p className="mt-1 font-mono text-xs uppercase tracking-widest text-on-surface-muted">
               Access your gamer account
             </p>
           </div>
 
           {/* Card */}
-          <div className="bg-surface-container-low p-8 rounded-xl shadow-2xl">
-            <div className="mb-8">
-              <h2 className="text-xl font-bold text-on-surface tracking-tight mb-1">
+          <div className="border border-outline bg-surface-1/40 p-6 md:p-8">
+            <div className="mb-6">
+              <h2 className="mb-1 font-[family-name:var(--font-space-grotesk)] text-xl font-bold tracking-tight text-on-surface">
                 Welcome Back
               </h2>
-              <p className="text-on-surface-variant text-sm">
+              <p className="text-sm text-on-surface-muted">
                 Sign in to manage your listings and messages.
               </p>
             </div>
 
             {error && (
-              <div role="alert" className="mb-6 rounded-md bg-error-container/30 border border-error/30 px-4 py-3 text-sm text-error">
+              <div role="alert" className="mb-6 border border-error/30 bg-error/10 px-4 py-3 text-sm text-error">
                 {error}
               </div>
             )}
@@ -95,11 +94,11 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} noValidate className="space-y-6">
               {/* Email */}
               <div className="space-y-2">
-                <label htmlFor="email" className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant block px-1">
+                <label htmlFor="email" className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted block px-1">
                   Email Address
                 </label>
-                <div className="relative group">
-                  <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <div className="relative">
+                  <EnvelopeIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
                   <input
                     id="email"
                     name="email"
@@ -119,12 +118,12 @@ export default function LoginPage() {
               {/* Password */}
               <div className="space-y-2">
                 <div className="flex justify-between items-center px-1">
-                  <label htmlFor="password" className="text-[0.6875rem] uppercase tracking-widest font-bold text-on-surface-variant">
+                  <label htmlFor="password" className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                     Password
                   </label>
                 </div>
-                <div className="relative group">
-                  <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-outline transition-colors group-focus-within:text-primary" aria-hidden="true" />
+                <div className="relative">
+                  <LockClosedIcon className="absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-on-surface-muted" aria-hidden="true" />
                   <input
                     id="password"
                     name="password"
@@ -140,7 +139,7 @@ export default function LoginPage() {
                   <button
                     type="button"
                     onClick={() => setShowPassword((v) => !v)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-outline hover:text-on-surface"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-on-surface-muted transition-colors hover:text-on-surface"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? <EyeSlashIcon className="h-5 w-5" /> : <EyeIcon className="h-5 w-5" />}
@@ -152,35 +151,35 @@ export default function LoginPage() {
               {/* CTA */}
               <button
                 type="submit"
-                className="indigo-gradient w-full py-4 rounded-md text-on-primary-container font-bold text-sm tracking-wide shadow-lg shadow-primary-container/20 hover:scale-[1.01] active:scale-95 transition-all duration-200"
+                className="w-full min-h-12 border border-secondary bg-secondary/10 px-4 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20"
               >
-                Sign In to vMarket
+                SIGN IN TO VMARKET
               </button>
             </form>
 
             {/* Divider */}
-            <div className="flex items-center my-8 gap-4" aria-hidden="true">
-              <div className="grow h-px bg-outline-variant/20" />
-              <span className="text-[0.6875rem] uppercase tracking-widest font-bold text-outline">
+            <div className="my-8 flex items-center gap-4" aria-hidden="true">
+              <div className="grow h-px bg-outline" />
+              <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                 Or continue with
               </span>
-              <div className="grow h-px bg-outline-variant/20" />
+              <div className="grow h-px bg-outline" />
             </div>
 
-            {/* Social (FEATURE-PENDING) */}
+            {/* Social (FEATURE-PENDING — restyled, stays disabled) */}
             <div className="grid grid-cols-2 gap-4">
-              <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed">
+              <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 border border-outline bg-surface-2/60 px-4 font-mono text-xs uppercase tracking-widest text-on-surface-muted opacity-60 cursor-not-allowed">
                 Google
               </button>
-              <button type="button" disabled className="flex items-center justify-center gap-2 py-3 bg-surface-container-highest rounded-md text-on-surface-variant text-sm font-bold opacity-40 cursor-not-allowed">
+              <button type="button" disabled className="flex min-h-12 items-center justify-center gap-2 border border-outline bg-surface-2/60 px-4 font-mono text-xs uppercase tracking-widest text-on-surface-muted opacity-60 cursor-not-allowed">
                 Apple
               </button>
             </div>
 
             {/* Footer link */}
-            <p className="mt-8 text-center text-sm text-on-surface-variant">
+            <p className="mt-8 text-center text-sm text-on-surface-muted">
               New to the marketplace?{" "}
-              <Link href="/register" className="text-primary font-bold hover:text-primary-fixed transition-colors">
+              <Link href="/register" className="font-bold text-secondary hover:underline">
                 Create an account
               </Link>
             </p>
@@ -188,34 +187,11 @@ export default function LoginPage() {
         </div>
       </main>
 
-      <footer className="relative z-10 text-center py-6">
-        <p className="text-[0.6875rem] uppercase tracking-widest font-bold text-outline">
-          © {new Date().getFullYear()} vMarket. Built for gamers.
+      <footer className="py-6 text-center">
+        <p className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
+          © {new Date().getFullYear()} vMarket.
         </p>
       </footer>
-
-      <div className="hidden lg:block fixed left-12 top-1/2 -translate-y-1/2 space-y-8 opacity-20 select-none z-0" aria-hidden="true">
-        <span className="text-[0.6875rem] uppercase tracking-[0.5em] font-bold block rotate-180" style={{ writingMode: "vertical-rl" }}>
-          PLAYER_ACCESS
-        </span>
-        <div className="w-px h-32 bg-outline-variant mx-auto" />
-        <span className="text-[0.6875rem] uppercase tracking-[0.5em] font-bold block rotate-180" style={{ writingMode: "vertical-rl" }}>
-          GAMER_PROFILE
-        </span>
-      </div>
-
-      <div className="hidden xl:block fixed right-0 top-0 bottom-0 w-1/3 z-0 pointer-events-none opacity-40" aria-hidden="true">
-        <div className="h-full w-full bg-surface-container-low flex items-center justify-center p-20">
-          <div className="w-full h-full rounded-xl overflow-hidden grayscale">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              alt=""
-              className="w-full h-full object-cover mix-blend-overlay opacity-30"
-              src={LOGIN_BACKGROUND_IMAGE}
-            />
-          </div>
-        </div>
-      </div>
-    </div>
+    </BlueprintGrid>
   );
 }

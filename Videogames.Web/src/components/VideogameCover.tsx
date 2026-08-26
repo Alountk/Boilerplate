@@ -107,7 +107,7 @@ export default function VideogameCover({
   if (!currentSrc) {
     return (
       <div
-        className={`${fallbackClassName} flex items-center justify-center p-4 bg-surface-container-low text-on-surface`}
+        className={`${fallbackClassName} flex items-center justify-center p-4 bg-surface-1 text-on-surface`}
         aria-label={alt ?? title}
       >
         <div className="w-full max-w-[90%] flex flex-col items-center gap-3">
@@ -117,7 +117,7 @@ export default function VideogameCover({
           {candidates.length > 0 && (
             <button
               type="button"
-              className="px-3 py-1.5 rounded-lg border border-outline text-xs font-semibold tracking-wide uppercase hover:bg-surface-container"
+              className="px-3 py-1.5 rounded-lg border border-outline text-xs font-semibold tracking-wide uppercase hover:bg-surface-1/40"
               onClick={() => {
                 setCoverLoadState({
                   key: candidatesKey,
@@ -139,7 +139,7 @@ export default function VideogameCover({
   return (
     <div className="relative w-full h-full">
       {runtimeState.isLoading && (
-        <div className="absolute inset-0 animate-pulse bg-surface-container-low" aria-hidden="true" />
+        <div className="absolute inset-0 animate-pulse bg-surface-1" aria-hidden="true" />
       )}
 
       {/* eslint-disable-next-line @next/next/no-img-element */}
