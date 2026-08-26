@@ -21,9 +21,9 @@ export const scrollToFirstError = () => {
  */
 export const getInputClassNames = (invalid: boolean) => {
   return [
-    "w-full px-4 py-3 rounded-xl border bg-surface-container-highest text-on-surface placeholder:text-outline/60 outline-none transition-all",
+    "w-full px-4 py-3 rounded-xl border bg-surface-2/60 text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-all",
     invalid
-      ? "border-error/80 focus:ring-2 focus:ring-error/40 focus:border-error"
-      : "border-outline-variant/40 focus:ring-2 focus:ring-primary/40 focus:border-primary",
+      ? "border-error/80 focus:border-error"
+      : "border-outline focus:ring-2 focus:ring-secondary/30 focus:border-secondary",
   ].join(" ");
 };

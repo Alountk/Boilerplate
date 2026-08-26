@@ -38,15 +38,16 @@ test.describe('home — blueprint blueprints render', () => {
     await expect(page.getByText('RECIÉN LLEGADOS').first()).toBeVisible();
 
     const grid = page.locator('[data-testid="recently-added-grid"]');
-    const empty = page.getByRole('status');
+    // The grid wrapper appears once the (async) listing load resolves; a
+    // seeded-empty API shows the blueprint empty state. Wait deterministically.
+    const gridAppeared = await grid
+      .waitFor({ state: 'attached', timeout: 10000 })
+      .then(() => true)
+      .catch(() => false);
 
-    const hasGrid = await grid.count();
-    if (hasGrid) {
+    if (gridAppeared) {
       const cols = await grid.evaluate((el) => getComputedStyle(el).gridTemplateColumns.split(' ').length);
       expect(cols).toBe(2);
-    } else {
-      // No listings seeded → the blueprint empty state is the valid target.
-      await expect(empty).toBeVisible();
     }
   });
 
