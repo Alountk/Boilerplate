@@ -3,17 +3,15 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "../../context/AuthContext";
 import { useRouter } from "next/navigation";
-// Note: We need an UpdateUserService in Infrastructure, or add update method to AuthService/UserService.
-// For now, assuming we can't easily update user without a dedicated service method.
-// I'll add a placeholder or implement it if I have time.
-// The task said "updateuser".
-// I'll assume I can add `updateUser` to `IAuthService` or `UserService`.
-// Let's stick to `AuthService` for now as it handles user state.
-
 import { UpdateUserRequest } from "../../domain/ports/IAuthService";
+import { useTheme } from "../../components/ThemeProvider";
+import { THEME_REGISTRY, type ThemeId } from "../../components/theme/registry";
+import BlueprintGrid from "../../components/theme/BlueprintGrid";
+import TitleBlock from "../../components/theme/TitleBlock";
 
 export default function ProfilePage() {
   const { user, updateUser, loading } = useAuth();
+  const { theme, setTheme } = useTheme();
   const router = useRouter();
   const [formData, setFormData] = useState<UpdateUserRequest>(() => ({
     firstName: user?.firstName || "",
@@ -44,8 +42,8 @@ export default function ProfilePage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50 dark:bg-gray-900">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+      <div className="min-h-screen flex items-center justify-center bg-surface">
+        <div className="animate-spin h-12 w-12 rounded-full border-b-2 border-secondary"></div>
       </div>
     );
   }
@@ -70,63 +68,112 @@ export default function ProfilePage() {
     }
   };
 
+  const inputCls =
+    "w-full border border-outline bg-surface-2/60 px-4 py-2.5 font-mono text-sm text-on-surface placeholder:text-on-surface-muted/50 outline-none transition-colors focus:border-secondary";
+
   return (
-    <div className="min-h-[calc(100vh-140px)] bg-gray-50 dark:bg-gray-900 py-12 px-4 transition-colors duration-300">
-      <div className="max-w-2xl mx-auto">
+    <BlueprintGrid className="min-h-screen bg-surface text-on-surface">
+      <div className="mx-auto w-full max-w-2xl px-4 pt-4">
+        <TitleBlock code="VMKT-BP-PRO" rev="C" date={new Date().toLocaleDateString("es-ES", { day: "2-digit", month: "2-digit" })} />
+      </div>
+
+      <div className="mx-auto max-w-2xl px-4 py-8">
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
-            Account Settings
+          <h1 className="font-[family-name:var(--font-space-grotesk)] text-3xl font-bold tracking-tight text-on-surface">
+            Configuración de cuenta
           </h1>
-          <p className="text-gray-500 dark:text-gray-400 mt-2">
+          <p className="mt-2 text-sm text-on-surface-muted">
             Manage your personal information and preferences
           </p>
         </div>
 
-        <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl overflow-hidden border border-gray-100 dark:border-gray-700">
-          <div className="bg-blue-600 px-8 py-4 text-white">
-            <h2 className="text-lg font-bold">Personal Profile</h2>
+        {/* ── Theme selector ─────────────────────────── */}
+        <section aria-labelledby="theme-heading" className="mb-8 border border-outline bg-surface-1/40 p-5">
+          <h2 id="theme-heading" className="mb-4 font-mono text-xs uppercase tracking-[0.2em] text-secondary">
+            Selección de tema
+          </h2>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3 sm:gap-4">
+            {THEME_REGISTRY.map((def) => {
+              const isActive = theme === def.id;
+              return (
+                <label
+                  key={def.id}
+                  className={`relative flex flex-col gap-2 border p-3 transition-colors ${
+                    isActive
+                      ? "border-secondary bg-secondary/10"
+                      : "border-outline bg-surface-2/60"
+                  } ${def.disabled ? "opacity-60" : "cursor-pointer"}`}
+                >
+                  <input
+                    type="radio"
+                    name="theme"
+                    value={def.id}
+                    checked={isActive}
+                    disabled={def.disabled}
+                    aria-label={def.name}
+                    onChange={() => setTheme(def.id as ThemeId)}
+                    className="sr-only"
+                  />
+                  <span className="font-mono text-sm font-bold uppercase tracking-widest text-on-surface">
+                    {def.name.toUpperCase()}
+                  </span>
+                  <span className="font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
+                    {def.description}
+                  </span>
+                  {isActive ? (
+                    <span className="absolute top-2 right-2 border border-secondary px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-secondary">
+                      ACTIVO
+                    </span>
+                  ) : null}
+                  {def.disabled ? (
+                    <span className="absolute top-2 right-2 border border-warning px-1.5 py-0.5 font-mono text-[9px] uppercase tracking-widest text-warning">
+                      PRÓXIMAMENTE
+                    </span>
+                  ) : null}
+                </label>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* ── Personal profile form ──────────────────── */}
+        <section aria-labelledby="profile-heading" className="border border-outline bg-surface-1/40">
+          <div className="border-b border-outline px-6 py-3">
+            <h2 id="profile-heading" className="font-mono text-xs uppercase tracking-[0.2em] text-secondary">
+              Personal Profile
+            </h2>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 space-y-6">
+          <form onSubmit={handleSubmit} className="space-y-6 p-6">
             {message && (
               <div
-                className={`p-4 rounded-xl text-sm font-medium border ${
+                className={`border px-4 py-3 text-sm font-medium ${
                   message.includes("success")
-                    ? "bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400 border-green-100 dark:border-green-800"
-                    : "bg-red-50 dark:bg-red-900/20 text-red-600 dark:text-red-400 border-red-100 dark:border-red-800"
+                    ? "border-success/50 bg-success/10 text-success"
+                    : "border-error/50 bg-error/10 text-error"
                 }`}
               >
                 {message}
               </div>
             )}
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+                <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                   First Name
                 </label>
-                <input
-                  name="firstName"
-                  value={formData.firstName || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+                <input name="firstName" value={formData.firstName || ""} onChange={handleChange} className={inputCls} />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+                <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                   Last Name
                 </label>
-                <input
-                  name="lastName"
-                  value={formData.lastName || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+                <input name="lastName" value={formData.lastName || ""} onChange={handleChange} className={inputCls} />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+              <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                 Email Address
               </label>
               <input
@@ -134,76 +181,54 @@ export default function ProfilePage() {
                 type="email"
                 value={formData.email || ""}
                 onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-100 dark:border-gray-800 bg-gray-50 dark:bg-gray-900/50 text-gray-500 dark:text-gray-400 cursor-not-allowed"
+                className={`${inputCls} cursor-not-allowed opacity-60`}
                 disabled
               />
-              <p className="text-[10px] text-gray-500 mt-1 italic">
+              <p className="mt-1 font-mono text-[9px] uppercase tracking-widest text-on-surface-muted italic">
                 Email address cannot be modified for security.
               </p>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+              <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                 Mailing Address
               </label>
-              <input
-                name="address"
-                value={formData.address || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                placeholder="Residential address"
-              />
+              <input name="address" value={formData.address || ""} onChange={handleChange} className={inputCls} placeholder="Residential address" />
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
               <div>
-                <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+                <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                   City
                 </label>
-                <input
-                  name="city"
-                  value={formData.city || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+                <input name="city" value={formData.city || ""} onChange={handleChange} className={inputCls} />
               </div>
               <div>
-                <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+                <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                   Country
                 </label>
-                <input
-                  name="country"
-                  value={formData.country || ""}
-                  onChange={handleChange}
-                  className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                />
+                <input name="country" value={formData.country || ""} onChange={handleChange} className={inputCls} />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-semibold mb-2 dark:text-gray-300 uppercase text-[10px] tracking-wider">
+              <label className="mb-2 block font-mono text-[10px] uppercase tracking-widest text-on-surface-muted">
                 Phone Number
               </label>
-              <input
-                name="phone"
-                value={formData.phone || ""}
-                onChange={handleChange}
-                className="w-full px-4 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-transparent dark:text-white focus:ring-2 focus:ring-blue-500 focus:border-transparent outline-none transition-all"
-                placeholder="+1..."
-              />
+              <input name="phone" value={formData.phone || ""} onChange={handleChange} className={inputCls} placeholder="+1..." />
             </div>
 
-            <div className="pt-6 border-t border-gray-100 dark:border-gray-700 mt-8 flex justify-end">
+            <div className="flex justify-end border-t border-outline pt-6">
               <button
                 type="submit"
-                className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-500/25 active:scale-[0.98]"
+                className="min-h-12 border border-secondary bg-secondary/10 px-8 font-mono text-xs uppercase tracking-widest text-secondary transition-colors active:bg-secondary/20"
               >
                 Save Changes
               </button>
             </div>
           </form>
-        </div>
+        </section>
       </div>
-    </div>
+    </BlueprintGrid>
   );
 }
