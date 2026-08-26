@@ -170,7 +170,7 @@ export function AdvancedOptions({
                   <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase" htmlFor={`lang-${index}`}>Language</label>
                   <input id={`lang-${index}`} name="language" value={item.language} onChange={(e) => onNameChange(index, e)} className={getInputClassNames(false)} placeholder="ES, FR, JP, etc." />
                 </div>
-                <div className="flex-2 space-y-1">
+                <div className="flex-1 space-y-1">
                   <label className="block text-xs font-bold mb-1 text-on-surface-variant uppercase" htmlFor={`name-${index}`}>Localized Title</label>
                   <input id={`name-${index}`} name="name" value={item.name} onChange={(e) => onNameChange(index, e)} className={getInputClassNames(false)} placeholder="Translated game title" />
                 </div>
