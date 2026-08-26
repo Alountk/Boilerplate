@@ -149,7 +149,7 @@ create_game "The Legend of Zelda: Breath of the Wild — Nintendo Switch" \
     description:"Una aventura de mundo abierto en la vasta tierra de Hyrule. Explora libremente, resuelve puzles y descubre secretos en esta obra maestra de Nintendo. Incluye todos los DLC.",
     urlImg:"https://media.rawg.io/media/games/cc3/cc3f1da19de2499e981c88a7f099a1b4.jpg",
     generalState:9.0,averagePrice:55.00,ownPrice:49.99,
-    acceptOffersRange:10.0,score:9.8,category:1,contents:[]
+    acceptOffersRange:10.0,score:9.8,category:2,contents:[]
   }')"
 
 # 2 — God of War (PlayStation 4)
@@ -166,7 +166,7 @@ create_game "God of War — PlayStation 4" \
     description:"Kratos y su hijo Atreus emprenden un viaje por la mitología nórdica. Una obra maestra de narrativa y combate que redefine el género de acción-aventura.",
     urlImg:"https://media.rawg.io/media/games/4be/4be6a6ad0364751a96229c56bf69be73.jpg",
     generalState:9.5,averagePrice:30.00,ownPrice:27.99,
-    acceptOffersRange:5.0,score:9.7,category:1,contents:[]
+    acceptOffersRange:5.0,score:9.7,category:0,contents:[]
   }')"
 
 # 3 — Super Mario Odyssey (Nintendo Switch)
@@ -183,7 +183,7 @@ create_game "Super Mario Odyssey — Nintendo Switch" \
     description:"Acompaña a Mario en una aventura mundial para rescatar a la princesa Peach. Captura enemigos con la gorra Cappy para usar sus habilidades. Un 3D-platformer sin igual.",
     urlImg:"https://media.rawg.io/media/games/267/267bd0dbc496f52692487d07d014c362.jpg",
     generalState:9.0,averagePrice:50.00,ownPrice:44.99,
-    acceptOffersRange:7.0,score:9.5,category:1,contents:[]
+    acceptOffersRange:7.0,score:9.5,category:2,contents:[]
   }')"
 
 # 4 — The Last of Us Remastered (PlayStation 4)
@@ -200,7 +200,7 @@ create_game "The Last of Us Remastered — PlayStation 4" \
     description:"Una aventura post-apocalíptica en impresionante 1080p. Un viaje de supervivencia y humanidad a través de un mundo devastado. Considerado uno de los mejores juegos de la historia.",
     urlImg:"https://media.rawg.io/media/games/a5a/a5abaa1b5cc1567b026b7240f606f7e8.jpg",
     generalState:9.5,averagePrice:25.00,ownPrice:22.00,
-    acceptOffersRange:5.0,score:9.6,category:1,contents:[]
+    acceptOffersRange:5.0,score:9.6,category:0,contents:[]
   }')"
 
 # 5 — Red Dead Redemption 2 (PlayStation 4)
@@ -217,7 +217,7 @@ create_game "Red Dead Redemption 2 — PlayStation 4" \
     description:"Una épica historia de forajidos en el corazón de la América sin ley. Lealtad, honor y un mundo en constante cambio que no espera a nadie. La experiencia de mundo abierto definitiva.",
     urlImg:"https://media.rawg.io/media/games/511/5118aff5091a1d002b1b97d77636a3bc.jpg",
     generalState:8.5,averagePrice:35.00,ownPrice:29.99,
-    acceptOffersRange:10.0,score:9.4,category:1,contents:[]
+    acceptOffersRange:10.0,score:9.4,category:0,contents:[]
   }')"
 
 # 6 — Halo: The Master Chief Collection (Xbox One)
@@ -249,7 +249,7 @@ create_game "Hollow Knight — Nintendo Switch" \
     description:"Una desafiante y hermosa aventura de acción a través de un vasto reino en ruinas habitado por insectos. Explora cavernas retorcidas, descubre historia antigua y domina el combate.",
     urlImg:"https://media.rawg.io/media/games/4cf/4cfc6b7f1850590a4634b08bfab308ab.jpg",
     generalState:9.5,averagePrice:20.00,ownPrice:17.99,
-    acceptOffersRange:5.0,score:9.1,category:1,contents:[]
+    acceptOffersRange:5.0,score:9.1,category:2,contents:[]
   }')"
 
 # 8 — Forza Horizon 5 (Xbox Series X)
@@ -282,7 +282,7 @@ create_game "Pokemon Scarlet — Nintendo Switch" \
     description:"Explora la región de Paldea en un RPG Pokemon de mundo abierto. Descubre nuevas criaturas en una historia de tres caminos únicos. La nueva generación del universo Pokemon.",
     urlImg:"https://media.rawg.io/media/games/73e/73eecb8909e0c39fb246f457b5d6cbbe.jpg",
     generalState:7.5,averagePrice:60.00,ownPrice:55.00,
-    acceptOffersRange:8.0,score:7.8,category:1,contents:[]
+    acceptOffersRange:8.0,score:7.8,category:2,contents:[]
   }')"
 
 # 10 — Marvel's Spider-Man (PlayStation 4)
@@ -299,7 +299,7 @@ create_game "Marvels Spider-Man — PlayStation 4" \
     description:"Recorre Nueva York como un experimentado Peter Parker con movimientos acrobáticos únicos. Una aventura de superhéroes que redefine el género con una narrativa impresionante.",
     urlImg:"https://media.rawg.io/media/games/9aa/9aa42d16d425fa6f179fc9dc2f763647.jpg",
     generalState:9.0,averagePrice:30.00,ownPrice:26.99,
-    acceptOffersRange:7.0,score:9.3,category:1,contents:[]
+    acceptOffersRange:7.0,score:9.3,category:0,contents:[]
   }')"
 
 # ── Done ─────────────────────────────────────────────────────────────────────
