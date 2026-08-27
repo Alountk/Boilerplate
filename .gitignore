@@ -102,6 +102,12 @@ Desktop.ini
 
 .env
 .env.local
+.env.*
+!.env.example
+!.env.portainer.example
+
+# TypeScript incremental build info
+*.tsbuildinfo
 
 # Agents
 .agents/
@@ -112,3 +118,5 @@ audit-output/
 test-results/
 
 /design
+# Local Pi runtime state
+.atl/
